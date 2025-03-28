@@ -21,7 +21,7 @@ const ChatSupport = () => {
     if (!message.trim()) return;
     
     // Add user message
-    const newMessages = [...messages, { text: message, sender: 'user' }];
+    const newMessages = [...messages, { text: message, sender: 'user' as const }];
     setMessages(newMessages);
     setMessage('');
     
@@ -33,7 +33,7 @@ const ChatSupport = () => {
           text: language === 'en' 
             ? "Thank you for your message. Dr. Bassma's team will respond shortly." 
             : "شكراً لرسالتك. سيرد فريق د. بسمة قريباً.",
-          sender: 'agent' 
+          sender: 'agent' as const 
         }
       ]);
     }, 1000);
