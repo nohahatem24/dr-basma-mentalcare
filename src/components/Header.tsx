@@ -42,7 +42,7 @@ const Header = () => {
           <div className="flex items-center justify-between w-full">
             <Link to="/" className="flex items-center gap-2">
               <span className="font-montserrat text-xl font-bold header-gradient">
-                {language === 'en' ? 'Dr. Besma Mental Hub' : 'مركز د. بسمة للصحة النفسية'}
+                {language === 'en' ? 'Dr. Bassma Mental Hub' : 'مركز د. بسمة للصحة النفسية'}
               </span>
             </Link>
 
