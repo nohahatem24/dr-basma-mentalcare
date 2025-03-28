@@ -13,6 +13,7 @@ import Services from "./pages/Services";
 import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import ChatSupport from "./components/ChatSupport";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
               </Routes>
             </main>
             <Footer />
+            <ChatSupport />
           </div>
         </BrowserRouter>
       </TooltipProvider>

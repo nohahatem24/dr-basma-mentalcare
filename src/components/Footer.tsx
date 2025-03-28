@@ -1,55 +1,70 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from './Header';
 
 const Footer = () => {
+  const { language } = useLanguage();
+  
   return (
-    <footer className="w-full border-t bg-background py-6">
+    <footer className={`w-full border-t bg-background py-6 ${language === 'ar' ? 'arabic text-right' : ''}`}>
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4 header-gradient">Dr. Bassma Mental Hub</h3>
+            <h3 className="text-xl font-bold mb-4 header-gradient">
+              {language === 'en' ? 'Dr. Bassma Mental Hub' : 'د. بسمة للصحة النفسية'}
+            </h3>
             <p className="text-muted-foreground text-sm mb-4">
-              Track, Understand, Heal - A comprehensive platform for mental health and emotional well-being.
+              {language === 'en' 
+                ? 'Track, Understand, Heal - A comprehensive platform for mental health and emotional well-being.'
+                : 'تتبع، افهم، اشفى - منصة شاملة للصحة النفسية والرفاهية العاطفية.'}
             </p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-semibold mb-4">
+              {language === 'en' ? 'Quick Links' : 'روابط سريعة'}
+            </h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Home
+                  {language === 'en' ? 'Home' : 'الرئيسية'}
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  About
+                  {language === 'en' ? 'About' : 'عن الدكتورة'}
                 </Link>
               </li>
               <li>
                 <Link to="/services" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Services
+                  {language === 'en' ? 'Services' : 'الخدمات'}
                 </Link>
               </li>
               <li>
                 <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  MindTrack
+                  {language === 'en' ? 'MindTrack' : 'مايند تراك'}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Contact
+                  {language === 'en' ? 'Contact' : 'التواصل'}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
+            <h4 className="font-semibold mb-4">
+              {language === 'en' ? 'Contact' : 'التواصل'}
+            </h4>
             <address className="not-italic text-sm text-muted-foreground">
-              <p className="mb-2">Email: info@drbassma.com</p>
-              <p className="mb-2">Phone: +123 456 7890</p>
+              <p className="mb-2">
+                {language === 'en' ? 'Email: info@drbassma.com' : 'البريد الإلكتروني: info@drbassma.com'}
+              </p>
+              <p className="mb-2">
+                {language === 'en' ? 'Phone: +123 456 7890' : 'الهاتف: +123 456 7890'}
+              </p>
               <div className="flex gap-4 mt-4">
                 <a href="#" className="text-muted-foreground hover:text-primary">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -75,7 +90,9 @@ const Footer = () => {
 
         <div className="mt-8 border-t pt-4 text-center">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Dr. Bassma Mental Hub. All rights reserved.
+            {language === 'en' 
+              ? `© ${new Date().getFullYear()} Dr. Bassma Mental Hub. All rights reserved.`
+              : `© ${new Date().getFullYear()} د. بسمة للصحة النفسية. جميع الحقوق محفوظة.`}
           </p>
         </div>
       </div>
