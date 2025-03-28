@@ -42,7 +42,7 @@ const Header = () => {
           <div className="flex items-center justify-between w-full">
             <Link to="/" className="flex items-center gap-2">
               <span className="font-montserrat text-xl font-bold header-gradient">
-                {language === 'en' ? 'Dr. Bassma' : 'د. بسمة'}
+                {language === 'en' ? 'Dr. Besma Mental Hub' : 'مركز د. بسمة للصحة النفسية'}
               </span>
             </Link>
 
@@ -82,8 +82,10 @@ const Header = () => {
                   <Moon className="h-5 w-5" />
                 )}
               </Button>
-              <Button size="sm" className="btn-primary">
-                {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
+              <Button size="sm" className="btn-primary" asChild>
+                <Link to="/auth">
+                  {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
+                </Link>
               </Button>
             </div>
 
@@ -132,8 +134,10 @@ const Header = () => {
                   {route.label}
                 </Link>
               ))}
-              <Button size="sm" className="btn-primary w-full">
-                {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
+              <Button size="sm" className="btn-primary w-full" asChild>
+                <Link to="/auth">
+                  {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
+                </Link>
               </Button>
             </nav>
           </div>

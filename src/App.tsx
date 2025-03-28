@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ChatSupport from "./components/ChatSupport";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/services" element={<Services />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
