@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { MessageCircle, X, Send, Clock, User } from 'lucide-react';
 import { useLanguage } from './Header';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from './NotificationSystem';
 
 type ChatMessage = {
   id: string;
@@ -19,6 +21,7 @@ const ChatSupport = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { language } = useLanguage();
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const [isLoading, setIsLoading] = useState(true);
   const [requestedSupport, setRequestedSupport] = useState(false);
 
@@ -50,6 +53,35 @@ const ChatSupport = () => {
     }
     setIsLoading(false);
   }, [language]);
+
+  useEffect(() => {
+    // Simulate receiving a message from the therapist after 30 seconds
+    // This is just for demo purposes - in a real app, this would come from a websocket or API
+    const simulateTherapistResponse = setTimeout(() => {
+      // Only simulate if there's user activity (messages exist)
+      if (messages.length > 1 && !isOpen) {
+        const therapistMessage = {
+          id: Date.now().toString(),
+          text: language === 'en'
+            ? 'Dr. Bassma has replied to your message. Click to view.'
+            : 'لقد ردت د. بسمة على رسالتك. انقر للعرض.',
+          sender: 'agent' as const,
+          timestamp: new Date()
+        };
+        
+        addNotification({
+          message: language === 'en' 
+            ? 'Dr. Bassma: Thanks for reaching out. How are you feeling today?'
+            : 'د. بسمة: شكراً للتواصل. كيف تشعر اليوم؟',
+          type: 'message'
+        });
+        
+        setMessages(prev => [...prev, therapistMessage]);
+      }
+    }, 30000);
+    
+    return () => clearTimeout(simulateTherapistResponse);
+  }, [messages, isOpen, language, addNotification]);
 
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
@@ -89,6 +121,18 @@ const ChatSupport = () => {
           description: language === 'en' ? 'A human agent will assist you soon.' : 'سيقوم أحد المختصين بمساعدتك قريبًا.',
         });
         
+        // Add notification for when the user is requesting to speak with Dr. Bassma
+        setTimeout(() => {
+          if (!isOpen) {
+            addNotification({
+              message: language === 'en' 
+                ? 'Dr. Bassma will review your message soon'
+                : 'ستقوم د. بسمة بمراجعة رسالتك قريبًا',
+              type: 'message'
+            });
+          }
+        }, 5000);
+        
         setRequestedSupport(true);
       } else if (requestedSupport) {
         responseText = language === 'en' 
@@ -96,7 +140,7 @@ const ChatSupport = () => {
           : "فريقنا لا يزال يعمل على طلبك السابق. سيرد عليك أحد المختصين في أقرب وقت ممكن.";
       } else {
         responseText = language === 'en' 
-          ? "Thank you for your message. Is there anything specific about Dr. Besma's services you'd like to know?"
+          ? "Thank you for your message. Is there anything specific about Dr. Bassma's services you'd like to know?"
           : "شكراً لرسالتك. هل هناك أي شيء محدد حول خدمات د. بسمة ترغب في معرفته؟";
       }
       
