@@ -9,7 +9,267 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_users: {
+        Row: {
+          created_at: string | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cbt_exercises: {
+        Row: {
+          alternative_thoughts: string | null
+          behaviors: string
+          created_at: string | null
+          emotions: string
+          id: string
+          situation: string
+          thoughts: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alternative_thoughts?: string | null
+          behaviors: string
+          created_at?: string | null
+          emotions: string
+          id?: string
+          situation: string
+          thoughts: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alternative_thoughts?: string | null
+          behaviors?: string
+          created_at?: string | null
+          emotions?: string
+          id?: string
+          situation?: string
+          thoughts?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          progress: number | null
+          status: string | null
+          target_date: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          progress?: number | null
+          status?: string | null
+          target_date?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          progress?: number | null
+          status?: string | null
+          target_date?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      gratitude_entries: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          sentiment: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          sentiment?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          sentiment?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          read: boolean | null
+          sender: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          sender: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          sender?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mood_entries: {
+        Row: {
+          created_at: string | null
+          id: string
+          mood_label: string | null
+          mood_score: number
+          notes: string | null
+          triggers: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mood_label?: string | null
+          mood_score: number
+          notes?: string | null
+          triggers?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mood_label?: string | null
+          mood_score?: number
+          notes?: string | null
+          triggers?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          first_name: string | null
+          id: string
+          language: string | null
+          last_name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          language?: string | null
+          last_name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          language?: string | null
+          last_name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string | null
+          notifications_enabled: boolean | null
+          reminder_time: string | null
+          theme: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          notifications_enabled?: boolean | null
+          reminder_time?: string | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          notifications_enabled?: boolean | null
+          reminder_time?: string | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
