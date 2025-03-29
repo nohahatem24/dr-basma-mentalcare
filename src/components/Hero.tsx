@@ -17,14 +17,17 @@ const Hero = () => {
     {
       title: language === 'en' ? 'MindTrack' : 'مايند تراك',
       subtitle: language === 'en' ? 'Your personal mental wellness companion' : 'رفيقك الشخصي للصحة النفسية',
+      description: language === 'en' ? 'Track your daily mood, identify triggers, and monitor your mental health journey with our intuitive tools.' : 'تتبع مزاجك اليومي، وتحديد المحفزات، ومراقبة رحلة صحتك النفسية مع أدواتنا البديهية.'
     },
     {
-      title: language === 'en' ? 'Track Your Mood' : 'تتبع مزاجك',
-      subtitle: language === 'en' ? 'Monitor your emotional health daily' : 'راقب صحتك العاطفية يوميًا',
+      title: language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية',
+      subtitle: language === 'en' ? 'Evidence-based CBT & DBT techniques' : 'تقنيات العلاج المعرفي السلوكي والعلاج السلوكي الجدلي المستندة إلى الأدلة',
+      description: language === 'en' ? 'Practice proven exercises from Dr. Bassma\'s therapeutic methods to improve your mental well-being.' : 'ممارسة التمارين المثبتة من أساليب الدكتورة بسمة العلاجية لتحسين صحتك النفسية.'
     },
     {
-      title: language === 'en' ? 'AI Insights' : 'رؤى الذكاء الاصطناعي',
-      subtitle: language === 'en' ? 'Get personalized mental health recommendations' : 'احصل على توصيات مخصصة للصحة النفسية',
+      title: language === 'en' ? 'Self-Reporting' : 'التقارير الذاتية',
+      subtitle: language === 'en' ? 'Detailed insights into your mental health' : 'رؤى مفصلة حول صحتك النفسية',
+      description: language === 'en' ? 'Generate comprehensive mental health reports to track progress and share with your healthcare provider.' : 'إنشاء تقارير شاملة عن الصحة النفسية لتتبع التقدم ومشاركتها مع مقدم الرعاية الصحية الخاص بك.'
     }
   ];
 
@@ -46,8 +49,8 @@ const Hero = () => {
             </h1>
             <p className="text-xl text-muted-foreground">
               {language === 'en' 
-                ? 'Welcome to Dr. Bassma Mental Hub. Track your emotional well-being and get personalized insights for better mental health.'
-                : 'مرحبًا بك في مركز د. بسمة للصحة النفسية. تتبع صحتك العاطفية واحصل على رؤى مخصصة لصحة نفسية أفضل.'}
+                ? 'Welcome to Dr. Bassma Mental Care. Track your emotional well-being and get personalized insights for better mental health.'
+                : 'مرحبًا بك في مركز د. بسمة للرعاية النفسية. تتبع صحتك العاطفية واحصل على رؤى مخصصة لصحة نفسية أفضل.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button className="btn-primary" size="lg" asChild>
@@ -69,10 +72,11 @@ const Hero = () => {
                 {carouselItems.map((item, index) => (
                   <CarouselItem key={index}>
                     <div className="aspect-video bg-gradient-to-br from-mindtrack-blue to-mindtrack-green opacity-80 rounded-xl"></div>
-                    <div className="absolute inset-0 flex items-center justify-center text-white">
-                      <div className="text-center p-6">
-                        <h2 className="text-2xl font-bold mb-4">{item.title}</h2>
-                        <p className="mb-6">{item.subtitle}</p>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
+                      <div className="text-center max-w-md">
+                        <h2 className="text-2xl md:text-3xl font-bold mb-2">{item.title}</h2>
+                        <p className="text-lg mb-3 font-medium">{item.subtitle}</p>
+                        <p className="text-sm md:text-base opacity-90">{item.description}</p>
                       </div>
                     </div>
                   </CarouselItem>

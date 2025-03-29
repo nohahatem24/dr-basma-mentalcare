@@ -12,7 +12,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4 header-gradient">
-              {language === 'en' ? 'Dr. Bassma Mental Hub' : 'د. بسمة للصحة النفسية'}
+              {language === 'en' ? 'Dr. Bassma Mental Care' : 'د. بسمة للرعاية النفسية'}
             </h3>
             <p className="text-muted-foreground text-sm mb-4">
               {language === 'en' 
@@ -91,8 +91,8 @@ const Footer = () => {
         <div className="mt-8 border-t pt-4 text-center">
           <p className="text-xs text-muted-foreground">
             {language === 'en' 
-              ? `© ${new Date().getFullYear()} Dr. Bassma Mental Hub. All rights reserved.`
-              : `© ${new Date().getFullYear()} د. بسمة للصحة النفسية. جميع الحقوق محفوظة.`}
+              ? `© ${new Date().getFullYear()} Dr. Bassma Mental Care. All rights reserved.`
+              : `© ${new Date().getFullYear()} د. بسمة للرعاية النفسية. جميع الحقوق محفوظة.`}
           </p>
         </div>
       </div>
