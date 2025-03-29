@@ -1,69 +1,76 @@
-# Welcome to your Lovable project
+# موقع العناية النفسية
 
-## Project info
+موقع للجلسات النفسية عبر الإنترنت مع نظام حجز المواعيد والدفع الآمن.
 
-**URL**: https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37
+## المتطلبات
 
-## How can I edit this code?
+- Node.js (الإصدار 18 أو أحدث)
+- npm أو yarn
+- Docker (لتشغيل Supabase محلياً)
+- حساب Supabase
+- حساب Stripe
 
-There are several ways of editing your application.
+## التثبيت
 
-**Use Lovable**
+1. استنساخ المستودع:
+```bash
+git clone https://github.com/yourusername/mental-care-website.git
+cd mental-care-website
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37) and start prompting.
+2. تثبيت التبعيات:
+```bash
+npm install
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+3. إنشاء ملف `.env` وتحديث المتغيرات البيئية:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+```
 
-**Use your preferred IDE**
+4. تشغيل Supabase محلياً:
+```bash
+npm run supabase:start
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+5. تطبيق ترحيل قاعدة البيانات:
+```bash
+npm run supabase:db:push
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+6. تشغيل التطبيق:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## الميزات
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- نظام مصادقة كامل للمستخدمين والأطباء
+- حجز المواعيد الفورية والمجدولة
+- نظام دفع آمن باستخدام Stripe
+- تتبع حالة الطبيب في الوقت الفعلي
+- واجهة مستخدم سهلة الاستخدام
+- تصميم متجاوب
 
-**Use GitHub Codespaces**
+## التقنيات المستخدمة
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
 - React
-- shadcn-ui
-- Tailwind CSS
+- TypeScript
+- Supabase (قاعدة البيانات والمصادقة)
+- Stripe (نظام الدفع)
+- Tailwind CSS (التصميم)
 
-## How can I deploy this project?
+## المساهمة
 
-Simply open [Lovable](https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37) and click on Share -> Publish.
+نرحب بمساهماتكم! يرجى اتباع الخطوات التالية:
 
-## I want to use a custom domain - is that possible?
+1. إنشاء فرع جديد (`git checkout -b feature/amazing-feature`)
+2. حفظ التغييرات (`git commit -m 'إضافة ميزة رائعة'`)
+3. دفع التغييرات إلى الفرع (`git push origin feature/amazing-feature`)
+4. فتح طلب سحب
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## الترخيص
+
+هذا المشروع مرخص تحت رخصة MIT - راجع ملف [LICENSE](LICENSE) لمزيد من التفاصيل.

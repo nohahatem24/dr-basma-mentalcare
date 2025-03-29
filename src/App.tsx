@@ -1,52 +1,61 @@
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './pages/Home';
+import { useTranslation } from '@/hooks/useTranslation';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/hooks/use-theme";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Services from "./pages/Services";
-import Dashboard from "./pages/Dashboard";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
-import ChatSupport from "./components/ChatSupport";
-import Auth from "./pages/Auth";
-import SelfReporting from "./pages/SelfReporting";
+// عند إضافة صفحات أخرى، سيتم استيرادها هنا
+// import DoctorProfilePage from './pages/DoctorProfilePage';
+// import LoginPage from './pages/auth/LoginPage';
+// import RegisterPage from './pages/auth/RegisterPage';
+// import AppointmentsPage from './pages/AppointmentsPage';
+// import VideoCallPage from './pages/VideoCallPage';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/self-reporting" element={<SelfReporting />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-            <ChatSupport />
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App: React.FC = () => {
+  const { isRTL } = useTranslation();
+  
+  // تطبيق الاتجاه الصحيح للغة على الجسم
+  useEffect(() => {
+    // إضافة فئة للتسهيلات مع RTL
+    if (isRTL) {
+      document.body.classList.add('rtl');
+      document.body.classList.remove('ltr');
+    } else {
+      document.body.classList.add('ltr');
+      document.body.classList.remove('rtl');
+    }
+    
+    // إضافة خطوط Google للغة العربية
+    const googleFontsLink = document.createElement('link');
+    googleFontsLink.rel = 'stylesheet';
+    googleFontsLink.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap';
+    document.head.appendChild(googleFontsLink);
+    
+    return () => {
+      // تنظيف
+      document.head.removeChild(googleFontsLink);
+    };
+  }, [isRTL]);
+  
+  return (
+    <Router>
+      <div className={`app ${isRTL ? 'rtl' : 'ltr'}`}>
+        <Routes>
+          {/* الصفحة الرئيسية */}
+          <Route path="/" element={<Home />} />
+          
+          {/* عند إضافة المزيد من الصفحات */}
+          {/* <Route path="/doctor/:id" element={<DoctorProfilePage />} /> */}
+          {/* <Route path="/login" element={<LoginPage />} /> */}
+          {/* <Route path="/register" element={<RegisterPage />} /> */}
+          {/* <Route path="/appointments" element={<AppointmentsPage />} /> */}
+          {/* <Route path="/video-call/:appointmentId" element={<VideoCallPage />} /> */}
+          
+          {/* توجيه للصفحة الرئيسية إذا لم يتم العثور على المسار */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+};
 
 export default App;
