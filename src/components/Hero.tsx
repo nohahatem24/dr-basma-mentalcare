@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -7,8 +8,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
 } from '@/components/ui/auto-carousel';
 
 const Hero = () => {
@@ -74,24 +73,14 @@ const Hero = () => {
           </div>
 
           <div className="relative rounded-xl overflow-hidden shadow-xl animate-fade-in">
-            <Carousel 
-              className="w-full" 
-              opts={{
-                align: "center",
-                containScroll: "trimSnaps",
-                loop: true,
-              }}
-              autoplay={true} 
-              interval={5000} 
-              setApi={(api) => {
-                api?.on('select', () => {
-                  handleSlideChange(api.selectedScrollSnap());
-                });
-              }}
-            >
-              <CarouselContent className="-ml-0">
+            <Carousel className="w-full" autoplay={true} interval={5000} setApi={(api) => {
+              api?.on('select', () => {
+                handleSlideChange(api.selectedScrollSnap());
+              });
+            }}>
+              <CarouselContent>
                 {carouselItems.map((item, index) => (
-                  <CarouselItem key={index} className="pl-0">
+                  <CarouselItem key={index}>
                     <div className="aspect-video bg-gradient-to-br from-mindtrack-blue to-mindtrack-green opacity-80 rounded-xl"></div>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
                       <div className="text-center max-w-md">
@@ -103,8 +92,6 @@ const Hero = () => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
-              <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
               <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
                 {carouselItems.map((_, index) => (
                   <span 
