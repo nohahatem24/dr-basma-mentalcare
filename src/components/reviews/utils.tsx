@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Star, StarHalf } from 'lucide-react';
+import { Review } from './types';
 
 export const renderStars = (count: number) => {
   const stars = [];
