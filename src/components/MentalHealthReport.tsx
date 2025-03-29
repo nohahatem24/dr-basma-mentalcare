@@ -8,11 +8,11 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/Header';
-import { Download, Calendar as CalendarIcon, FileDown, LineChart, Brain } from 'lucide-react';
+import { Download, Calendar as CalendarIcon, FileDown, LineChart, Brain, Printer, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
-type ReportFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+type ReportFrequency = 'daily' | 'weekly' | 'monthly' | 'custom';
 
 const MentalHealthReport = () => {
   const { language } = useLanguage();
@@ -64,6 +64,22 @@ const MentalHealthReport = () => {
     });
   };
   
+  const handlePrintReport = () => {
+    toast({
+      title: language === 'en' ? 'Printing Report' : 'جاري طباعة التقرير',
+      description: language === 'en' ? 'Your report is being sent to your printer.' : 'يتم إرسال تقريرك إلى الطابعة.',
+    });
+    // In a real implementation, this would trigger the print dialog
+    window.print();
+  };
+  
+  const handleSendReport = () => {
+    toast({
+      title: language === 'en' ? 'Report Sent' : 'تم إرسال التقرير',
+      description: language === 'en' ? 'Your report has been sent to Dr. Bassma.' : 'تم إرسال تقريرك إلى الدكتورة بسمة.',
+    });
+  };
+  
   const formatDate = (date: Date | undefined) => {
     if (!date) return '';
     return format(date, 'PPP', {
@@ -106,8 +122,8 @@ const MentalHealthReport = () => {
               <SelectItem value="monthly">
                 {language === 'en' ? 'Monthly' : 'شهري'}
               </SelectItem>
-              <SelectItem value="yearly">
-                {language === 'en' ? 'Yearly' : 'سنوي'}
+              <SelectItem value="custom">
+                {language === 'en' ? 'Custom Range' : 'نطاق مخصص'}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -206,6 +222,24 @@ const MentalHealthReport = () => {
                 </span>
               </Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <input type="checkbox" id="include-relationships" className="rounded text-primary" defaultChecked />
+              <Label htmlFor="include-relationships" className="cursor-pointer">
+                {language === 'en' ? 'Relationships' : 'العلاقات'}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input type="checkbox" id="include-cbt" className="rounded text-primary" defaultChecked />
+              <Label htmlFor="include-cbt" className="cursor-pointer">
+                {language === 'en' ? 'CBT Exercises' : 'تمارين CBT'}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input type="checkbox" id="include-dbt" className="rounded text-primary" defaultChecked />
+              <Label htmlFor="include-dbt" className="cursor-pointer">
+                {language === 'en' ? 'DBT Exercises' : 'تمارين DBT'}
+              </Label>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -221,14 +255,34 @@ const MentalHealthReport = () => {
         </Button>
         
         {reportGenerated && (
-          <Button 
-            variant="outline" 
-            onClick={handleDownloadReport}
-            className="w-full sm:w-auto"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {language === 'en' ? 'Download PDF' : 'تنزيل PDF'}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={handleDownloadReport}
+              className="w-full sm:w-auto"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {language === 'en' ? 'Download PDF' : 'تنزيل PDF'}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={handlePrintReport}
+              className="w-full sm:w-auto"
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              {language === 'en' ? 'Print' : 'طباعة'}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={handleSendReport}
+              className="w-full sm:w-auto"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {language === 'en' ? 'Send to Doctor' : 'إرسال إلى الطبيب'}
+            </Button>
+          </div>
         )}
       </CardFooter>
     </Card>

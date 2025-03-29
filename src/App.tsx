@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ChatSupport from "./components/ChatSupport";
 import Auth from "./pages/Auth";
+import SelfReporting from "./pages/SelfReporting";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/self-reporting" element={<SelfReporting />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<NotFound />} />

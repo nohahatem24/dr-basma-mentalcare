@@ -2,7 +2,7 @@
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Moon, Sun, Globe, MessageCircle } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe, MessageCircle, FileText } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
 
@@ -33,6 +33,7 @@ const Header = () => {
     { path: '/about', label: language === 'en' ? 'About' : 'عن الدكتورة' },
     { path: '/services', label: language === 'en' ? 'Services' : 'الخدمات' },
     { path: '/dashboard', label: language === 'en' ? 'MindTrack' : 'مايند تراك' },
+    { path: '/self-reporting', label: language === 'en' ? 'Self-Reporting' : 'التقييم الذاتي' },
     { path: '/contact', label: language === 'en' ? 'Contact' : 'التواصل' },
   ];
 
