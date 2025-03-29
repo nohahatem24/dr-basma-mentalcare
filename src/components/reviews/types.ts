@@ -8,4 +8,6 @@ export interface Review {
   isAnonymous: boolean;
   isRecommended: boolean;
   reply?: string;
+  isPrivate?: boolean;
+  isFeatured?: boolean;
 }

@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { ThumbsUp, User } from 'lucide-react';
+import { ThumbsUp, User, Star } from 'lucide-react';
 import { useLanguage } from '@/components/Header';
 import { Review } from './types';
+import { Badge } from '@/components/ui/badge';
 
 interface ReviewCardProps {
   review: Review;
@@ -14,8 +15,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, renderStars }) => {
   const { language } = useLanguage();
 
   return (
-    <Card key={review.id} className="overflow-hidden">
+    <Card key={review.id} className={`overflow-hidden ${review.isFeatured ? 'border-primary/50 bg-primary/5' : ''}`}>
       <div className="p-4">
+        {review.isFeatured && (
+          <Badge variant="outline" className="mb-2 bg-primary/10 text-primary">
+            {language === 'en' ? 'Featured Review' : 'مراجعة مميزة'}
+          </Badge>
+        )}
+        
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2">
             {review.isAnonymous ? (
