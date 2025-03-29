@@ -1,27 +1,287 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dr. Bassma Mental Care</title>
-    <meta name="description" content="Track, Understand, Heal - Dr. Bassma Adel's Mental Health Platform" />
-    <meta name="author" content="Dr. Bassma Adel" />
-
-    <meta property="og:title" content="Dr. Bassma Mental Care" />
-    <meta property="og:description" content="Track, Understand, Heal - Dr. Bassma Adel's Mental Health Platform" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <title>د. بسمة للعناية النفسية</title>
+    <meta name="description" content="منصة د. بسمة عادل للدعم النفسي" />
+    <meta name="author" content="د. بسمة عادل" />
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+      body {
+        font-family: 'IBM Plex Sans Arabic', sans-serif;
+      }
+      
+      .rtl {
+        direction: rtl;
+      }
+      
+      .ltr {
+        direction: ltr;
+      }
+      
+      .primary {
+        color: #3b82f6;
+      }
+      
+      .secondary {
+        color: #f59e0b;
+      }
+      
+      .bg-primary {
+        background-color: #3b82f6;
+      }
+      
+      .bg-secondary {
+        background-color: #f59e0b;
+      }
+    </style>
   </head>
+  <body class="bg-gray-50">
+    <div id="root">
+      <!-- Header -->
+      <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-gray-900 mr-2">
+              د. بسمة للعناية النفسية
+            </h1>
+          </div>
+          <button onclick="toggleLanguage()" class="text-gray-600 hover:text-primary">
+            English
+          </button>
+        </div>
+      </header>
+      
+      <!-- Main content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            خدمات الدعم النفسي
+          </h2>
+          <p class="mt-4 text-xl text-gray-600">
+            منصة متكاملة تقدم خدمات الدعم النفسي عن بعد مع نخبة من الأطباء المتخصصين
+          </p>
+        </div>
+        
+        <!-- Doctor Status and Appointment Booking Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <!-- Doctor Status -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+              <h2 class="text-xl font-semibold mb-4">حالة الطبيب</h2>
+              
+              <!-- Current status display -->
+              <div class="flex items-center p-3 rounded-lg border bg-green-100 text-green-800 border-green-200 mb-4">
+                <span class="ml-2 font-medium">متاح</span>
+              </div>
+              
+              <!-- Status explanation -->
+              <div class="mt-4 text-sm text-gray-600">
+                <h3 class="font-medium text-gray-700 mb-2">شرح الحالات</h3>
+                <ul class="space-y-2">
+                  <li>متاح للجلسات الفورية والحجوزات المستقبلية</li>
+                  <li>في جلسة حالياً، يمكن حجز مواعيد مستقبلية فقط</li>
+                  <li>غير متصل حالياً، يمكن حجز مواعيد مستقبلية فقط</li>
+                  <li>متاح للجلسات المجدولة مسبقاً فقط</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Appointment Booking -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+              <h2 class="text-xl font-semibold mb-4">حجز موعد</h2>
+              
+              <!-- Date selection -->
+              <div class="mb-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">اختر التاريخ</h3>
+                <div class="flex overflow-x-auto pb-2 space-x-2 rtl:space-x-reverse">
+                  <button class="flex flex-col items-center justify-center min-w-[100px] px-3 py-2 rounded-lg border bg-primary text-white border-primary">
+                    <span class="text-xs text-white">اليوم</span>
+                    <span class="text-sm font-medium mt-1">اليوم</span>
+                  </button>
+                  <button class="flex flex-col items-center justify-center min-w-[100px] px-3 py-2 rounded-lg border border-gray-200 hover:border-primary">
+                    <span class="text-xs text-gray-500">غداً</span>
+                    <span class="text-sm font-medium mt-1">غداً</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Time slots -->
+              <div class="mb-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">الأوقات المتاحة</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <button class="flex items-center justify-center py-2 px-3 rounded-lg border border-gray-200 hover:border-primary">
+                    <span>09:00 ص</span>
+                  </button>
+                  <button class="flex items-center justify-center py-2 px-3 rounded-lg border border-gray-200 hover:border-primary">
+                    <span>10:00 ص</span>
+                  </button>
+                  <button class="flex items-center justify-center py-2 px-3 rounded-lg border border-gray-200 hover:border-primary">
+                    <span>11:00 ص</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Book buttons -->
+              <button class="w-full py-2 px-4 bg-secondary hover:bg-opacity-90 text-white rounded-lg transition-colors flex items-center justify-center mb-4">
+                حجز جلسة فورية
+              </button>
+              <button class="w-full py-2 px-4 bg-primary hover:bg-opacity-90 text-white rounded-lg transition-colors flex items-center justify-center">
+                حجز موعد
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-12">
+          <div class="p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-center">مميزاتنا</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Feature 1 -->
+              <div class="flex flex-col items-center text-center p-4">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-full mb-4">
+                  <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-medium mb-2">جلسات فورية</h3>
+                <p class="text-gray-600">احصل على جلسة فورية مع طبيبك في أي وقت تحتاج إليها</p>
+              </div>
+              
+              <!-- Feature 2 -->
+              <div class="flex flex-col items-center text-center p-4">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-full mb-4">
+                  <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-medium mb-2">دفع آمن</h3>
+                <p class="text-gray-600">نظام دفع آمن ومشفّر لحماية معلوماتك الشخصية والمالية</p>
+              </div>
+              
+              <!-- Feature 3 -->
+              <div class="flex flex-col items-center text-center p-4">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-full mb-4">
+                  <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-medium mb-2">تتبع الحالة</h3>
+                <p class="text-gray-600">تتبع حالة طبيبك ومعرفة مدى توفره للجلسات الفورية</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- How It Works Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <div class="p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-center">كيف يعمل</h2>
+            
+            <div class="flex flex-col space-y-8">
+              <!-- Step 1 -->
+              <div class="flex flex-col md:flex-row items-center">
+                <div class="flex-shrink-0 bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mb-4 md:mb-0 md:ml-6">
+                  1
+                </div>
+                <div>
+                  <h3 class="text-lg font-medium mb-2">إنشاء حساب</h3>
+                  <p class="text-gray-600">قم بإنشاء حساب جديد وملء المعلومات الشخصية اللازمة</p>
+                </div>
+              </div>
+              
+              <!-- Step 2 -->
+              <div class="flex flex-col md:flex-row items-center">
+                <div class="flex-shrink-0 bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mb-4 md:mb-0 md:ml-6">
+                  2
+                </div>
+                <div>
+                  <h3 class="text-lg font-medium mb-2">اختر طبيبك</h3>
+                  <p class="text-gray-600">تصفح قائمة الأطباء المتاحين واختر الطبيب المناسب لحالتك</p>
+                </div>
+              </div>
+              
+              <!-- Step 3 -->
+              <div class="flex flex-col md:flex-row items-center">
+                <div class="flex-shrink-0 bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mb-4 md:mb-0 md:ml-6">
+                  3
+                </div>
+                <div>
+                  <h3 class="text-lg font-medium mb-2">احجز موعدك</h3>
+                  <p class="text-gray-600">اختر الوقت المناسب لك أو احصل على جلسة فورية إذا كان الطبيب متاحاً</p>
+                </div>
+              </div>
+              
+              <!-- Step 4 -->
+              <div class="flex flex-col md:flex-row items-center">
+                <div class="flex-shrink-0 bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mb-4 md:mb-0 md:ml-6">
+                  4
+                </div>
+                <div>
+                  <h3 class="text-lg font-medium mb-2">ابدأ جلستك</h3>
+                  <p class="text-gray-600">ادخل إلى غرفة المحادثة المرئية في الوقت المحدد للجلسة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <footer class="bg-white shadow-inner mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+              <h3 class="text-xl font-semibold text-gray-900 ml-2">
+                د. بسمة للعناية النفسية
+              </h3>
+            </div>
+            
+            <div class="flex flex-wrap justify-center space-x-4">
+              <a href="#" class="text-gray-600 hover:text-primary">من نحن</a>
+              <a href="#" class="text-gray-600 hover:text-primary">اتصل بنا</a>
+              <a href="#" class="text-gray-600 hover:text-primary">سياسة الخصوصية</a>
+              <a href="#" class="text-gray-600 hover:text-primary">شروط الاستخدام</a>
+            </div>
+          </div>
+          
+          <div class="mt-8 text-center text-gray-500 text-sm">
+            &copy; 2024 د. بسمة للعناية النفسية. جميع الحقوق محفوظة
+          </div>
+        </div>
+      </footer>
+    </div>
 
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      function toggleLanguage() {
+        const html = document.documentElement;
+        const currentLang = html.getAttribute('lang');
+        const currentDir = html.getAttribute('dir');
+        
+        if (currentLang === 'ar') {
+          html.setAttribute('lang', 'en');
+          html.setAttribute('dir', 'ltr');
+          document.body.classList.remove('rtl');
+          document.body.classList.add('ltr');
+        } else {
+          html.setAttribute('lang', 'ar');
+          html.setAttribute('dir', 'rtl');
+          document.body.classList.remove('ltr');
+          document.body.classList.add('rtl');
+        }
+      }
+    </script>
   </body>
 </html>
