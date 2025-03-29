@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -12,6 +12,7 @@ import {
 
 const Hero = () => {
   const { language } = useLanguage();
+  const [activeIndex, setActiveIndex] = useState(0);
   
   const carouselItems = [
     {
@@ -21,7 +22,7 @@ const Hero = () => {
     },
     {
       title: language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية',
-      subtitle: language === 'en' ? 'Evidence-based CBT & DBT techniques' : 'تقنيات العلاج المعرفي السلوكي والعلاج السلوكي الجدلي المستندة إلى الأدلة',
+      subtitle: language === 'en' ? 'Evidence-based CBT techniques' : 'تقنيات العلاج المعرفي السلوكي المستندة إلى الأدلة',
       description: language === 'en' ? 'Practice proven exercises from Dr. Bassma\'s therapeutic methods to improve your mental well-being.' : 'ممارسة التمارين المثبتة من أساليب الدكتورة بسمة العلاجية لتحسين صحتك النفسية.'
     },
     {
@@ -30,6 +31,11 @@ const Hero = () => {
       description: language === 'en' ? 'Generate comprehensive mental health reports to track progress and share with your healthcare provider.' : 'إنشاء تقارير شاملة عن الصحة النفسية لتتبع التقدم ومشاركتها مع مقدم الرعاية الصحية الخاص بك.'
     }
   ];
+
+  // Update active index when carousel slides change
+  const handleSlideChange = (index: number) => {
+    setActiveIndex(index);
+  };
 
   return (
     <div className="relative overflow-hidden bg-background">
@@ -67,7 +73,11 @@ const Hero = () => {
           </div>
 
           <div className="relative rounded-xl overflow-hidden shadow-xl animate-fade-in">
-            <Carousel className="w-full" autoplay={true} interval={5000}>
+            <Carousel className="w-full" autoplay={true} interval={5000} setApi={(api) => {
+              api?.on('select', () => {
+                handleSlideChange(api.selectedScrollSnap());
+              });
+            }}>
               <CarouselContent>
                 {carouselItems.map((item, index) => (
                   <CarouselItem key={index}>
@@ -84,7 +94,10 @@ const Hero = () => {
               </CarouselContent>
               <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
                 {carouselItems.map((_, index) => (
-                  <span key={index} className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-white' : 'bg-white/60'}`}></span>
+                  <span 
+                    key={index} 
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${index === activeIndex ? 'bg-white' : 'bg-white/60'}`}
+                  ></span>
                 ))}
               </div>
             </Carousel>
