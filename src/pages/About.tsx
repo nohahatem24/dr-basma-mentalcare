@@ -1,7 +1,16 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const About = () => {
+  const [sessionsCount, setSessionsCount] = useState(1200); // Example starting value
+
+  // Simulate session increment (replace with real backend logic)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSessionsCount((prev) => prev + 1); // Increment sessions over time
+    }, 10000); // Increment every 10 seconds (for demo purposes)
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="container py-12">
       <div className="max-w-4xl mx-auto">
@@ -27,6 +36,29 @@ const About = () => {
               Her approach combines evidence-based practices with a deep understanding of individual needs, 
               creating personalized treatment plans that address the unique challenges faced by each client.
             </p>
+          </div>
+        </div>
+
+        {/* Highlighted Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Years of Experience */}
+          <div className="p-6 rounded-lg bg-primary/10 text-center">
+            <h3 className="text-4xl font-bold text-primary">
+              {new Date().getFullYear() - 2017}+
+            </h3>
+            <p className="text-muted-foreground">Years of Experience</p>
+          </div>
+
+          {/* Average Rating */}
+          <div className="p-6 rounded-lg bg-primary/10 text-center">
+            <h3 className="text-4xl font-bold text-primary">4.9</h3>
+            <p className="text-muted-foreground">Average Rating</p>
+          </div>
+
+          {/* Number of Sessions */}
+          <div className="p-6 rounded-lg bg-primary/10 text-center">
+            <h3 className="text-4xl font-bold text-primary">{sessionsCount}</h3>
+            <p className="text-muted-foreground">Sessions Completed</p>
           </div>
         </div>
         
