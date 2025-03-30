@@ -5,7 +5,7 @@ import MentalHealthReport from '@/components/MentalHealthReport';
 import TherapeuticExercises from '@/components/TherapeuticExercises';
 import RelationshipTracker from '@/components/RelationshipTracker';
 import MoodTracker from '@/components/MoodTracker';
-import DoctorReviews from '@/components/DoctorReviews';
+import CPTTechniques from '@/components/CPTTechniques';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card-component';
@@ -31,6 +31,10 @@ const SelfReporting = () => {
           <MentalHealthReport />
         </div>
 
+        <div className="md:col-span-3">
+          <CPTTechniques />
+        </div>
+
         <div className="md:col-span-2 space-y-8">
           <MoodTracker />
           <RelationshipTracker />
@@ -48,15 +52,11 @@ const SelfReporting = () => {
                 : 'التقييم الذاتي مفيد، ولكن أحيانًا يمكن أن يحدث التحدث مع مختص فرقًا كبيرًا.'}
             </p>
             <Button asChild className="w-full">
-              <Link to="/contact">
-                {language === 'en' ? 'Contact Dr. Bassma' : 'تواصل مع د. بسمة'}
+              <Link to="/book-appointment">
+                {language === 'en' ? 'Book an Appointment' : 'حجز موعد'}
               </Link>
             </Button>
           </Card>
-        </div>
-
-        <div className="md:col-span-3">
-          <DoctorReviews />
         </div>
       </div>
     </div>
