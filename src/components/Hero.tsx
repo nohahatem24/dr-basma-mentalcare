@@ -26,9 +26,9 @@ const Hero = () => {
       description: language === 'en' ? 'Practice proven exercises from Dr. Bassma\'s therapeutic methods to improve your mental well-being.' : 'ممارسة التمارين المثبتة من أساليب الدكتورة بسمة العلاجية لتحسين صحتك النفسية.'
     },
     {
-      title: language === 'en' ? 'Self-Reporting' : 'التقارير الذاتية',
-      subtitle: language === 'en' ? 'Detailed insights into your mental health' : 'رؤى مفصلة حول صحتك النفسية',
-      description: language === 'en' ? 'Generate comprehensive mental health reports to track progress and share with your healthcare provider.' : 'إنشاء تقارير شاملة عن الصحة النفسية لتتبع التقدم ومشاركتها مع مقدم الرعاية الصحية الخاص بك.'
+      title: language === 'en' ? 'Online Sessions' : 'الجلسات عبر الإنترنت',
+      subtitle: language === 'en' ? 'Connect with Dr. Bassma from anywhere' : 'تواصل مع د. بسمة من أي مكان',
+      description: language === 'en' ? 'Book secure video sessions with Dr. Bassma and receive professional mental health support from the comfort of your home.' : 'احجز جلسات فيديو آمنة مع د. بسمة واحصل على دعم الصحة النفسية المهني من راحة منزلك.'
     }
   ];
 
@@ -60,13 +60,13 @@ const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button className="btn-primary" size="lg" asChild>
-                <Link to="/dashboard">
-                  {language === 'en' ? 'Start Tracking' : 'ابدأ التتبع'} <ArrowRight className="ml-2 h-4 w-4" />
+                <Link to="/doctor">
+                  {language === 'en' ? 'Book a Session' : 'احجز جلسة'} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link to="/about">
-                  {language === 'en' ? 'Learn More' : 'اعرف المزيد'}
+                <Link to="/dashboard">
+                  {language === 'en' ? 'Start Tracking' : 'ابدأ التتبع'}
                 </Link>
               </Button>
             </div>

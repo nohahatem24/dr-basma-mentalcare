@@ -16,6 +16,9 @@ import NotFound from "./pages/NotFound";
 import ChatSupport from "./components/ChatSupport";
 import Auth from "./pages/Auth";
 import SelfReporting from "./pages/SelfReporting";
+import DoctorProfile from "./pages/DoctorProfile";
+import BookAppointment from "./pages/BookAppointment";
+import VideoSession from "./pages/VideoSession";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +40,9 @@ const App = () => (
                 <Route path="/self-reporting" element={<SelfReporting />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/doctor" element={<DoctorProfile />} />
+                <Route path="/book-appointment" element={<BookAppointment />} />
+                <Route path="/video-session" element={<VideoSession />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
