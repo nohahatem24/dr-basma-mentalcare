@@ -1,12 +1,12 @@
 
 import React from 'react';
 import MentalHealthReport from '@/components/MentalHealthReport';
-import TherapeuticExercises from '@/components/TherapeuticExercises';
 import RelationshipTracker from '@/components/RelationshipTracker';
 import MoodTracker from '@/components/MoodTracker';
 import CPTTechniques from '@/components/CPTTechniques';
 import SelfReportingHeader from '@/components/self-reporting/SelfReportingHeader';
 import NeedHelpCard from '@/components/self-reporting/NeedHelpCard';
+import GuidedBreathing from '@/components/self-reporting/GuidedBreathing';
 
 const SelfReporting = () => {
   return (
@@ -28,7 +28,7 @@ const SelfReporting = () => {
         </div>
 
         <div className="space-y-8">
-          <TherapeuticExercises />
+          <GuidedBreathing />
           <NeedHelpCard />
         </div>
       </div>

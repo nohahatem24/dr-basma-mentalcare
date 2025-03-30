@@ -2,7 +2,7 @@
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Moon, Sun, Globe, MessageCircle, FileText } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe, MessageCircle, FileText, Calendar } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
 
@@ -34,6 +34,7 @@ const Header = () => {
     { path: '/services', label: language === 'en' ? 'Services' : 'الخدمات' },
     { path: '/dashboard', label: language === 'en' ? 'MindTrack' : 'مايند تراك' },
     { path: '/self-reporting', label: language === 'en' ? 'Self-Reporting' : 'التقييم الذاتي' },
+    { path: '/book-appointment', label: language === 'en' ? 'Book Appointment' : 'حجز موعد', icon: <Calendar className="mr-2 h-4 w-4" /> },
     { path: '/contact', label: language === 'en' ? 'Contact' : 'التواصل' },
   ];
 
@@ -54,10 +55,11 @@ const Header = () => {
                 <Link
                   key={route.path}
                   to={route.path}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                  className={`text-sm font-medium transition-colors hover:text-primary flex items-center ${
                     location.pathname === route.path ? 'text-primary' : 'text-muted-foreground'
-                  }`}
+                  } ${route.path === '/book-appointment' ? 'bg-primary/10 px-3 py-1 rounded-md' : ''}`}
                 >
+                  {route.icon && route.icon}
                   {route.label}
                 </Link>
               ))}
@@ -130,11 +132,12 @@ const Header = () => {
                 <Link
                   key={route.path}
                   to={route.path}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                  className={`text-sm font-medium transition-colors hover:text-primary flex items-center ${
                     location.pathname === route.path ? 'text-primary' : 'text-muted-foreground'
-                  }`}
+                  } ${route.path === '/book-appointment' ? 'bg-primary/10 px-3 py-1 rounded-md' : ''}`}
                   onClick={() => setIsOpen(false)}
                 >
+                  {route.icon && route.icon}
                   {route.label}
                 </Link>
               ))}

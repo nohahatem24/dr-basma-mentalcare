@@ -19,6 +19,7 @@ import SelfReporting from "./pages/SelfReporting";
 import DoctorProfile from "./pages/DoctorProfile";
 import BookAppointment from "./pages/BookAppointment";
 import VideoSession from "./pages/VideoSession";
+import BookingFloatingButton from "./components/BookingFloatingButton";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
             </main>
             <Footer />
             <ChatSupport />
+            <BookingFloatingButton />
           </div>
         </BrowserRouter>
       </TooltipProvider>
