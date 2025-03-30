@@ -13,31 +13,31 @@ const Index = () => {
   const features = [
     {
       icon: <Brain className="h-10 w-10 text-mindtrack-blue" />,
-      title: language === 'en' ? 'Mood Tracking' : 'تتبع المزاج',
-      description: language === 'en' 
-        ? 'Log and monitor your daily mood patterns with our intuitive tracking system.' 
-        : 'سجل وراقب أنماط مزاجك اليومية من خلال نظام التتبع البديهي لدينا.',
+      title: language === 'en' ? 'Online Sessions' : 'جلسات عبر الإنترنت',
+      description: language === 'en'
+        ? 'Book personalized online sessions with Dr. Bassma to address your mental health needs from the comfort of your home.'
+        : 'احجز جلسات شخصية عبر الإنترنت مع الدكتورة بسمة لتلبية احتياجات صحتك النفسية من راحة منزلك.',
     },
     {
       icon: <LineChart className="h-10 w-10 text-mindtrack-green" />,
-      title: language === 'en' ? 'AI-Powered Insights' : 'رؤى مدعومة بالذكاء الاصطناعي',
-      description: language === 'en' 
-        ? 'Receive personalized insights and patterns based on your emotional data.' 
-        : 'احصل على رؤى وأنماط مخصصة بناءً على بياناتك العاطفية.',
+      title: language === 'en' ? 'Flexible Scheduling' : 'جدولة مرنة',
+      description: language === 'en'
+        ? 'Choose session times that fit your schedule and get the support you need.'
+        : 'اختر أوقات الجلسات التي تناسب جدولك واحصل على الدعم الذي تحتاجه.',
     },
     {
       icon: <Heart className="h-10 w-10 text-mindtrack-lavender" />,
-      title: language === 'en' ? 'CBT Tools' : 'أدوات العلاج السلوكي المعرفي',
-      description: language === 'en' 
-        ? 'Access cognitive behavioral therapy exercises to improve thought patterns.' 
-        : 'الوصول إلى تمارين العلاج المعرفي السلوكي لتحسين أنماط التفكير.',
+      title: language === 'en' ? 'Compassionate Care' : 'رعاية رحيمة',
+      description: language === 'en'
+        ? 'Experience empathetic and professional guidance tailored to your well-being.'
+        : 'احصل على إرشاد متعاطف ومهني مصمم خصيصًا لرفاهيتك.',
     },
     {
       icon: <ShieldCheck className="h-10 w-10 text-mindtrack-blue" />,
-      title: language === 'en' ? 'Secure & Private' : 'آمن وخاص',
-      description: language === 'en' 
-        ? 'Your data is encrypted and only accessible to you and Dr. Bassma.' 
-        : 'بياناتك مشفرة ولا يمكن الوصول إليها إلا لك ولدكتورة بسمة.',
+      title: language === 'en' ? 'Secure & Confidential' : 'آمن وسري',
+      description: language === 'en'
+        ? 'Your online sessions are private and conducted in a secure environment.'
+        : 'جلساتك عبر الإنترنت خاصة وتتم في بيئة آمنة.',
     },
   ];
 
