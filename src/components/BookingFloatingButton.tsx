@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
@@ -15,7 +14,7 @@ const BookingFloatingButton = () => {
         <TooltipTrigger asChild>
           <Button
             asChild
-            className="fixed bottom-6 right-6 shadow-lg size-16 rounded-full bg-primary text-primary-foreground"
+            className="fixed bottom-24 right-6 shadow-lg size-16 rounded-full bg-primary text-primary-foreground" // Adjusted bottom position
             aria-label={language === 'en' ? 'Book Appointment' : 'حجز موعد'}
           >
             <Link to="/book-appointment">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -195,11 +194,11 @@ const ChatSupport = () => {
     <>
       <Button
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg z-50 bg-primary hover:bg-primary/90"
+        className="fixed bottom-6 right-6 rounded-full h-16 w-16 shadow-lg z-50 bg-primary hover:bg-primary/90"
         size="icon"
         aria-label="Chat Support"
       >
-        {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        {isOpen ? <X className="h-8 w-8" /> : <MessageCircle className="h-8 w-8" />}
       </Button>
 
       {isOpen && (
