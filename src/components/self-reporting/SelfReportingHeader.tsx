@@ -10,7 +10,7 @@ const SelfReportingHeader = () => {
       <h1 className="text-3xl font-bold header-gradient mb-2">
         {language === 'en' ? 'Self-Reporting Tools' : 'أدوات التقييم الذاتي'}
       </h1>
-      <p className="text-muted-foreground">
+      <p className={`text-muted-foreground ${language === 'ar' ? 'text-right' : ''}`}>
         {language === 'en'
           ? 'Track your mental wellbeing, generate reports, and manage your therapeutic journey'
           : 'تتبع صحتك النفسية، وإنشاء التقارير، وإدارة رحلتك العلاجية'}

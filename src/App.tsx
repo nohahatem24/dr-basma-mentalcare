@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,7 +15,6 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ChatSupport from "./components/ChatSupport";
 import Auth from "./pages/Auth";
-import SelfReporting from "./pages/SelfReporting";
 import DoctorProfile from "./pages/DoctorProfile";
 import BookAppointment from "./pages/BookAppointment";
 import VideoSession from "./pages/VideoSession";
@@ -37,7 +37,6 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/self-reporting" element={<SelfReporting />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/doctor" element={<DoctorProfile />} />

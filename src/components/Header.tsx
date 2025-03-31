@@ -2,7 +2,7 @@
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Moon, Sun, Globe, MessageCircle, FileText, Calendar } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe, MessageCircle, FileText, Calendar, Brain } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
 
@@ -32,9 +32,16 @@ const Header = () => {
     { path: '/', label: language === 'en' ? 'Home' : 'الرئيسية' },
     { path: '/about', label: language === 'en' ? 'About' : 'عن الدكتورة' },
     { path: '/services', label: language === 'en' ? 'Services' : 'الخدمات' },
-    { path: '/dashboard', label: language === 'en' ? 'MindTrack' : 'مايند تراك' },
-    { path: '/self-reporting', label: language === 'en' ? 'Self-Reporting' : 'التقييم الذاتي' },
-    { path: '/book-appointment', label: language === 'en' ? 'Book Appointment' : 'حجز موعد', icon: <Calendar className="mr-2 h-4 w-4" /> },
+    { 
+      path: '/dashboard', 
+      label: language === 'en' ? 'MindTrack' : 'مايند تراك',
+      icon: <Brain className="mr-2 h-4 w-4" /> 
+    },
+    { 
+      path: '/book-appointment', 
+      label: language === 'en' ? 'Book Appointment' : 'حجز موعد', 
+      icon: <Calendar className="mr-2 h-4 w-4" /> 
+    },
     { path: '/contact', label: language === 'en' ? 'Contact' : 'التواصل' },
   ];
 
@@ -59,8 +66,17 @@ const Header = () => {
                     location.pathname === route.path ? 'text-primary' : 'text-muted-foreground'
                   } ${route.path === '/book-appointment' ? 'bg-primary/10 px-3 py-1 rounded-md' : ''}`}
                 >
-                  {route.icon && route.icon}
-                  {route.label}
+                  {language === 'ar' ? (
+                    <>
+                      <span>{route.label}</span>
+                      {route.icon && React.cloneElement(route.icon, { className: "ml-2 h-4 w-4" })}
+                    </>
+                  ) : (
+                    <>
+                      {route.icon && route.icon}
+                      <span>{route.label}</span>
+                    </>
+                  )}
                 </Link>
               ))}
             </nav>
@@ -137,8 +153,17 @@ const Header = () => {
                   } ${route.path === '/book-appointment' ? 'bg-primary/10 px-3 py-1 rounded-md' : ''}`}
                   onClick={() => setIsOpen(false)}
                 >
-                  {route.icon && route.icon}
-                  {route.label}
+                  {language === 'ar' ? (
+                    <>
+                      <span>{route.label}</span>
+                      {route.icon && React.cloneElement(route.icon, { className: "ml-2 h-4 w-4" })}
+                    </>
+                  ) : (
+                    <>
+                      {route.icon && route.icon}
+                      <span>{route.label}</span>
+                    </>
+                  )}
                 </Link>
               ))}
               <Button size="sm" className="btn-primary w-full" asChild>

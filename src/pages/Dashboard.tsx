@@ -1,12 +1,17 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Brain, Heart, BookOpen, Target, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
+import { Card, CardContent } from '@/components/ui/card';
+import MindTrackNavigation from '@/components/MindTrackNavigation';
+import MentalHealthReport from '@/components/MentalHealthReport';
+import RelationshipTracker from '@/components/RelationshipTracker';
+import MoodTracker from '@/components/MoodTracker';
+import CPTTechniques from '@/components/CPTTechniques';
+import NeedHelpCard from '@/components/self-reporting/NeedHelpCard';
+import GuidedBreathing from '@/components/self-reporting/GuidedBreathing';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Calendar } from '@/components/ui/calendar';
 
 // Mock data for the mood chart
 const mockMoodData = [
@@ -58,6 +63,8 @@ const mockJournalEntriesAr = [
 const Dashboard = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { language } = useLanguage();
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'mood';
 
   // Get the appropriate journal entries based on language
   const journalEntries = language === 'en' ? mockJournalEntries : mockJournalEntriesAr;
@@ -74,263 +81,159 @@ const Dashboard = () => {
     day: language === 'en' ? weekDays.en[index] : weekDays.ar[index]
   }));
 
+  // Render the appropriate component based on the active tab
+  const renderActiveComponent = () => {
+    switch(activeTab) {
+      case 'mood':
+        return <MoodTracker />;
+      case 'journal':
+        return (
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-2xl font-semibold mb-4">
+                {language === 'en' ? 'Your Journal' : 'مذكراتك'}
+              </h2>
+              <div className="space-y-4">
+                {journalEntries.map(entry => (
+                  <div key={entry.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-medium">{entry.date}</h3>
+                      <span className="text-sm px-2 py-1 bg-primary/10 rounded-full">{entry.mood}</span>
+                    </div>
+                    <p className="text-muted-foreground">{entry.content}</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {entry.triggers.map((trigger, i) => (
+                        <span key={i} className="text-xs bg-accent/30 px-2 py-1 rounded">{trigger}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      case 'gratitude':
+        return (
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-2xl font-semibold mb-4">
+                {language === 'en' ? 'Gratitude Journal' : 'مذكرات الامتنان'}
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                {language === 'en' 
+                  ? 'Record what you\'re grateful for to improve your mental well-being.' 
+                  : 'سجل ما أنت ممتن له لتحسين صحتك النفسية.'}
+              </p>
+              {/* Placeholder for gratitude entries */}
+              <div className="bg-accent/10 rounded-lg p-6 text-center">
+                <p>{language === 'en' ? 'No gratitude entries yet.' : 'لا توجد مدخلات امتنان حتى الآن.'}</p>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      case 'goals':
+        return (
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-2xl font-semibold mb-4">
+                {language === 'en' ? 'Your Goals' : 'أهدافك'}
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                {language === 'en' 
+                  ? 'Set and track your personal growth goals.' 
+                  : 'حدد وتتبع أهداف نموك الشخصي.'}
+              </p>
+              {/* Placeholder for goals */}
+              <div className="bg-accent/10 rounded-lg p-6 text-center">
+                <p>{language === 'en' ? 'No goals set yet.' : 'لم يتم تحديد أهداف بعد.'}</p>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      case 'report':
+        return <MentalHealthReport />;
+      case 'breathing':
+        return <GuidedBreathing />;
+      case 'cpt':
+        return <CPTTechniques />;
+      case 'relationship':
+        return <RelationshipTracker />;
+      default:
+        return <MoodTracker />;
+    }
+  };
+
   return (
     <div className={`container py-8 ${language === 'ar' ? 'arabic text-right' : ''}`}>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <h1 className="text-3xl font-bold header-gradient mb-4 md:mb-0">
           {language === 'en' ? 'MindTrack Dashboard' : 'لوحة تحكم مايند تراك'}
         </h1>
-        <div className="flex gap-4">
-          <Button variant="outline" size="sm">
-            {language === 'en' ? 'Demo Mode' : 'وضع العرض التجريبي'}
-          </Button>
-          <Button className="btn-primary" size="sm">
-            {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
-          </Button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle>{language === 'en' ? 'Track Your Journey' : 'تتبع رحلتك'}</CardTitle>
-            <CardDescription>
-              {language === 'en' ? 'Monitor your mental well-being' : 'راقب صحتك النفسية'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border"
-                />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">
-                  {language === 'en' ? 'Quick Access' : 'وصول سريع'}
-                </h3>
-                <ul className="space-y-1">
-                  <li>  
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Brain className="mr-2 h-4 w-4 text-black" />
-                      <span>{language === 'en' ? 'Mood Tracker' : 'متتبع المزاج'}</span>
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      <span>{language === 'en' ? 'Journal' : 'مذكرات'}</span>
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Heart className="mr-2 h-4 w-4" />
-                      <span>{language === 'en' ? 'Gratitude' : 'الامتنان'}</span>
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Brain className="mr-2 h-4 w-4" />
-                      <span>{language === 'en' ? 'Triggers' : 'المحفزات'}</span>
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Target className="mr-2 h-4 w-4" />
-                      <span>{language === 'en' ? 'Goals' : 'الأهداف'}</span>
-                    </Button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Main Content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-1">
           <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
+            <CardContent className="p-4">
+              <div className="space-y-4">
                 <div>
-                  <CardTitle>{language === 'en' ? 'Mood Trends' : 'اتجاهات المزاج'}</CardTitle>
-                  <CardDescription>
-                    {language === 'en' ? 'Track how you\'ve been feeling' : 'تتبع كيف كان شعورك'}
-                  </CardDescription>
-                </div>
-                <div className="flex items-center">
-                  <Button variant="ghost" size="icon">
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-sm">
-                    {language === 'en' ? 'This Week' : 'هذا الأسبوع'}
-                  </span>
-                  <Button variant="ghost" size="icon">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={moodDataTranslated}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="mood"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    dot={{ strokeWidth: 2 }}
-                    activeDot={{ r: 6 }}
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    className="rounded-md border"
                   />
-                </LineChart>
-              </ResponsiveContainer>
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span>{language === 'en' ? '1 - Very Low' : '١ - منخفض جداً'}</span>
-                <span>{language === 'en' ? '2 - Low' : '٢ - منخفض'}</span>
-                <span>{language === 'en' ? '3 - Neutral' : '٣ - محايد'}</span>
-                <span>{language === 'en' ? '4 - Good' : '٤ - جيد'}</span>
-                <span>{language === 'en' ? '5 - Excellent' : '٥ - ممتاز'}</span>
+                </div>
+                <MindTrackNavigation activePage={activeTab} />
+                <NeedHelpCard />
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          <Tabs defaultValue="journal">
-            <TabsList className="w-full">
-              <TabsTrigger value="journal" className="flex-1">
-                {language === 'en' ? 'Journal' : 'المذكرات'}
-              </TabsTrigger>
-              <TabsTrigger value="gratitude" className="flex-1">
-                {language === 'en' ? 'Gratitude' : 'الامتنان'}
-              </TabsTrigger>
-              <TabsTrigger value="triggers" className="flex-1">
-                {language === 'en' ? 'Triggers' : 'المحفزات'}
-              </TabsTrigger>
-              <TabsTrigger value="goals" className="flex-1">
-                {language === 'en' ? 'Goals' : 'الأهداف'}
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="journal" className="space-y-4 mt-4">
-              <div className="flex justify-between">
-                <h3 className="text-lg font-medium">
-                  {language === 'en' ? 'Your Journal Entries' : 'مدخلات مذكراتك'}
-                </h3>
-                <Button className="btn-secondary" size="sm">
-                  {language === 'en' ? 'New Entry' : 'إدخال جديد'}
-                </Button>
-              </div>
-              
-              {journalEntries.map((entry) => (
-                <Card key={entry.id} className="card-hover">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <CardTitle className="text-base">{entry.date}</CardTitle>
-                      <span className={`text-sm px-2 py-1 rounded-full ${
-                        (entry.mood === 'Happy' || entry.mood === 'سعيد') ? 'bg-green-100 text-green-800' : 
-                        (entry.mood === 'Anxious' || entry.mood === 'قلق') ? 'bg-amber-100 text-amber-800' : ''
-                      }`}>
-                        {entry.mood}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{entry.content}</p>
-                    <div className="flex gap-2 mt-3">
-                      {entry.triggers.map((trigger, i) => (
-                        <span key={i} className="text-xs bg-accent/30 px-2 py-1 rounded">
-                          {trigger}
-                        </span>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-            
-            <TabsContent value="gratitude" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {language === 'en' ? 'Gratitude Journal' : 'مذكرات الامتنان'}
-                  </CardTitle>
-                  <CardDescription>
-                    {language === 'en' ? 'Record things you\'re grateful for' : 'سجل الأشياء التي تشعر بالامتنان لها'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-muted-foreground py-8">
-                    {language === 'en' 
-                      ? 'Sign in to access your gratitude journal' 
-                      : 'قم بتسجيل الدخول للوصول إلى مذكرات الامتنان الخاصة بك'}
-                  </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="triggers" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {language === 'en' ? 'Emotional Triggers' : 'المحفزات العاطفية'}
-                  </CardTitle>
-                  <CardDescription>
-                    {language === 'en' 
-                      ? 'Identify patterns in what affects your mood' 
-                      : 'تعرف على الأنماط التي تؤثر على مزاجك'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-muted-foreground py-8">
-                    {language === 'en' 
-                      ? 'Sign in to track your emotional triggers' 
-                      : 'قم بتسجيل الدخول لتتبع محفزاتك العاطفية'}
-                  </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="goals" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {language === 'en' ? 'Personal Goals' : 'الأهداف الشخصية'}
-                  </CardTitle>
-                  <CardDescription>
-                    {language === 'en' 
-                      ? 'Set and track goals for your mental well-being' 
-                      : 'ضع وتتبع أهدافًا لصحتك النفسية'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-muted-foreground py-8">
-                    {language === 'en' 
-                      ? 'Sign in to manage your personal growth goals' 
-                      : 'قم بتسجيل الدخول لإدارة أهداف نموك الشخصي'}
-                  </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-6">
+          {renderActiveComponent()}
           
+          {/* Only show mood trends if on mood tab */}
+          {activeTab === 'mood' && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4">
+                  {language === 'en' ? 'Mood Trends' : 'اتجاهات المزاج'}
+                </h2>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={moodDataTranslated}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="mood"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={{ strokeWidth: 2 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>{language === 'en' ? '1 - Very Low' : '١ - منخفض جداً'}</span>
+                  <span>{language === 'en' ? '3 - Neutral' : '٣ - محايد'}</span>
+                  <span>{language === 'en' ? '5 - Excellent' : '٥ - ممتاز'}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* AI Insights Card */}
           <Card>
-            <CardHeader>
-              <CardTitle>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4">
                 {language === 'en' ? 'AI Insights' : 'رؤى الذكاء الاصطناعي'}
-              </CardTitle>
-              <CardDescription>
-                {language === 'en' 
-                  ? 'Personalized insights based on your data' 
-                  : 'رؤى مخصصة بناءً على بياناتك'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </h2>
               <div className="bg-accent/10 p-4 rounded-lg">
                 <p className="text-sm italic text-muted-foreground">
                   {language === 'en' 
@@ -338,11 +241,6 @@ const Dashboard = () => {
                     : '"بناءً على أنماط مزاجك الأخيرة، يبدو أنك تشعر بمزاج أفضل في عطلات نهاية الأسبوع. فكر في أنشطة تجلب لك الفرح خلال أيام الأسبوع للحفاظ على مشاعر أكثر توازناً."'}
                 </p>
               </div>
-              <p className="text-xs text-muted-foreground mt-3">
-                {language === 'en' 
-                  ? 'Note: This is a demo insight. Sign in to receive personalized insights based on your actual data.'
-                  : 'ملاحظة: هذه رؤية تجريبية. قم بتسجيل الدخول لتلقي رؤى مخصصة بناءً على بياناتك الفعلية.'}
-              </p>
             </CardContent>
           </Card>
         </div>

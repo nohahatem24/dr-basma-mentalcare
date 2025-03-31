@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,7 +39,6 @@ const GuidedBreathing = () => {
   const breathingCircleRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>(null);
   
-  // Clear timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -49,13 +47,11 @@ const GuidedBreathing = () => {
     };
   }, []);
   
-  // Handle phase transitions
   useEffect(() => {
     if (!isActive) return;
     
     const settings = isCustom ? customSettings : BREATHING_TECHNIQUES[technique];
     
-    // Initialize seconds for the current phase
     if (currentPhase === 'inhale') {
       setSecondsLeft(settings.inhale);
     } else if (currentPhase === 'hold1') {
@@ -66,24 +62,19 @@ const GuidedBreathing = () => {
       setSecondsLeft(settings.hold2);
     }
     
-    // Clear previous timer
     if (timerRef.current) {
       window.clearInterval(timerRef.current);
     }
     
-    // Set new timer
     timerRef.current = window.setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
-          // Move to next phase
           const nextPhase = getNextPhase(currentPhase, settings);
           setCurrentPhase(nextPhase);
           
-          // If we've completed a full cycle
           if (nextPhase === 'inhale') {
             setCompletedCycles(cycles => cycles + 1);
             
-            // Notify user on milestone cycles
             if ((completedCycles + 1) % 5 === 0) {
               toast({
                 title: language === 'en' ? `${completedCycles + 1} cycles completed` : `${completedCycles + 1} دورات مكتملة`,
@@ -109,7 +100,6 @@ const GuidedBreathing = () => {
     };
   }, [currentPhase, isActive, technique, isCustom, customSettings, language, completedCycles, toast]);
   
-  // Update total duration
   useEffect(() => {
     if (isActive) {
       const durationInterval = setInterval(() => {
@@ -120,7 +110,6 @@ const GuidedBreathing = () => {
     }
   }, [isActive]);
   
-  // Animate breathing circle
   useEffect(() => {
     if (!breathingCircleRef.current) return;
     
@@ -137,7 +126,6 @@ const GuidedBreathing = () => {
     }
   }, [currentPhase]);
   
-  // Get the next breathing phase based on current settings
   const getNextPhase = (phase: BreathingPhase, settings: typeof customSettings): BreathingPhase => {
     if (phase === 'inhale') {
       return settings.hold1 > 0 ? 'hold1' : 'exhale';
@@ -150,7 +138,6 @@ const GuidedBreathing = () => {
     }
   };
   
-  // Start or pause the breathing session
   const toggleBreathing = () => {
     if (isActive) {
       if (timerRef.current) {
@@ -163,7 +150,6 @@ const GuidedBreathing = () => {
     }
   };
   
-  // Reset the breathing session
   const resetBreathing = () => {
     if (timerRef.current) {
       window.clearInterval(timerRef.current);
@@ -180,7 +166,6 @@ const GuidedBreathing = () => {
     });
   };
   
-  // Handle technique change
   const handleTechniqueChange = (value: string) => {
     if (value === 'custom') {
       setIsCustom(true);
@@ -190,25 +175,22 @@ const GuidedBreathing = () => {
       setSecondsLeft(BREATHING_TECHNIQUES[value as BreathingTechnique].inhale);
     }
     
-    // Reset session when changing technique
     if (isActive) {
       toggleBreathing();
     }
   };
   
-  // Format time display (mm:ss)
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // Get label for current phase
   const getPhaseLabel = (phase: BreathingPhase) => {
     if (phase === 'inhale') {
       return language === 'en' ? 'Inhale' : 'استنشق';
     } else if (phase === 'hold1') {
-      return language === 'en' ? 'Hold' : 'احبس';
+      return language === 'en' ? 'Hold' : 'ا��بس';
     } else if (phase === 'exhale') {
       return language === 'en' ? 'Exhale' : 'زفير';
     } else {
@@ -218,12 +200,12 @@ const GuidedBreathing = () => {
   
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+      <CardHeader className={language === 'ar' ? 'text-right' : ''}>
+        <CardTitle className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse justify-end' : ''}`}>
           <Wind className="h-5 w-5 text-primary" />
           {language === 'en' ? 'Guided Breathing Exercise' : 'تمرين التنفس الموجّه'}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className={language === 'ar' ? 'text-right' : ''}>
           {language === 'en'
             ? 'Follow the visual cues to practice mindful breathing and reduce stress'
             : 'اتبع الإشارات المرئية لممارسة التنفس اليقظ وتقليل التوتر'}
@@ -248,12 +230,12 @@ const GuidedBreathing = () => {
               className={isActive ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'}
             >
               {isActive 
-                ? <><Pause className="mr-2 h-4 w-4" /> {language === 'en' ? 'Pause' : 'توقف'}</>
-                : <><Play className="mr-2 h-4 w-4" /> {language === 'en' ? 'Start' : 'ابدأ'}</>
+                ? <><Pause className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} /> {language === 'en' ? 'Pause' : 'توقف'}</>
+                : <><Play className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} /> {language === 'en' ? 'Start' : 'ابدأ'}</>
               }
             </Button>
             <Button onClick={resetBreathing} variant="outline" size="lg">
-              <RefreshCw className="mr-2 h-4 w-4" />
+              <RefreshCw className={`${language === 'ar' ? 'ml-2' : 'mr-2'} h-4 w-4`} />
               {language === 'en' ? 'Reset' : 'إعادة تعيين'}
             </Button>
           </div>
@@ -261,15 +243,15 @@ const GuidedBreathing = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-1 text-sm">
+            <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center gap-1 text-sm ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 <span>
                   {language === 'en' ? 'Total Time: ' : 'الوقت الإجمالي: '}
                   {formatTime(totalDuration)}
                 </span>
               </div>
-              <div className="flex items-center gap-1 text-sm">
+              <div className={`flex items-center gap-1 text-sm ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                 <BarChart className="h-4 w-4 text-muted-foreground" />
                 <span>
                   {language === 'en' ? 'Cycles: ' : 'الدورات: '}
@@ -279,7 +261,7 @@ const GuidedBreathing = () => {
             </div>
             
             <div className="space-y-2">
-              <Label>
+              <Label className={language === 'ar' ? 'text-right block' : ''}>
                 {language === 'en' ? 'Breathing Technique' : 'تقنية التنفس'}
               </Label>
               <Select 
@@ -305,12 +287,12 @@ const GuidedBreathing = () => {
           
           {isCustom && (
             <div className="space-y-3">
-              <h3 className="text-sm font-medium">
+              <h3 className={`text-sm font-medium ${language === 'ar' ? 'text-right' : ''}`}>
                 {language === 'en' ? 'Custom Settings (seconds)' : 'الإعدادات المخصصة (ثواني)'}
               </h3>
               
               <div className="space-y-2">
-                <Label>
+                <Label className={language === 'ar' ? 'text-right block' : ''}>
                   {language === 'en' ? 'Inhale' : 'استنشاق'} ({customSettings.inhale}s)
                 </Label>
                 <Slider
@@ -323,7 +305,7 @@ const GuidedBreathing = () => {
               </div>
               
               <div className="space-y-2">
-                <Label>
+                <Label className={language === 'ar' ? 'text-right block' : ''}>
                   {language === 'en' ? 'Hold After Inhale' : 'احبس بعد الاستنشاق'} ({customSettings.hold1}s)
                 </Label>
                 <Slider
@@ -336,7 +318,7 @@ const GuidedBreathing = () => {
               </div>
               
               <div className="space-y-2">
-                <Label>
+                <Label className={language === 'ar' ? 'text-right block' : ''}>
                   {language === 'en' ? 'Exhale' : 'زفير'} ({customSettings.exhale}s)
                 </Label>
                 <Slider
@@ -349,7 +331,7 @@ const GuidedBreathing = () => {
               </div>
               
               <div className="space-y-2">
-                <Label>
+                <Label className={language === 'ar' ? 'text-right block' : ''}>
                   {language === 'en' ? 'Hold After Exhale' : 'احبس بعد الزفير'} ({customSettings.hold2}s)
                 </Label>
                 <Slider
@@ -365,10 +347,10 @@ const GuidedBreathing = () => {
         </div>
         
         <div className="bg-muted/20 p-4 rounded-lg">
-          <h3 className="font-medium mb-2">
+          <h3 className={`font-medium mb-2 ${language === 'ar' ? 'text-right' : ''}`}>
             {language === 'en' ? 'Benefits of Breathing Exercises' : 'فوائد تمارين التنفس'}
           </h3>
-          <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
+          <ul className={`text-sm space-y-1 list-disc ${language === 'ar' ? 'text-right pr-6' : 'list-inside'} text-muted-foreground`}>
             <li>
               {language === 'en' 
                 ? 'Reduces stress and anxiety' 

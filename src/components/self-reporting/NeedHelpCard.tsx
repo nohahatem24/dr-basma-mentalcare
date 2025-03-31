@@ -10,10 +10,10 @@ const NeedHelpCard = () => {
 
   return (
     <Card className="p-6 bg-accent/10 rounded-lg">
-      <h3 className="text-xl font-semibold mb-3">
+      <h3 className={`text-xl font-semibold mb-3 ${language === 'ar' ? 'text-right' : ''}`}>
         {language === 'en' ? 'Need Professional Help?' : 'بحاجة إلى مساعدة مهنية؟'}
       </h3>
-      <p className="text-sm text-muted-foreground mb-4">
+      <p className={`text-sm text-muted-foreground mb-4 ${language === 'ar' ? 'text-right' : ''}`}>
         {language === 'en'
           ? 'Self-reporting is helpful, but sometimes talking to a professional can make a big difference.'
           : 'التقييم الذاتي مفيد، ولكن أحيانًا يمكن أن يحدث التحدث مع مختص فرقًا كبيرًا.'}

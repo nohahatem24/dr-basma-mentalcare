@@ -2,7 +2,7 @@
 import React from 'react';
 import { useLanguage } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Brain, BookOpen, Heart, Target } from 'lucide-react';
+import { Brain, BookOpen, Heart, Target, Wind, Activity, BarChart3, FileText } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface MindTrackNavProps {
@@ -14,11 +14,7 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
   const location = useLocation();
 
   const getBasePath = () => {
-    // If we're already in dashboard, use that path
-    if (location.pathname.includes('/dashboard')) {
-      return '/dashboard';
-    }
-    return '/mindtrack'; // Future dedicated MindTrack page
+    return '/dashboard'; // Now everything is under dashboard
   };
 
   const navItems = [
@@ -30,7 +26,7 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
     },
     {
       id: 'journal',
-      label: language === 'en' ? 'Journal' : 'مذكرات',
+      label: language === 'en' ? 'Journal' : 'المذكرات',
       icon: <BookOpen className="mr-2 h-4 w-4" />,
       path: `${getBasePath()}?tab=journal`
     },
@@ -39,6 +35,30 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
       label: language === 'en' ? 'Gratitude' : 'الامتنان',
       icon: <Heart className="mr-2 h-4 w-4" />,
       path: `${getBasePath()}?tab=gratitude`
+    },
+    {
+      id: 'report',
+      label: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
+      icon: <FileText className="mr-2 h-4 w-4" />,
+      path: `${getBasePath()}?tab=report`
+    },
+    {
+      id: 'breathing',
+      label: language === 'en' ? 'Guided Breathing' : 'التنفس الموجّه',
+      icon: <Wind className="mr-2 h-4 w-4" />,
+      path: `${getBasePath()}?tab=breathing`
+    },
+    {
+      id: 'cpt',
+      label: language === 'en' ? 'CPT Techniques' : 'تقنيات المعالجة المعرفية',
+      icon: <Activity className="mr-2 h-4 w-4" />,
+      path: `${getBasePath()}?tab=cpt`
+    },
+    {
+      id: 'relationship',
+      label: language === 'en' ? 'Relationship Tracker' : 'متتبع العلاقات',
+      icon: <BarChart3 className="mr-2 h-4 w-4" />,
+      path: `${getBasePath()}?tab=relationship`
     },
     {
       id: 'goals',
@@ -51,24 +71,35 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium">
-        {language === 'en' ? 'Quick Access' : 'وصول سريع'}
+        {language === 'en' ? 'MindTrack Tools' : 'أدوات مايند تراك'}
       </h3>
-      <ul className="space-y-1">
-        {navItems.map(item => (
-          <li key={item.id}>
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-start ${activePage === item.id ? 'bg-accent/50' : ''}`}
-              asChild
-            >
-              <Link to={item.path}>
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            </Button>
-          </li>
-        ))}
-      </ul>
+      <div className="max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
+        <ul className="space-y-1">
+          {navItems.map(item => (
+            <li key={item.id}>
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${activePage === item.id ? 'bg-accent/50' : ''} ${language === 'ar' ? 'flex-row-reverse' : ''}`}
+                asChild
+              >
+                <Link to={item.path}>
+                  {language === 'ar' ? (
+                    <>
+                      <span>{item.label}</span>
+                      {React.cloneElement(item.icon, { className: "ml-2 h-4 w-4" })}
+                    </>
+                  ) : (
+                    <>
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </>
+                  )}
+                </Link>
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
