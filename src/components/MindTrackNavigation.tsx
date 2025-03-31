@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLanguage } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -37,12 +36,6 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
       path: `${getBasePath()}?tab=gratitude`
     },
     {
-      id: 'report',
-      label: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
-      icon: <FileText className="mr-2 h-4 w-4" />,
-      path: `${getBasePath()}?tab=report`
-    },
-    {
       id: 'breathing',
       label: language === 'en' ? 'Guided Breathing' : 'التنفس الموجّه',
       icon: <Wind className="mr-2 h-4 w-4" />,
@@ -66,6 +59,12 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
       icon: <Target className="mr-2 h-4 w-4" />,
       path: `${getBasePath()}?tab=goals`
     },
+    {
+      id: 'report',
+      label: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
+      icon: <FileText className="mr-2 h-4 w-4" />,
+      path: `${getBasePath()}?tab=report`
+    }
   ];
 
   return (
