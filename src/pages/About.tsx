@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+type SessionsResponse = {
+  count: number; // Define the expected structure of the response
+};
 
 const About = () => {
-  const [sessionsCount, setSessionsCount] = useState(1200); // Example starting value
+  const [sessionsCount, setSessionsCount] = useState(0); // Start with 0 until fetched
 
-  // Simulate session increment (replace with real backend logic)
+  // Fetch the initial session count from the backend
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionsCount((prev) => prev + 1); // Increment sessions over time
-    }, 10000); // Increment every 10 seconds (for demo purposes)
-    return () => clearInterval(interval);
+    const fetchSessions = async () => {
+      try {
+        const response = await axios.get<SessionsResponse>('/api/sessions'); // Use the defined type
+        setSessionsCount(response.data.count); // Access the 'count' property safely
+      } catch (error) {
+        console.error('Error fetching session count:', error);
+      }
+    };
+
+    fetchSessions();
   }, []);
 
   return (
@@ -57,7 +68,7 @@ const About = () => {
 
           {/* Number of Sessions */}
           <div className="p-6 rounded-lg bg-primary/10 text-center">
-            <h3 className="text-4xl font-bold text-primary">{sessionsCount}</h3>
+            <h3 className="text-4xl font-bold text-primary">{sessionsCount}+</h3>
             <p className="text-muted-foreground">Sessions Completed</p>
           </div>
         </div>

@@ -114,9 +114,9 @@ const Dashboard = () => {
                   {language === 'en' ? 'Quick Access' : 'وصول سريع'}
                 </h3>
                 <ul className="space-y-1">
-                  <li>
+                  <li>  
                     <Button variant="ghost" className="w-full justify-start">
-                      <Brain className="mr-2 h-4 w-4" />
+                      <Brain className="mr-2 h-4 w-4 text-black" />
                       <span>{language === 'en' ? 'Mood Tracker' : 'متتبع المزاج'}</span>
                     </Button>
                   </li>
@@ -130,6 +130,12 @@ const Dashboard = () => {
                     <Button variant="ghost" className="w-full justify-start">
                       <Heart className="mr-2 h-4 w-4" />
                       <span>{language === 'en' ? 'Gratitude' : 'الامتنان'}</span>
+                    </Button>
+                  </li>
+                  <li>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Brain className="mr-2 h-4 w-4" />
+                      <span>{language === 'en' ? 'Triggers' : 'المحفزات'}</span>
                     </Button>
                   </li>
                   <li>
