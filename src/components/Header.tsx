@@ -2,7 +2,7 @@
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Moon, Sun, Globe, MessageCircle, FileText, Calendar, Brain } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe, User, Calendar, Brain, Settings } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
 
@@ -23,6 +23,10 @@ const Header = () => {
   const [language, setLanguage] = useState<LanguageType>('en');
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  
+  // Mock authentication state - would use context in real app
+  const isAuthenticated = true; // For demo purposes
+  const isDoctor = false; // For demo purposes
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleLanguage = () => setLanguage(language === 'en' ? 'ar' : 'en');
@@ -35,7 +39,8 @@ const Header = () => {
     { 
       path: '/dashboard', 
       label: language === 'en' ? 'MindTrack' : 'مايند تراك',
-      icon: <Brain className="mr-2 h-4 w-4" /> 
+      icon: <Brain className="mr-2 h-4 w-4" />,
+      requireAuth: true
     },
     { 
       path: '/book-appointment', 
@@ -43,7 +48,26 @@ const Header = () => {
       icon: <Calendar className="mr-2 h-4 w-4" /> 
     },
     { path: '/contact', label: language === 'en' ? 'Contact' : 'التواصل' },
+    { 
+      path: '/profile', 
+      label: language === 'en' ? 'My Profile' : 'الملف الشخصي', 
+      icon: <User className="mr-2 h-4 w-4" />,
+      requireAuth: true
+    },
+    { 
+      path: '/doctor-admin', 
+      label: language === 'en' ? 'Doctor Admin' : 'لوحة تحكم الطبيب', 
+      icon: <Settings className="mr-2 h-4 w-4" />,
+      requireDoctor: true
+    },
   ];
+
+  // Filter routes based on authentication
+  const filteredRoutes = routes.filter(route => {
+    if (route.requireAuth && !isAuthenticated) return false;
+    if (route.requireDoctor && !isDoctor) return false;
+    return true;
+  });
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>
@@ -58,7 +82,7 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6">
-              {routes.map((route) => (
+              {filteredRoutes.map((route) => (
                 <Link
                   key={route.path}
                   to={route.path}
@@ -104,9 +128,15 @@ const Header = () => {
                 )}
               </Button>
               <Button size="sm" className="btn-primary" asChild>
-                <Link to="/auth">
-                  {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
-                </Link>
+                {isAuthenticated ? (
+                  <Link to="/profile">
+                    {language === 'en' ? 'My Profile' : 'الملف الشخصي'}
+                  </Link>
+                ) : (
+                  <Link to="/auth">
+                    {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
+                  </Link>
+                )}
               </Button>
             </div>
 
@@ -144,7 +174,7 @@ const Header = () => {
         {isOpen && (
           <div className="container md:hidden py-4 animate-fade-in">
             <nav className="flex flex-col space-y-4">
-              {routes.map((route) => (
+              {filteredRoutes.map((route) => (
                 <Link
                   key={route.path}
                   to={route.path}
@@ -167,9 +197,15 @@ const Header = () => {
                 </Link>
               ))}
               <Button size="sm" className="btn-primary w-full" asChild>
-                <Link to="/auth">
-                  {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
-                </Link>
+                {isAuthenticated ? (
+                  <Link to="/profile">
+                    {language === 'en' ? 'My Profile' : 'الملف الشخصي'}
+                  </Link>
+                ) : (
+                  <Link to="/auth">
+                    {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
+                  </Link>
+                )}
               </Button>
             </nav>
           </div>
