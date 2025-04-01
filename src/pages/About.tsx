@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 
 type SessionsResponse = {
   count: number; // Define the expected structure of the response
@@ -31,11 +30,9 @@ const About = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="col-span-1">
             <div className="aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-mindtrack-blue/20 to-mindtrack-lavender/20">
-              <img 
-                src={BassmaAdelImage} 
-                alt="Dr. Bassma Adel" 
-                className="w-full h-full object-cover" 
-              />
+              <div className="h-full flex items-center justify-center text-mindtrack-blue">
+                <span className="text-xl font-semibold">Dr. Bassma Adel</span>
+              </div>
             </div>
           </div>
           
@@ -58,7 +55,7 @@ const About = () => {
           {/* Years of Experience */}
           <div className="p-6 rounded-lg bg-primary/10 text-center">
             <h3 className="text-4xl font-bold text-primary">
-              {new Date().getFullYear() - 2016}+
+              {new Date().getFullYear() - 2017}+
             </h3>
             <p className="text-muted-foreground">Years of Experience</p>
           </div>

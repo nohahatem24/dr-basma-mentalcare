@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -8,7 +9,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentSummary from '@/components/booking/AppointmentSummary';
 import AppointmentDetails from '@/components/booking/AppointmentDetails';
-import { PaymentForm } from '@/components/booking/PaymentForm';
+import PaymentForm from '@/components/booking/PaymentForm';
 
 interface TimeSlot {
   id: string;
@@ -16,21 +17,6 @@ interface TimeSlot {
   time: string;
   isAvailable: boolean;
   doctorId: string;
-}
-
-interface PaymentFormProps {
-  paymentMethod: string;
-  setPaymentMethod: (method: string) => void;
-  cardInfo: {
-    cardNumber: string;
-    cardName: string;
-    expiry: string;
-    cvv: string;
-  };
-  onCardInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isProcessing: boolean;
-  onBookingComplete: (e: React.FormEvent) => Promise<void>;
-  fee: number;
 }
 
 const BookAppointment = () => {
@@ -217,17 +203,17 @@ const BookAppointment = () => {
           />
           
           {/* Payment Information - Only show if a slot is selected */}
-            {selectedSlot && (
+          {selectedSlot && (
             <PaymentForm 
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               cardInfo={cardInfo}
-              onCardInfoChange={handleCardInfoChange} // Updated prop name to match PaymentForm's expected prop
+              handleCardInfoChange={handleCardInfoChange}
               isProcessing={isProcessing}
-              onBookingComplete={handleBookingComplete} // Updated prop name to match PaymentForm's expected prop
+              handleBookingComplete={handleBookingComplete}
               fee={120}
             />
-            )}
+          )}
         </div>
       </div>
     </div>

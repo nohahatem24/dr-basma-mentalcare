@@ -1,117 +1,315 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar } from "@/components/ui/avatar";
+import { Calendar } from "@/components/ui/calendar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/components/Header';
-import { APPOINTMENT_FEES, AVAILABLE_SLOTS } from '@/config/doctor';
-import { AppointmentDetails } from '@/types/booking';
-import { BookingCalendar } from '@/components/booking/BookingCalendar';
-import { CustomBookingForm } from '../components/booking/CustomBookingForm';
-import { DoctorHeader } from '@/components/doctor/DoctorHeader';
-import { DoctorInfo } from '@/components/doctor/DoctorInfo';
-
-const doctorInfo = {
-  name: "Dr. Bassma Adel",
-  title: "Clinical Psychologist",
-  bio: "Dr. Bassma Adel is a licensed clinical psychologist with over 8 years of experience...",
-  certifications: [
-    "Master's in Positive Psychology – Mansoura University",
-    "Licensed Clinical Psychologist",
-    "Certified CBT Specialist",
-    "Member of the Egyptian Association for Psychotherapists"
-  ],
-  rating: 4.9,
-  reviewCount: 87
-};
+import DoctorReviews from '@/components/DoctorReviews';
+import { Star, Video, Clock, Calendar as CalendarIcon, CheckCircle } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { format } from 'date-fns';
 
 const DoctorProfile = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [availableSlots, setAvailableSlots] = useState<string[]>([
+    "9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"
+  ]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [doctorOnline] = useState(true);
+  const [doctorOnline, setDoctorOnline] = useState<boolean>(true);
   
-  const [customDate, setCustomDate] = useState<Date>(new Date());
-  const [customTime, setCustomTime] = useState("");
-  const [customNotes, setCustomNotes] = useState("");
+  const [customDate, setCustomDate] = useState<Date | undefined>(new Date());
+  const [customTime, setCustomTime] = useState<string>("");
+  const [customNotes, setCustomNotes] = useState<string>("");
 
-  const handleBooking = (details: AppointmentDetails) => {
-    console.log('Navigating to payment with details:', details); // Debug log
-    navigate('/payment', { state: details });
-  };
-
-  const validateAndBook = (type: AppointmentDetails['appointmentType']) => {
-    if (type === 'standard' && !selectedSlot) {
+  const bookAppointment = () => {
+    if (!selectedSlot) {
       toast({
         title: language === 'en' ? "Select a time slot" : "اختر موعداً",
+        description: language === 'en' ? "Please select an available time slot" : "يرجى اختيار وقت متاح",
         variant: "destructive",
       });
       return;
     }
 
-    const details: AppointmentDetails = {
-      doctorName: "Dr. Bassma Adel",
-      fee: APPOINTMENT_FEES[type],
-      appointmentType: type,
-      date: type === 'custom' ? customDate : selectedDate,
-      time: type === 'custom' ? customTime : selectedSlot || '',
-      ...(type === 'custom' && { notes: customNotes }),
-    };
+    navigate('/payment', { 
+      state: { 
+        date: selectedDate,
+        time: selectedSlot,
+        doctorName: "Dr. Bassma Adel",
+        fee: 120,
+        appointmentType: "standard"
+      } 
+    });
+  };
 
-    handleBooking(details);
+  const sendCustomRequest = () => {
+    if (!customDate || !customTime) {
+      toast({
+        title: language === 'en' ? "Missing information" : "معلومات ناقصة",
+        description: language === 'en' ? "Please select both date and time" : "يرجى تحديد التاريخ والوقت",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    navigate('/payment', { 
+      state: { 
+        date: customDate,
+        time: customTime,
+        doctorName: "Dr. Bassma Adel",
+        fee: 120,
+        notes: customNotes,
+        appointmentType: "custom"
+      } 
+    });
+  };
+
+  const requestImmediateSession = () => {
+    navigate('/payment', { 
+      state: { 
+        doctorName: "Dr. Bassma Adel",
+        fee: 150,
+        appointmentType: "immediate",
+        date: new Date(),
+        time: "Now"
+      } 
+    });
+  };
+
+  const doctorInfo = {
+    name: language === 'en' ? "Dr. Bassma Adel" : "د. بسمة عادل",
+    title: language === 'en' ? "Clinical Psychologist" : "أخصائية نفسية سريرية",
+    bio: language === 'en'
+      ? "Dr. Bassma Adel is a licensed clinical psychologist with over 8 years of experience, specializing in cognitive-behavioral therapy (CBT), anxiety disorders, depression, and personality disorders. She has helped numerous patients improve their mental well-being through evidence-based therapy."
+      : "د. بسمة عادل هي أخصائية نفسية سريرية مرخصة تتمتع بخبرة تزيد عن 8 سنوات، متخصصة في العلاج المعرفي السلوكي (CBT)، واضطرابات القلق، والاكتئاب، والاكتئاب، واضطرابات الشخصية. ساعدت العديد من المرضى على تحسين صحتهم النفسية من خلال العلاج القائم على الأدلة.",
+    certifications: [
+      language === 'en' ? "Master’s in Positive Psychology – Mansoura University" : "ماجستير في علم النفس الإيجابي - جامعة المنصورة",
+      language === 'en' ? "Licensed Clinical Psychologist" : "أخصائية نفسية سريرية مرخصة",
+      language === 'en' ? "Certified CBT Specialist" : "متخصصة معتمدة في العلاج المعرفي السلوكي",
+      language === 'en' ? "Member of the Egyptian Association for Psychotherapists" : "عضو في الجمعية المصرية للمعالجين النفسيين"
+    ],
+    rating: 4.9,
+    reviewCount: 87
   };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <DoctorHeader 
-            doctorInfo={doctorInfo}
-            isOnline={doctorOnline}
-            onImmediateSession={() => validateAndBook('immediate')}
-          />
+          <Card className="col-span-1">
+            <CardHeader className="text-center">
+              <Avatar className="h-24 w-24 mx-auto">
+                <img src="/placeholder.svg" alt={doctorInfo.name} className="h-full w-full object-cover" />
+              </Avatar>
+              
+              <CardTitle className="mt-4">{doctorInfo.name}</CardTitle>
+              <CardDescription>{doctorInfo.title}</CardDescription>
+              
+              <div className="flex justify-center items-center mt-2">
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <span className="ml-1 font-medium">{doctorInfo.rating}</span>
+                <span className="ml-1 text-muted-foreground">({doctorInfo.reviewCount})</span>
+              </div>
+              
+              <Badge 
+                variant={doctorOnline ? "default" : "outline"} 
+                className={`mt-3 ${doctorOnline ? "bg-green-500 hover:bg-green-600" : ""}`}
+              >
+                {doctorOnline 
+                  ? (language === 'en' ? "Available Now" : "متاحة الآن") 
+                  : (language === 'en' ? "Offline" : "غير متصلة")}
+              </Badge>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-medium mb-2">{language === 'en' ? "About" : "نبذة"}</h3>
+                <p className="text-sm text-muted-foreground">{doctorInfo.bio}</p>
+              </div>
+              
+              <div>
+                <h3 className="font-medium mb-2">{language === 'en' ? "Certifications" : "الشهادات"}</h3>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  {doctorInfo.certifications.map((cert, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
+                      <span>{cert}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+            
+            {doctorOnline && (
+              <CardFooter>
+                <Button 
+                  className="w-full"
+                  onClick={requestImmediateSession}
+                >
+                  <Video className="mr-2 h-4 w-4" />
+                  {language === 'en' ? "Request Immediate Session" : "طلب جلسة فورية"}
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
           
           <Card className="col-span-1 lg:col-span-2">
             <CardHeader>
               <CardTitle>{language === 'en' ? "Book an Appointment" : "حجز موعد"}</CardTitle>
+              <CardDescription>
+                {language === 'en' 
+                  ? "Select a date and time for your session with Dr. Bassma" 
+                  : "اختر تاريخًا ووقتًا لجلستك مع الدكتورة بسمة"}
+              </CardDescription>
             </CardHeader>
             
             <CardContent>
               <Tabs defaultValue="calendar" className="w-full">
                 <TabsList className="mb-4">
-                  {/* Tabs triggers */}
+                  <TabsTrigger value="calendar">
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    {language === 'en' ? "Select Date" : "اختر التاريخ"}
+                  </TabsTrigger>
+                  <TabsTrigger value="custom">
+                    <Clock className="h-4 w-4 mr-2" />
+                    {language === 'en' ? "Request Custom Time" : "طلب وقت مخصص"}
+                  </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="calendar">
-                  <BookingCalendar
-                    selectedDate={selectedDate}
-                    onDateSelect={setSelectedDate}
-                    selectedSlot={selectedSlot}
-                    onSlotSelect={setSelectedSlot}
-                    availableSlots={AVAILABLE_SLOTS}
-                    onBook={() => validateAndBook('standard')}
-                  />
+                <TabsContent value="calendar" className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="flex justify-center">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        className="rounded-md border"
+                        disabled={(date) => 
+                          date < new Date() || 
+                          date.getDay() === 0 || 
+                          date.getDay() === 6
+                        }
+                      />
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="font-medium">
+                        {language === 'en' ? "Available Time Slots" : "الأوقات المتاحة"}
+                      </h3>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableSlots.map((slot) => (
+                          <Button
+                            key={slot}
+                            variant={selectedSlot === slot ? "default" : "outline"}
+                            onClick={() => setSelectedSlot(slot)}
+                            className="justify-center"
+                          >
+                            {slot}
+                          </Button>
+                        ))}
+                      </div>
+                      
+                      <Button 
+                        className="w-full mt-4" 
+                        onClick={bookAppointment}
+                      >
+                        {language === 'en' ? "Book Appointment" : "حجز موعد"}
+                      </Button>
+                    </div>
+                  </div>
                 </TabsContent>
                 
                 <TabsContent value="custom">
-                  <CustomBookingForm
-                    customDate={customDate}
-                    onDateSelect={setCustomDate}
-                    customTime={customTime}
-                    onTimeChange={setCustomTime}
-                    customNotes={customNotes}
-                    onNotesChange={setCustomNotes}
-                    onSubmit={() => validateAndBook('custom')}
-                  />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        {language === 'en' ? "Request Custom Appointment" : "طلب موعد مخصص"}
+                      </CardTitle>
+                      <CardDescription>
+                        {language === 'en' 
+                          ? "If none of the available times work for you, send a custom request" 
+                          : "إذا لم تكن أي من الأوقات المتاحة مناسبة لك، أرسل طلبًا مخصصًا"}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          {language === 'en' ? "Preferred Date" : "التاريخ المفضل"}
+                        </label>
+                        <Calendar
+                          mode="single"
+                          selected={customDate}
+                          onSelect={setCustomDate}
+                          className="rounded-md border"
+                          disabled={(date) => date < new Date()}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          {language === 'en' ? "Preferred Time" : "الوقت المفضل"}
+                        </label>
+                        <Input 
+                          type="time"
+                          value={customTime}
+                          onChange={(e) => setCustomTime(e.target.value)}
+                          placeholder={language === 'en' ? "Select time" : "اختر الوقت"}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          {language === 'en' ? "Additional Notes" : "ملاحظات إضافية"}
+                        </label>
+                        <Textarea 
+                          value={customNotes}
+                          onChange={(e) => setCustomNotes(e.target.value)}
+                          placeholder={language === 'en' 
+                            ? "Any specific requirements or preferences" 
+                            : "أي متطلبات أو تفضيلات محددة"}
+                          rows={3}
+                        />
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        {language === 'en' 
+                          ? "Dr. Bassma will review your request and confirm if she can accommodate your preferred time." 
+                          : "ستراجع الدكتورة بسمة طلبك وتؤكد ما إذا كان بإمكانها استيعاب الوقت المفضل لديك."}
+                      </p>
+                      
+                      <Button className="w-full" onClick={sendCustomRequest}>
+                        {language === 'en' ? "Send Request" : "إرسال الطلب"}
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
           
-          <DoctorInfo doctorInfo={doctorInfo} />
+          <Card className="col-span-1 lg:col-span-3">
+            <CardHeader>
+              <CardTitle>{language === 'en' ? "Patient Reviews" : "آراء المرضى"}</CardTitle>
+              <CardDescription>
+                {language === 'en' 
+                  ? "See what other patients are saying about Dr. Bassma" 
+                  : "انظر ماذا يقول المرضى الآخرون عن الدكتورة بسمة"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DoctorReviews />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -210,34 +211,6 @@ const Header = () => {
           </div>
         )}
       </header>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          {/* Other elements */}
-          <Link
-            to="/book-appointment"
-            className="text-sm font-medium transition-colors hover:text-primary flex items-center text-muted-foreground px-3 py-1"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-calendar mr-2 h-4 w-4"
-            >
-              <path d="M8 2v4"></path>
-              <path d="M16 2v4"></path>
-              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-              <path d="M3 10h18"></path>
-            </svg>
-            <span>Book Appointment</span>
-          </Link>
-        </div>
-      </div>
     </LanguageContext.Provider>
   );
 };

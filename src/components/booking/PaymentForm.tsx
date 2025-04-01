@@ -1,89 +1,100 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
-export interface PaymentFormProps {
+import React from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from 'lucide-react';
+import { useLanguage } from '@/components/Header';
+import PaymentMethodSelector from './PaymentMethodSelector';
+import CreditCardForm from './CreditCardForm';
+
+interface CardInfo {
+  cardNumber: string;
+  cardName: string;
+  expiry: string;
+  cvv: string;
+}
+
+interface PaymentFormProps {
   paymentMethod: string;
-  setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
-  cardInfo: {
-    cardNumber: string;
-    cardName: string;
-    expiry: string;
-    cvv: string;
-  };
-  onCardInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setPaymentMethod: (method: string) => void;
+  cardInfo: CardInfo;
+  handleCardInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isProcessing: boolean;
-  onBookingComplete: (e: React.FormEvent) => Promise<void>;
+  handleBookingComplete: (e: React.FormEvent) => void;
   fee: number;
 }
 
-export const PaymentForm: React.FC<PaymentFormProps> = ({
+const PaymentForm: React.FC<PaymentFormProps> = ({
   paymentMethod,
   setPaymentMethod,
   cardInfo,
-  onCardInfoChange,
+  handleCardInfoChange,
   isProcessing,
-  onBookingComplete,
+  handleBookingComplete,
   fee
 }) => {
+  const { language } = useLanguage();
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Payment Details</CardTitle>
+        <CardTitle>
+          {language === 'en' ? "Payment Method" : "طريقة الدفع"}
+        </CardTitle>
+        <CardDescription>
+          {language === 'en' 
+            ? "All transactions are secure and encrypted" 
+            : "جميع المعاملات آمنة ومشفرة"}
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={onBookingComplete} className="space-y-4">
-          <div className="space-y-2">
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="credit_card">Credit Card</option>
-              <option value="debit_card">Debit Card</option>
-            </select>
-          </div>
-
-          <Input
-            type="text"
-            name="cardNumber"
-            value={cardInfo.cardNumber}
-            onChange={onCardInfoChange}
-            placeholder="Card Number"
+      <CardContent className="space-y-6">
+        <PaymentMethodSelector 
+          paymentMethod={paymentMethod} 
+          setPaymentMethod={setPaymentMethod} 
+        />
+        
+        {paymentMethod === 'credit_card' && (
+          <CreditCardForm 
+            cardInfo={cardInfo} 
+            onChange={handleCardInfoChange} 
           />
-          <Input
-            type="text"
-            name="cardName"
-            value={cardInfo.cardName}
-            onChange={onCardInfoChange}
-            placeholder="Name on Card"
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              type="text"
-              name="expiry"
-              value={cardInfo.expiry}
-              onChange={onCardInfoChange}
-              placeholder="MM/YY"
-            />
-            <Input
-              type="text"
-              name="cvv"
-              value={cardInfo.cvv}
-              onChange={onCardInfoChange}
-              placeholder="CVV"
-            />
+        )}
+        
+        {paymentMethod === 'digital_wallet' && (
+          <div className="pt-2">
+            <p className="text-sm text-muted-foreground mb-4">
+              {language === 'en' 
+                ? "You'll be redirected to complete your payment" 
+                : "ستتم إعادة توجيهك لإكمال الدفع"}
+            </p>
           </div>
-          <Button
-            type="submit"
-            disabled={isProcessing}
-            className="w-full"
-          >
-            {isProcessing ? "Processing..." : `Pay $${fee}`}
-          </Button>
-        </form>
+        )}
       </CardContent>
+      <CardFooter className="flex-col space-y-2">
+        <Button 
+          className="w-full" 
+          disabled={isProcessing}
+          onClick={handleBookingComplete}
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {language === 'en' ? "Processing..." : "جارٍ المعالجة..."}
+            </>
+          ) : (
+            <>
+              {language === 'en' 
+                ? `Pay Now $${fee}` 
+                : `ادفع الآن $${fee}`}
+            </>
+          )}
+        </Button>
+        <p className="text-xs text-center text-muted-foreground">
+          {language === 'en' 
+            ? "By proceeding, you agree to our terms and cancellation policy" 
+            : "بالمتابعة، فإنك توافق على شروطنا وسياسة الإلغاء"}
+        </p>
+      </CardFooter>
     </Card>
   );
 };
