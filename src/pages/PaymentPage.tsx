@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AppointmentDetails } from '@/types/booking';
 import { BookingSummary } from '@/components/booking/BookingSummary';
 import { PaymentForm } from '@/components/booking/PaymentForm';
-import { BookingConfirmation } from '../components/booking/BookingConfirmation';
+import { BookingConfirmation } from '@/components/booking/BookingConfirmation';
 
 const PaymentPage = () => {
   const { language } = useLanguage();
