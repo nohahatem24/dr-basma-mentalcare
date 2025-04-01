@@ -1,8 +1,7 @@
-
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Moon, Sun, Globe, User, Calendar, Brain, Settings } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
 
@@ -23,8 +22,7 @@ const Header = () => {
   const [language, setLanguage] = useState<LanguageType>('en');
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  
-  // Mock authentication state - would use context in real app
+
   const isAuthenticated = true; // For demo purposes
   const isDoctor = false; // For demo purposes
 
@@ -36,33 +34,13 @@ const Header = () => {
     { path: '/', label: language === 'en' ? 'Home' : 'الرئيسية' },
     { path: '/about', label: language === 'en' ? 'About' : 'عن الدكتورة' },
     { path: '/services', label: language === 'en' ? 'Services' : 'الخدمات' },
-    { 
-      path: '/dashboard', 
-      label: language === 'en' ? 'MindTrack' : 'مايند تراك',
-      icon: <Brain className="mr-2 h-4 w-4" />,
-      requireAuth: true
-    },
-    { 
-      path: '/book-appointment', 
-      label: language === 'en' ? 'Book Appointment' : 'حجز موعد', 
-      icon: <Calendar className="mr-2 h-4 w-4" /> 
-    },
+    { path: '/dashboard', label: language === 'en' ? 'MindTrack' : 'مايند تراك', requireAuth: true },
+    { path: '/book-appointment', label: language === 'en' ? 'Book Appointment' : 'حجز موعد' },
     { path: '/contact', label: language === 'en' ? 'Contact' : 'التواصل' },
-    { 
-      path: '/profile', 
-      label: language === 'en' ? 'My Profile' : 'الملف الشخصي', 
-      icon: <User className="mr-2 h-4 w-4" />,
-      requireAuth: true
-    },
-    { 
-      path: '/doctor-admin', 
-      label: language === 'en' ? 'Doctor Admin' : 'لوحة تحكم الطبيب', 
-      icon: <Settings className="mr-2 h-4 w-4" />,
-      requireDoctor: true
-    },
+    { path: '/profile', label: language === 'en' ? 'My Profile' : 'الملف الشخصي', requireAuth: true },
+    { path: '/doctor-admin', label: language === 'en' ? 'Doctor Admin' : 'لوحة تحكم الطبيب', requireDoctor: true },
   ];
 
-  // Filter routes based on authentication
   const filteredRoutes = routes.filter(route => {
     if (route.requireAuth && !isAuthenticated) return false;
     if (route.requireDoctor && !isDoctor) return false;
@@ -80,27 +58,16 @@ const Header = () => {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6">
               {filteredRoutes.map((route) => (
                 <Link
                   key={route.path}
                   to={route.path}
-                  className={`text-sm font-medium transition-colors hover:text-primary flex items-center ${
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
                     location.pathname === route.path ? 'text-primary' : 'text-muted-foreground'
-                  } ${route.path === '/book-appointment' ? 'bg-primary/10 px-3 py-1 rounded-md' : ''}`}
+                  }`}
                 >
-                  {language === 'ar' ? (
-                    <>
-                      <span>{route.label}</span>
-                      {route.icon && React.cloneElement(route.icon, { className: "ml-2 h-4 w-4" })}
-                    </>
-                  ) : (
-                    <>
-                      {route.icon && route.icon}
-                      <span>{route.label}</span>
-                    </>
-                  )}
+                  <span>{route.label}</span>
                 </Link>
               ))}
             </nav>
@@ -140,7 +107,6 @@ const Header = () => {
               </Button>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-2">
               <NotificationSystem />
               <Button
@@ -170,7 +136,6 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isOpen && (
           <div className="container md:hidden py-4 animate-fade-in">
             <nav className="flex flex-col space-y-4">
@@ -178,22 +143,12 @@ const Header = () => {
                 <Link
                   key={route.path}
                   to={route.path}
-                  className={`text-sm font-medium transition-colors hover:text-primary flex items-center ${
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
                     location.pathname === route.path ? 'text-primary' : 'text-muted-foreground'
-                  } ${route.path === '/book-appointment' ? 'bg-primary/10 px-3 py-1 rounded-md' : ''}`}
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
-                  {language === 'ar' ? (
-                    <>
-                      <span>{route.label}</span>
-                      {route.icon && React.cloneElement(route.icon, { className: "ml-2 h-4 w-4" })}
-                    </>
-                  ) : (
-                    <>
-                      {route.icon && route.icon}
-                      <span>{route.label}</span>
-                    </>
-                  )}
+                  <span>{route.label}</span>
                 </Link>
               ))}
               <Button size="sm" className="btn-primary w-full" asChild>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -8,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentSummary from '@/components/booking/AppointmentSummary';
-import AppointmentDetails from '@/components/booking/AppointmentDetails';
 import PaymentForm from '@/components/booking/PaymentForm';
 
 interface TimeSlot {
@@ -30,12 +28,6 @@ const BookAppointment = () => {
   // State for time slots
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
-  
-  // State for appointment details
-  const [appointmentInfo, setAppointmentInfo] = useState({
-    reason: '',
-    notes: '',
-  });
   
   // State for payment
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
@@ -74,11 +66,6 @@ const BookAppointment = () => {
     
     fetchTimeSlots();
   }, [selectedDate]);
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setAppointmentInfo((prev) => ({ ...prev, [name]: value }));
-  };
   
   const handleCardInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -195,12 +182,6 @@ const BookAppointment = () => {
               }} 
             />
           )}
-          
-          {/* Appointment Details */}
-          <AppointmentDetails 
-            appointmentInfo={appointmentInfo}
-            onChange={handleInputChange}
-          />
           
           {/* Payment Information - Only show if a slot is selected */}
           {selectedSlot && (
