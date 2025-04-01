@@ -1,102 +1,58 @@
-
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from 'lucide-react';
+import { Input } from "@/components/ui/input";
 import { useLanguage } from '@/components/Header';
-import PaymentMethodSelector from './PaymentMethodSelector';
-import CreditCardForm from './CreditCardForm';
-
-interface CardInfo {
-  cardNumber: string;
-  cardName: string;
-  expiry: string;
-  cvv: string;
-}
 
 interface PaymentFormProps {
-  paymentMethod: string;
-  setPaymentMethod: (method: string) => void;
-  cardInfo: CardInfo;
-  handleCardInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isProcessing: boolean;
-  handleBookingComplete: (e: React.FormEvent) => void;
   fee: number;
+  isProcessing: boolean;
+  onPaymentComplete: () => void;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({
-  paymentMethod,
-  setPaymentMethod,
-  cardInfo,
-  handleCardInfoChange,
+export const PaymentForm: React.FC<PaymentFormProps> = ({
+  fee,
   isProcessing,
-  handleBookingComplete,
-  fee
+  onPaymentComplete,
 }) => {
   const { language } = useLanguage();
-  
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          {language === 'en' ? "Payment Method" : "طريقة الدفع"}
+          {language === 'en' ? 'Payment Details' : 'تفاصيل الدفع'}
         </CardTitle>
-        <CardDescription>
-          {language === 'en' 
-            ? "All transactions are secure and encrypted" 
-            : "جميع المعاملات آمنة ومشفرة"}
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <PaymentMethodSelector 
-          paymentMethod={paymentMethod} 
-          setPaymentMethod={setPaymentMethod} 
+      <CardContent className="space-y-4">
+        <Input
+          type="text"
+          placeholder={language === 'en' ? 'Card Number' : 'رقم البطاقة'}
         />
-        
-        {paymentMethod === 'credit_card' && (
-          <CreditCardForm 
-            cardInfo={cardInfo} 
-            onChange={handleCardInfoChange} 
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            type="text"
+            placeholder={language === 'en' ? 'MM/YY' : 'شهر/سنة'}
           />
-        )}
-        
-        {paymentMethod === 'digital_wallet' && (
-          <div className="pt-2">
-            <p className="text-sm text-muted-foreground mb-4">
-              {language === 'en' 
-                ? "You'll be redirected to complete your payment" 
-                : "ستتم إعادة توجيهك لإكمال الدفع"}
-            </p>
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex-col space-y-2">
-        <Button 
-          className="w-full" 
+          <Input
+            type="text"
+            placeholder={language === 'en' ? 'CVC' : 'رمز التحقق'}
+          />
+        </div>
+        <Button
+          onClick={onPaymentComplete}
           disabled={isProcessing}
-          onClick={handleBookingComplete}
+          className="w-full"
         >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {language === 'en' ? "Processing..." : "جارٍ المعالجة..."}
-            </>
-          ) : (
-            <>
-              {language === 'en' 
-                ? `Pay Now $${fee}` 
-                : `ادفع الآن $${fee}`}
-            </>
-          )}
+          {isProcessing
+            ? language === 'en'
+              ? 'Processing...'
+              : 'جاري المعالجة...'
+            : language === 'en'
+            ? `Pay $${fee}`
+            : `ادفع $${fee}`}
         </Button>
-        <p className="text-xs text-center text-muted-foreground">
-          {language === 'en' 
-            ? "By proceeding, you agree to our terms and cancellation policy" 
-            : "بالمتابعة، فإنك توافق على شروطنا وسياسة الإلغاء"}
-        </p>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };
-
-export default PaymentForm;
