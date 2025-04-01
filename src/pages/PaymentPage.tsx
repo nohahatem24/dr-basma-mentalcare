@@ -8,11 +8,7 @@ import { BookingSummary } from '@/components/booking/BookingSummary';
 import { PaymentForm } from '@/components/booking/PaymentForm';
 import { BookingConfirmation } from '@/components/booking/BookingConfirmation';
 
-interface PaymentFormProps {
-  fee: number;
-  isProcessing: boolean;
-  onPaymentComplete: () => Promise<void>;
-}
+import { PaymentFormProps } from '@/components/booking/PaymentForm';
 
 export const PaymentPage = () => {
   const { language } = useLanguage();
