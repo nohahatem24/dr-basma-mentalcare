@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Hero from '@/components/Hero';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Brain, Heart, LineChart, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
+import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
 
 const Index = () => {
   const { language } = useLanguage();
