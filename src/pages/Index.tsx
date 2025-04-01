@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Hero from '@/components/Hero';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Brain, Heart, LineChart, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
+import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 
 const Index = () => {
   const { language } = useLanguage();
@@ -103,12 +103,11 @@ const Index = () => {
               </Button>
             </div>
             <div className="relative rounded-xl overflow-hidden">
-              <div className="aspect-square bg-gradient-to-br from-mindtrack-lavender/50 to-mindtrack-blue/50 rounded-xl"></div>
-              <div className="absolute inset-0 flex items-center justify-center text-white/90">
-                <div className="text-center">
-                  <span className="text-xl font-semibold">{language === 'en' ? 'Dr. Bassma Adel' : 'د. بسمة عادل'}</span>
-                </div>
-              </div>
+              <img 
+                src={BassmaAdelImage} 
+                alt={language === 'en' ? 'Dr. Bassma Adel' : 'د. بسمة عادل'} 
+                className="h-full w-full object-cover" 
+              />
             </div>
           </div>
         </div>

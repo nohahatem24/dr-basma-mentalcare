@@ -14,6 +14,7 @@ import { Star, Video, Clock, Calendar as CalendarIcon, CheckCircle } from 'lucid
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
+import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 
 const DoctorProfile = () => {
   const { language } = useLanguage();
@@ -108,7 +109,7 @@ const DoctorProfile = () => {
           <Card className="col-span-1">
             <CardHeader className="text-center">
               <Avatar className="h-24 w-24 mx-auto">
-                <img src="/placeholder.svg" alt={doctorInfo.name} className="h-full w-full object-cover" />
+                <img src={BassmaAdelImage} alt={doctorInfo.name} className="h-full w-full object-cover" />
               </Avatar>
               
               <CardTitle className="mt-4">{doctorInfo.name}</CardTitle>
