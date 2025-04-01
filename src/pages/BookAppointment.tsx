@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentSummary from '@/components/booking/AppointmentSummary';
 import AppointmentDetails from '@/components/booking/AppointmentDetails';
-import PaymentForm from '@/components/booking/PaymentForm';
+import { PaymentForm } from '@/components/booking/PaymentForm';
 
 interface TimeSlot {
   id: string;

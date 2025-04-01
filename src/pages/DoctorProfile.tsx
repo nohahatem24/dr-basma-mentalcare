@@ -39,6 +39,7 @@ const DoctorProfile = () => {
   const [customNotes, setCustomNotes] = useState("");
 
   const handleBooking = (details: AppointmentDetails) => {
+    console.log('Navigating to payment with details:', details); // Debug log
     navigate('/payment', { state: details });
   };
 
