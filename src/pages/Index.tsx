@@ -3,7 +3,7 @@ import Hero from '@/components/Hero';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
-import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
+import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 
 const Index = () => {
   const { language } = useLanguage();
@@ -30,7 +30,7 @@ const Index = () => {
             </div>
             <div className="relative rounded-xl overflow-hidden">
               <img 
-                src={BasmaAdelImage} 
+                src={BassmaAdelImage} 
                 alt={language === 'en' ? 'Dr. Bassma Adel' : 'د. بسمة عادل'} 
                 className="w-full h-full object-cover" 
               />

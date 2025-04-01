@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
+import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 
 type SessionsResponse = {
   count: number; // Define the expected structure of the response
@@ -32,7 +32,7 @@ const About = () => {
           <div className="col-span-1">
             <div className="aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-mindtrack-blue/20 to-mindtrack-lavender/20">
               <img 
-                src={BasmaAdelImage} 
+                src={BassmaAdelImage} 
                 alt="Dr. Bassma Adel" 
                 className="w-full h-full object-cover" 
               />
