@@ -202,17 +202,17 @@ const BookAppointment = () => {
           />
           
           {/* Payment Information - Only show if a slot is selected */}
-          {selectedSlot && (
+            {selectedSlot && (
             <PaymentForm 
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               cardInfo={cardInfo}
-              handleCardInfoChange={handleCardInfoChange}
+              onCardInfoChange={handleCardInfoChange} // Updated prop name to match PaymentForm's expected prop
               isProcessing={isProcessing}
-              handleBookingComplete={handleBookingComplete}
+              onBookingComplete={handleBookingComplete} // Updated prop name to match PaymentForm's expected prop
               fee={120}
             />
-          )}
+            )}
         </div>
       </div>
     </div>
