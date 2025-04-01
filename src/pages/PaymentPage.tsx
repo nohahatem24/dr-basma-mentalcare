@@ -8,7 +8,7 @@ import { BookingSummary } from '@/components/booking/BookingSummary';
 import { PaymentForm } from '@/components/booking/PaymentForm';
 import { BookingConfirmation } from '@/components/booking/BookingConfirmation';
 
-export interface PaymentFormProps {
+interface PaymentFormProps {
   fee: number;
   isProcessing: boolean;
   onPaymentComplete: () => Promise<void>;
