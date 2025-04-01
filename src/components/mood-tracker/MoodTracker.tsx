@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Chart as ChartJS,
@@ -19,8 +20,6 @@ import { useNavigate } from 'react-router-dom';
 import { MoodForm } from './MoodForm';
 import { MoodGraph } from './MoodGraph';
 import { MoodHistory } from './MoodHistory';
-import MoodChart from '@/components/dashboard/MoodChart';
-import { useMoodChartData } from '@/components/dashboard/MoodChartUtils';
 
 // Register ChartJS components
 ChartJS.register(
@@ -66,9 +65,6 @@ const MoodTracker = () => {
       triggers: [language === 'en' ? 'Work' : 'العمل', language === 'en' ? 'Lack of sleep' : 'قلة النوم']
     }
   ]);
-
-  // Convert mood entries to chart data format
-  const moodChartData = useMoodChartData(moodEntries);
 
   const handleAddMoodEntry = (formData: { mood: number; notes: string; triggers: string[] }) => {
     // If editing an existing entry
@@ -142,16 +138,9 @@ const MoodTracker = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Mood Graph using both visualizations */}
-        <div className="space-y-6">
+        {/* Mood Graph */}
+        <div>
           <MoodGraph moodEntries={moodEntries} />
-          {moodChartData.length > 0 && (
-            <MoodChart 
-              moodData={moodChartData} 
-              title={language === 'en' ? 'Recent Mood Trends' : 'اتجاهات المزاج الأخيرة'}
-              className="mt-4"
-            />
-          )}
         </div>
 
         {/* Mood Form */}

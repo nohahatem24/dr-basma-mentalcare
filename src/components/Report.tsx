@@ -2,7 +2,6 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Button } from '@/components/ui/button';
-import MoodChart from '@/components/dashboard/MoodChart';
 import { useMoodChartData } from '@/components/dashboard/MoodChartUtils';
 
 interface ReportProps {
@@ -50,15 +49,6 @@ const Report: React.FC<ReportProps> = ({ moodEntries, relationshipData, language
     },
   };
 
-  // Convert mood entries for the new MoodChart component
-  const moodChartData = useMoodChartData(moodEntries.map(entry => ({
-    id: Math.random().toString(),
-    date: new Date(entry.date),
-    mood: entry.mood,
-    notes: '',
-    triggers: []
-  })));
-
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">
@@ -72,21 +62,6 @@ const Report: React.FC<ReportProps> = ({ moodEntries, relationshipData, language
         </h2>
         <div className="space-y-8">
           <Line data={moodGraphData} options={moodGraphOptions} />
-          
-          {/* Add the new MoodChart component */}
-          {moodChartData.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-lg font-medium mb-4">
-                {language === 'en' ? 'Mood Trends' : 'اتجاهات المزاج'}
-              </h3>
-              <MoodChart 
-                moodData={moodChartData}
-                showLabels={true}
-                height={250}
-                className="border-none shadow-none"
-              />
-            </div>
-          )}
         </div>
       </section>
 

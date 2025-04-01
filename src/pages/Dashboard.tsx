@@ -11,7 +11,6 @@ import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import JournalEntries from '@/components/dashboard/JournalEntries';
 import GratitudeJournal from '@/components/dashboard/GratitudeJournal';
 import GoalsTracker from '@/components/dashboard/GoalsTracker';
-import MoodChart from '@/components/dashboard/MoodChart';
 import AIInsights from '@/components/dashboard/AIInsights';
 
 const Dashboard = () => {
@@ -65,9 +64,6 @@ const Dashboard = () => {
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-6">
           {renderActiveComponent()}
-          
-          {/* Only show mood trends if on mood tab */}
-          {activeTab === 'mood' && <MoodChart />}
           
           {/* AI Insights Card */}
           <AIInsights />

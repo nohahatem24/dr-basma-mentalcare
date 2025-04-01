@@ -13,18 +13,23 @@ interface MoodGraphProps {
 export const MoodGraph: React.FC<MoodGraphProps> = ({ moodEntries }) => {
   const { language } = useLanguage();
 
+  // Sort entries by date (oldest to newest)
+  const sortedEntries = [...moodEntries].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   // Prepare data for the graph
   const moodGraphData = {
-    labels: moodEntries.map((entry) =>
+    labels: sortedEntries.map((entry) =>
       new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'ar-EG', {
         month: 'short',
         day: 'numeric',
-      }).format(entry.date)
+      }).format(new Date(entry.date))
     ),
     datasets: [
       {
         label: language === 'en' ? 'Mood Over Time' : 'المزاج مع مرور الوقت',
-        data: moodEntries.map((entry) => entry.mood),
+        data: sortedEntries.map((entry) => entry.mood),
         borderColor: 'rgba(75,192,192,1)',
         backgroundColor: 'rgba(75,192,192,0.2)',
         fill: true,
