@@ -18,7 +18,7 @@ const BookingFloatingButton = () => {
             className="fixed bottom-24 right-6 shadow-lg size-16 rounded-full bg-primary text-primary-foreground"
             aria-label={language === 'en' ? 'Book Appointment' : 'حجز موعد'}
           >
-            <Link to="/book-appointment">
+            <Link to="/doctor">
               <Calendar className="h-6 w-6" />
             </Link>
           </Button>

@@ -25,6 +25,7 @@ import UserProfile from "@/components/user/UserProfile";
 import DoctorAdmin from "@/components/doctor/DoctorAdmin";
 import { useLanguage } from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
+import PaymentPage from "./pages/PaymentPage";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +152,13 @@ const AppRoutes = () => {
           <div className="container py-8">
             <DoctorAdmin />
           </div>
+        </ProtectedRoute>
+      } />
+      
+      {/* Hidden payment page - not in navigation */}
+      <Route path="/payment" element={
+        <ProtectedRoute>
+          <PaymentPage />
         </ProtectedRoute>
       } />
       
