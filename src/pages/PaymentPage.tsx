@@ -5,10 +5,57 @@ import { useLanguage } from '@/components/Header';
 import { Button } from "@/components/ui/button";
 import { AppointmentDetails } from '@/types/booking';
 import { BookingSummary } from '@/components/booking/BookingSummary';
-import { PaymentForm } from '@/components/booking/PaymentForm';
 import { BookingConfirmation } from '@/components/booking/BookingConfirmation';
 
-import { PaymentFormProps } from '@/components/booking/PaymentForm';
+type PaymentFormProps = {
+  fee: number;
+  isProcessing: boolean;
+  onPaymentComplete: () => Promise<void>;
+};
+
+const PaymentForm: React.FC<PaymentFormProps> = ({ fee, isProcessing, onPaymentComplete }) => {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onPaymentComplete();
+      }}
+      className="space-y-4"
+    >
+      <div>
+        <label className="block text-sm font-medium">Card Number</label>
+        <input
+          type="text"
+          placeholder="Enter your card number"
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">Expiry Date</label>
+        <input
+          type="text"
+          placeholder="MM/YY"
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium">CVV</label>
+        <input
+          type="text"
+          placeholder="Enter CVV"
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={isProcessing}
+        className="w-full bg-primary text-white py-2 rounded-md"
+      >
+        {isProcessing ? "Processing..." : `Pay $${fee}`}
+      </button>
+    </form>
+  );
+};
 
 export const PaymentPage = () => {
   const { language } = useLanguage();

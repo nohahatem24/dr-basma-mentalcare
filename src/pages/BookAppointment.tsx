@@ -18,6 +18,21 @@ interface TimeSlot {
   doctorId: string;
 }
 
+interface PaymentFormProps {
+  paymentMethod: string;
+  setPaymentMethod: (method: string) => void;
+  cardInfo: {
+    cardNumber: string;
+    cardName: string;
+    expiry: string;
+    cvv: string;
+  };
+  onCardInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isProcessing: boolean;
+  onBookingComplete: (e: React.FormEvent) => Promise<void>;
+  fee: number;
+}
+
 const BookAppointment = () => {
   const { language } = useLanguage();
   const { toast } = useToast();

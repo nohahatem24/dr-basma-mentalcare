@@ -1,17 +1,31 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export interface PaymentFormProps {
-  fee: number;
+  paymentMethod: string;
+  setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
+  cardInfo: {
+    cardNumber: string;
+    cardName: string;
+    expiry: string;
+    cvv: string;
+  };
+  onCardInfoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isProcessing: boolean;
-  onPaymentComplete: () => void;
+  onBookingComplete: (e: React.FormEvent) => Promise<void>;
+  fee: number;
 }
 
 export const PaymentForm: React.FC<PaymentFormProps> = ({
-  fee,
+  paymentMethod,
+  setPaymentMethod,
+  cardInfo,
+  onCardInfoChange,
   isProcessing,
-  onPaymentComplete,
+  onBookingComplete,
+  fee
 }) => {
   return (
     <Card>
@@ -19,13 +33,53 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         <CardTitle>Payment Details</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={(e) => { e.preventDefault(); onPaymentComplete(); }}>
-          <div className="space-y-4">
-            <input type="text" placeholder="Card Number" className="input" />
-            <input type="text" placeholder="MM/YY" className="input" />
-            <input type="text" placeholder="CVC" className="input" />
+        <form onSubmit={onBookingComplete} className="space-y-4">
+          <div className="space-y-2">
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="credit_card">Credit Card</option>
+              <option value="debit_card">Debit Card</option>
+            </select>
           </div>
-          <Button type="submit" disabled={isProcessing} className="w-full">
+
+          <Input
+            type="text"
+            name="cardNumber"
+            value={cardInfo.cardNumber}
+            onChange={onCardInfoChange}
+            placeholder="Card Number"
+          />
+          <Input
+            type="text"
+            name="cardName"
+            value={cardInfo.cardName}
+            onChange={onCardInfoChange}
+            placeholder="Name on Card"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              type="text"
+              name="expiry"
+              value={cardInfo.expiry}
+              onChange={onCardInfoChange}
+              placeholder="MM/YY"
+            />
+            <Input
+              type="text"
+              name="cvv"
+              value={cardInfo.cvv}
+              onChange={onCardInfoChange}
+              placeholder="CVV"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isProcessing}
+            className="w-full"
+          >
             {isProcessing ? "Processing..." : `Pay $${fee}`}
           </Button>
         </form>
