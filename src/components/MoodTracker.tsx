@@ -1,5 +1,16 @@
-
 import React, { useState } from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -9,6 +20,19 @@ import { Brain, Edit, Trash2, Plus, Calendar } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useNavigate } from 'react-router-dom';
+
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 interface MoodEntry {
   id: string;
@@ -21,13 +45,14 @@ interface MoodEntry {
 const MoodTracker = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [mood, setMood] = useState(0);
   const [notes, setNotes] = useState('');
   const [trigger, setTrigger] = useState('');
   const [triggers, setTriggers] = useState<string[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  
+
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([
     {
       id: '1',
@@ -44,16 +69,16 @@ const MoodTracker = () => {
       triggers: [language === 'en' ? 'Work' : 'العمل', language === 'en' ? 'Lack of sleep' : 'قلة النوم']
     }
   ]);
-  
+
   const handleAddMoodEntry = () => {
     // If editing an existing entry
     if (editingId) {
-      const updatedEntries = moodEntries.map(entry => 
-        entry.id === editingId 
-          ? { ...entry, mood, notes, triggers } 
+      const updatedEntries = moodEntries.map(entry =>
+        entry.id === editingId
+          ? { ...entry, mood, notes, triggers }
           : entry
       );
-      
+
       setMoodEntries(updatedEntries);
       toast({
         title: language === 'en' ? 'Mood Entry Updated' : 'تم تحديث إدخال المزاج',
@@ -68,18 +93,18 @@ const MoodTracker = () => {
         notes,
         triggers
       };
-      
+
       setMoodEntries([newEntry, ...moodEntries]);
       toast({
         title: language === 'en' ? 'Mood Tracked' : 'تم تتبع المزاج',
         description: language === 'en' ? 'Your mood has been recorded.' : 'تم تسجيل مزاجك.',
       });
     }
-    
+
     // Reset form
     resetForm();
   };
-  
+
   const handleEditEntry = (entry: MoodEntry) => {
     setMood(entry.mood);
     setNotes(entry.notes);
@@ -87,7 +112,7 @@ const MoodTracker = () => {
     setEditingId(entry.id);
     setIsAdding(true);
   };
-  
+
   const handleDeleteEntry = (id: string) => {
     setMoodEntries(moodEntries.filter(entry => entry.id !== id));
     toast({
@@ -95,7 +120,7 @@ const MoodTracker = () => {
       description: language === 'en' ? 'The mood entry has been removed.' : 'تمت إزالة إدخال المزاج.',
     });
   };
-  
+
   const resetForm = () => {
     setMood(0);
     setNotes('');
@@ -104,19 +129,19 @@ const MoodTracker = () => {
     setEditingId(null);
     setIsAdding(false);
   };
-  
+
   const handleAddTrigger = () => {
     if (!trigger.trim()) return;
     setTriggers([...triggers, trigger]);
     setTrigger('');
   };
-  
+
   const handleRemoveTrigger = (index: number) => {
     const newTriggers = [...triggers];
     newTriggers.splice(index, 1);
     setTriggers(newTriggers);
   };
-  
+
   const getMoodLabel = (moodValue: number) => {
     if (moodValue >= 8) return language === 'en' ? 'Excellent' : 'ممتاز';
     if (moodValue >= 5) return language === 'en' ? 'Very Good' : 'جيد جدا';
@@ -127,25 +152,57 @@ const MoodTracker = () => {
     if (moodValue >= -8) return language === 'en' ? 'Very Poor' : 'سيء جدا';
     return language === 'en' ? 'Terrible' : 'سيء للغاية';
   };
-  
+
   const getMoodColor = (moodValue: number) => {
     if (moodValue >= 5) return 'bg-green-100 text-green-800';
     if (moodValue >= 0) return 'bg-blue-100 text-blue-800';
     if (moodValue >= -5) return 'bg-amber-100 text-amber-800';
     return 'bg-red-100 text-red-800';
   };
-  
+
   const formatDate = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = { 
+    const options: Intl.DateTimeFormatOptions = {
       weekday: 'short',
-      year: 'numeric', 
-      month: 'short', 
+      year: 'numeric',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     };
-    
+
     return new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'ar-EG', options).format(date);
+  };
+
+  // Prepare data for the graph
+  const moodGraphData = {
+    labels: moodEntries.map((entry) =>
+      new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'ar-EG', {
+        month: 'short',
+        day: 'numeric',
+      }).format(entry.date)
+    ),
+    datasets: [
+      {
+        label: language === 'en' ? 'Mood Over Time' : 'المزاج مع مرور الوقت',
+        data: moodEntries.map((entry) => entry.mood),
+        borderColor: 'rgba(75,192,192,1)',
+        backgroundColor: 'rgba(75,192,192,0.2)',
+        fill: true,
+      },
+    ],
+  };
+
+  const moodGraphOptions = {
+    scales: {
+      y: {
+        min: -10,
+        max: 10,
+        title: {
+          display: true,
+          text: language === 'en' ? 'Mood Scale (-10 to 10)' : 'مقياس المزاج (-١٠ إلى ١٠)',
+        },
+      },
+    },
   };
 
   return (
@@ -162,14 +219,19 @@ const MoodTracker = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Add the graph here */}
+        <div className="bg-accent/10 p-4 rounded-lg">
+          <Line data={moodGraphData} options={moodGraphOptions} />
+        </div>
+
         {isAdding ? (
           <div className="space-y-4 bg-accent/10 p-4 rounded-lg">
             <h3 className="font-medium">
-              {editingId 
+              {editingId
                 ? language === 'en' ? 'Edit Mood Entry' : 'تعديل إدخال المزاج'
                 : language === 'en' ? 'How are you feeling?' : 'كيف تشعر؟'}
             </h3>
-            
+
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label>
@@ -179,7 +241,7 @@ const MoodTracker = () => {
                   {mood} - {getMoodLabel(mood)}
                 </span>
               </div>
-              
+
               <div className="py-4">
                 <div className="flex justify-between text-xs mb-2">
                   <span>-10</span>
@@ -200,7 +262,7 @@ const MoodTracker = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label>
                 {language === 'en' ? 'Notes' : 'ملاحظات'}
@@ -211,7 +273,7 @@ const MoodTracker = () => {
                 onChange={(e) => setNotes(e.target.value)}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label>
                 {language === 'en' ? 'Triggers' : 'المحفزات'}
@@ -227,16 +289,16 @@ const MoodTracker = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               {triggers.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {triggers.map((item, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="bg-accent/50 px-2 py-1 rounded-full text-sm flex items-center gap-1"
                     >
                       {item}
-                      <button 
+                      <button
                         type="button"
                         onClick={() => handleRemoveTrigger(index)}
                         className="h-4 w-4 rounded-full bg-muted/20 flex items-center justify-center hover:bg-muted/40"
@@ -248,7 +310,7 @@ const MoodTracker = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="flex gap-2">
               <Button onClick={handleAddMoodEntry}>
                 {editingId
@@ -268,13 +330,13 @@ const MoodTracker = () => {
             {language === 'en' ? 'Track My Mood Now' : 'تتبع مزاجي الآن'}
           </Button>
         )}
-        
+
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-medium">
               {language === 'en' ? 'Mood History' : 'سجل المزاج'}
             </h3>
-            
+
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -305,7 +367,7 @@ const MoodTracker = () => {
               </PopoverContent>
             </Popover>
           </div>
-          
+
           {moodEntries.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               {language === 'en'
@@ -328,7 +390,7 @@ const MoodTracker = () => {
                           {formatDate(new Date(entry.date))}
                         </p>
                       </div>
-                      
+
                       <div className="flex gap-1">
                         <Button
                           variant="ghost"
@@ -348,16 +410,16 @@ const MoodTracker = () => {
                         </Button>
                       </div>
                     </div>
-                    
+
                     {entry.notes && (
                       <p className="text-sm mt-2">{entry.notes}</p>
                     )}
-                    
+
                     {entry.triggers.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {entry.triggers.map((trigger, index) => (
-                          <span 
-                            key={index} 
+                          <span
+                            key={index}
                             className="bg-muted/50 px-2 py-0.5 rounded-full text-xs"
                           >
                             {trigger}
@@ -373,8 +435,12 @@ const MoodTracker = () => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">
-          {language === 'en' ? 'View All Mood Entries' : 'عرض جميع إدخالات المزاج'}
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => navigate('/report', { state: { moodEntries } })}
+        >
+          {language === 'en' ? 'View Full Report' : 'عرض التقرير الكامل'}
         </Button>
       </CardFooter>
     </Card>

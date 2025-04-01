@@ -1,9 +1,8 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/use-theme";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,8 +18,42 @@ import DoctorProfile from "./pages/DoctorProfile";
 import BookAppointment from "./pages/BookAppointment";
 import VideoSession from "./pages/VideoSession";
 import BookingFloatingButton from "./components/BookingFloatingButton";
+import Report from "@/components/Report";
+import { useLanguage } from "@/components/Header";
+import { useState } from "react";
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => {
+  const location = useLocation();
+  const { language } = useLanguage();
+  const [relationshipData, setRelationshipData] = useState([]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/doctor" element={<DoctorProfile />} />
+      <Route path="/book-appointment" element={<BookAppointment />} />
+      <Route path="/video-session" element={<VideoSession />} />
+      <Route
+        path="/report"
+        element={
+          <Report
+            moodEntries={(location.state as any)?.moodEntries || []}
+            relationshipData={relationshipData}
+            language={language}
+          />
+        }
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -32,18 +65,7 @@ const App = () => (
           <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/doctor" element={<DoctorProfile />} />
-                <Route path="/book-appointment" element={<BookAppointment />} />
-                <Route path="/video-session" element={<VideoSession />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <AppRoutes />
             </main>
             <Footer />
             <ChatSupport />
