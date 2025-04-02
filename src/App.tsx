@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +25,7 @@ import DoctorAdmin from "@/components/doctor/DoctorAdmin";
 import { useLanguage } from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import PaymentPage from "./pages/PaymentPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,7 @@ interface SessionState {
   isAuthenticated: boolean;
   isDoctor: boolean;
   isLoading: boolean;
+  user: any | null;
 }
 
 // Auth provider component
@@ -39,21 +42,36 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<SessionState>({
     isAuthenticated: false,
     isDoctor: false,
-    isLoading: true
+    isLoading: true,
+    user: null
   });
 
   useEffect(() => {
-    const checkSession = async () => {
-      setTimeout(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, supabaseSession) => {
+        console.log("Auth state changed:", event);
         setSession({
-          isAuthenticated: true,
-          isDoctor: false,
-          isLoading: false
+          isAuthenticated: !!supabaseSession,
+          isDoctor: supabaseSession?.user?.user_metadata?.role === 'doctor',
+          isLoading: false,
+          user: supabaseSession?.user || null
         });
-      }, 1000);
-    };
+      }
+    );
 
-    checkSession();
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: supabaseSession } }) => {
+      console.log("Existing session:", supabaseSession);
+      setSession({
+        isAuthenticated: !!supabaseSession,
+        isDoctor: supabaseSession?.user?.user_metadata?.role === 'doctor',
+        isLoading: false,
+        user: supabaseSession?.user || null
+      });
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return (
@@ -74,8 +92,27 @@ const ProtectedRoute = ({
   requireDoctor?: boolean;
 }) => {
   const location = useLocation();
-  const isAuthenticated = true;
-  const isDoctor = false;
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isDoctor, setIsDoctor] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      const authenticated = !!data.session;
+      const doctorRole = data.session?.user?.user_metadata?.role === 'doctor';
+      
+      setIsAuthenticated(authenticated);
+      setIsDoctor(doctorRole);
+      setIsLoading(false);
+    };
+    
+    checkAuth();
+  }, []);
+  
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
   
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
@@ -159,6 +196,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Router>
+          <ScrollToTop />
           <AuthProvider>
             <div className="flex flex-col min-h-screen">
               <Header />

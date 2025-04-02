@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,12 +8,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/Header';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone, Shield, Eye, EyeOff } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,27 +34,53 @@ const Auth = () => {
   // OTP state
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        // User is already logged in, redirect to dashboard
+        const from = (location.state as any)?.from?.pathname || '/dashboard';
+        navigate(from, { replace: true });
+      }
+    };
+    
+    checkSession();
+  }, [navigate, location]);
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword,
+      });
       
-      // Simulate successful login
+      if (error) throw error;
+      
       toast({
         title: language === 'en' ? 'Successfully logged in' : 'تم تسجيل الدخول بنجاح',
         description: language === 'en' ? 'Welcome back!' : 'مرحبًا بعودتك!',
       });
       
-      // Redirect to dashboard after successful login
-      navigate('/dashboard');
-    }, 1500);
+      // Redirect to the original destination or dashboard
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Login failed' : 'فشل تسجيل الدخول',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -67,22 +95,50 @@ const Auth = () => {
       return;
     }
     
-    // Simulate signup process
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Split the name into first and last name
+      const nameParts = signupName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
       
-      // Simulate successful signup
-      toast({
-        title: language === 'en' ? 'Account created successfully' : 'تم إنشاء الحساب بنجاح',
-        description: language === 'en' ? 'Welcome to Dr. Besma Mental Hub!' : 'مرحبًا بك في مركز د. بسمة للصحة النفسية!',
+      const { data, error } = await supabase.auth.signUp({
+        email: signupEmail,
+        password: signupPassword,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: signupPhone,
+            role: 'patient', // Default role for new users
+          }
+        }
       });
       
-      // Redirect to dashboard after successful signup
-      navigate('/dashboard');
-    }, 1500);
+      if (error) throw error;
+      
+      toast({
+        title: language === 'en' ? 'Account created successfully' : 'تم إنشاء الحساب بنجاح',
+        description: language === 'en' 
+          ? 'Please check your email to confirm your account' 
+          : 'يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك',
+      });
+      
+      // If email confirmation is disabled in Supabase, redirect to dashboard
+      if (data.session) {
+        navigate('/dashboard');
+      }
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Signup failed' : 'فشل إنشاء الحساب',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleSendOTP = () => {
+  const handleSendOTP = async () => {
     if (!loginEmail && !signupPhone) {
       toast({
         title: language === 'en' ? 'Email or phone required' : 'البريد الإلكتروني أو الهاتف مطلوب',
@@ -92,29 +148,82 @@ const Auth = () => {
       return;
     }
     
-    setOtpSent(true);
-    toast({
-      title: language === 'en' ? 'OTP sent' : 'تم إرسال رمز التحقق',
-      description: language === 'en' ? 'Please check your email or phone for the verification code.' : 'يرجى التحقق من بريدك الإلكتروني أو هاتفك للحصول على رمز التحقق.',
-    });
-  };
-  
-  const handleVerifyOTP = () => {
     setIsLoading(true);
     
-    // Simulate OTP verification
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Send OTP via email
+      if (loginEmail) {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: loginEmail,
+        });
+        
+        if (error) throw error;
+      }
+      // Send OTP via phone (requires additional setup in Supabase)
+      else if (signupPhone) {
+        toast({
+          title: language === 'en' ? 'Phone OTP not configured' : 'رمز التحقق عبر الهاتف غير مكون',
+          description: language === 'en' ? 'Please use email authentication.' : 'يرجى استخدام المصادقة عبر البريد الإلكتروني.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
       
-      // Simulate successful verification
+      setOtpSent(true);
+      
+      toast({
+        title: language === 'en' ? 'OTP sent' : 'تم إرسال رمز التحقق',
+        description: language === 'en' ? 'Please check your email for the verification code.' : 'يرجى التحقق من بريدك الإلكتروني للحصول على رمز التحقق.',
+      });
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Failed to send OTP' : 'فشل إرسال رمز التحقق',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleVerifyOTP = async () => {
+    if (!otp || !loginEmail) {
+      toast({
+        title: language === 'en' ? 'Verification code required' : 'رمز التحقق مطلوب',
+        description: language === 'en' ? 'Please enter the verification code.' : 'يرجى إدخال رمز التحقق.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: loginEmail,
+        token: otp,
+        type: 'email',
+      });
+      
+      if (error) throw error;
+      
       toast({
         title: language === 'en' ? 'Successfully verified' : 'تم التحقق بنجاح',
         description: language === 'en' ? 'Welcome to Dr. Besma Mental Hub!' : 'مرحبًا بك في مركز د. بسمة للصحة النفسية!',
       });
       
-      // Redirect to dashboard after successful verification
+      // Redirect to dashboard
       navigate('/dashboard');
-    }, 1500);
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Verification failed' : 'فشل التحقق',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const toggleShowPassword = () => {
@@ -226,7 +335,7 @@ const Auth = () => {
                     onClick={handleSendOTP}
                   >
                     <Phone className="mr-2 h-4 w-4" />
-                    {language === 'en' ? 'Login with Phone Number' : 'الدخول برقم الهاتف'}
+                    {language === 'en' ? 'Login with One-Time Code' : 'الدخول برمز لمرة واحدة'}
                   </Button>
                 </form>
               ) : (
