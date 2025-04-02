@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,7 +16,6 @@ import NotFound from "./pages/NotFound";
 import ChatSupport from "./components/ChatSupport";
 import Auth from "./pages/Auth";
 import DoctorProfile from "./pages/DoctorProfile";
-import BookAppointment from "./pages/BookAppointment";
 import VideoSession from "./pages/VideoSession";
 import BookingFloatingButton from "./components/BookingFloatingButton";
 import Report from "@/components/Report";
@@ -45,14 +43,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   useEffect(() => {
-    // Check for existing session
     const checkSession = async () => {
-      // For the demo purposes, hardcode authentication
-      // In a real app, this would use supabase.auth.getSession()
       setTimeout(() => {
         setSession({
-          isAuthenticated: true, // Set to true for demo
-          isDoctor: false, // Change based on user role
+          isAuthenticated: true,
+          isDoctor: false,
           isLoading: false
         });
       }, 1000);
@@ -61,7 +56,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkSession();
   }, []);
 
-  // Auth context would be here in a real implementation
   return (
     <div>
       {children}
@@ -80,9 +74,8 @@ const ProtectedRoute = ({
   requireDoctor?: boolean;
 }) => {
   const location = useLocation();
-  // Here we're simulating authentication for demo purposes
-  const isAuthenticated = true; // Would use context in real app
-  const isDoctor = false; // Would use context in real app
+  const isAuthenticated = true;
+  const isDoctor = false;
   
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
@@ -108,20 +101,13 @@ const AppRoutes = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/auth" element={<Auth />} />
       
-      {/* Protected routes */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
         </ProtectedRoute>
       } />
       
-      <Route path="/doctor" element={<DoctorProfile />} />
-      
-      <Route path="/book-appointment" element={
-        <ProtectedRoute>
-          <BookAppointment />
-        </ProtectedRoute>
-      } />
+      <Route path="/book-appointment" element={<DoctorProfile />} />
       
       <Route path="/video-session" element={
         <ProtectedRoute>
@@ -155,7 +141,6 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       
-      {/* Hidden payment page - not in navigation */}
       <Route path="/payment" element={
         <ProtectedRoute>
           <PaymentPage />

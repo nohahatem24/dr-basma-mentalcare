@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -60,7 +61,7 @@ const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button className="btn-primary" size="lg" asChild>
-                <Link to="/doctor">
+                <Link to="/book-appointment">
                   {language === 'en' ? 'Book a Session' : 'احجز جلسة'} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

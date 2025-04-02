@@ -1,33 +1,22 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
-import { useLanguage } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '@/components/Header';
 
 const BookingFloatingButton = () => {
   const { language } = useLanguage();
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            asChild
-            className="fixed bottom-24 right-6 shadow-lg size-16 rounded-full bg-primary text-primary-foreground"
-            aria-label={language === 'en' ? 'Book Appointment' : 'حجز موعد'}
-          >
-            <Link to="/doctor">
-              <Calendar className="h-6 w-6" />
-            </Link>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{language === 'en' ? 'Book Appointment' : 'حجز موعد'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Button
+      className="fixed bottom-20 right-6 md:right-10 shadow-lg rounded-full h-14 w-14 p-0 bg-gradient-to-r from-mindtrack-blue to-mindtrack-green hover:opacity-90 z-50"
+      asChild
+    >
+      <Link to="/book-appointment" aria-label={language === 'en' ? 'Book a session' : 'حجز جلسة'}>
+        <Calendar className="h-6 w-6 text-white" />
+      </Link>
+    </Button>
   );
 };
 
