@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Shield, Eye, EyeOff, Phone } from 'lucide-react';
+import { Mail, Shield, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,12 +28,18 @@ const LoginForm = ({ language, setOtpSent, setEmail }: LoginFormProps) => {
     setIsLoading(true);
     
     try {
+      console.log("Attempting to login with:", loginEmail);
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password: loginPassword,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
+      
+      console.log("Login successful, session:", data.session);
       
       toast({
         title: language === 'en' ? 'Successfully logged in' : 'تم تسجيل الدخول بنجاح',
@@ -44,6 +50,7 @@ const LoginForm = ({ language, setOtpSent, setEmail }: LoginFormProps) => {
       const from = (location.state as any)?.from?.pathname || '/dashboard';
       navigate(from, { replace: true });
     } catch (error: any) {
+      console.error("Login failed:", error);
       toast({
         title: language === 'en' ? 'Login failed' : 'فشل تسجيل الدخول',
         description: error.message,
@@ -67,12 +74,21 @@ const LoginForm = ({ language, setOtpSent, setEmail }: LoginFormProps) => {
     setIsLoading(true);
     
     try {
+      console.log("Sending OTP to:", loginEmail);
       // Send OTP via email
-      const { error } = await supabase.auth.signInWithOtp({
+      const { data, error } = await supabase.auth.signInWithOtp({
         email: loginEmail,
+        options: {
+          shouldCreateUser: true, // Create the user if they don't exist
+        }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("OTP error:", error);
+        throw error;
+      }
+      
+      console.log("OTP sent successfully:", data);
       
       if (setEmail) {
         setEmail(loginEmail);
@@ -84,6 +100,7 @@ const LoginForm = ({ language, setOtpSent, setEmail }: LoginFormProps) => {
         description: language === 'en' ? 'Please check your email for the verification code.' : 'يرجى التحقق من بريدك الإلكتروني للحصول على رمز التحقق.',
       });
     } catch (error: any) {
+      console.error("Failed to send OTP:", error);
       toast({
         title: language === 'en' ? 'Failed to send OTP' : 'فشل إرسال رمز التحقق',
         description: error.message,

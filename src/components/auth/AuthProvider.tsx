@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 // Type for session and user
@@ -10,9 +10,26 @@ export interface SessionState {
   user: any | null;
 }
 
+interface AuthContextType {
+  session: SessionState;
+  signOut: () => Promise<void>;
+}
+
 interface AuthProviderProps {
   children: React.ReactNode;
 }
+
+// Create context
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Hook to use auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<SessionState>({
@@ -21,6 +38,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     isLoading: true,
     user: null
   });
+
+  // Sign out function
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -51,9 +73,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <div>
+    <AuthContext.Provider value={{ session, signOut }}>
       {children}
-    </div>
+    </AuthContext.Provider>
   );
 };
 

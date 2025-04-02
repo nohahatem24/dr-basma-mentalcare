@@ -41,6 +41,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
     }
     
     try {
+      console.log("Starting signup process for:", signupEmail);
       // Split the name into first and last name
       const nameParts = signupName.trim().split(' ');
       const firstName = nameParts[0] || '';
@@ -55,11 +56,17 @@ const SignupForm = ({ language }: SignupFormProps) => {
             last_name: lastName,
             phone: signupPhone,
             role: 'patient', // Default role for new users
+            full_name: signupName,
           }
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Signup error:", error);
+        throw error;
+      }
+      
+      console.log("Signup successful:", data);
       
       toast({
         title: language === 'en' ? 'Account created successfully' : 'تم إنشاء الحساب بنجاح',
@@ -70,9 +77,11 @@ const SignupForm = ({ language }: SignupFormProps) => {
       
       // If email confirmation is disabled in Supabase, redirect to dashboard
       if (data.session) {
+        console.log("Session available, redirecting to dashboard");
         navigate('/dashboard');
       }
     } catch (error: any) {
+      console.error("Signup failed:", error);
       toast({
         title: language === 'en' ? 'Signup failed' : 'فشل إنشاء الحساب',
         description: error.message,

@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthProvider';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,33 +15,17 @@ const ProtectedRoute = ({
   requireDoctor = false 
 }: ProtectedRouteProps) => {
   const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [isDoctor, setIsDoctor] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { session } = useAuth();
   
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      const authenticated = !!data.session;
-      const doctorRole = data.session?.user?.user_metadata?.role === 'doctor';
-      
-      setIsAuthenticated(authenticated);
-      setIsDoctor(doctorRole);
-      setIsLoading(false);
-    };
-    
-    checkAuth();
-  }, []);
-  
-  if (isLoading) {
+  if (session.isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
   
-  if (requireAuth && !isAuthenticated) {
+  if (requireAuth && !session.isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
   
-  if (requireDoctor && !isDoctor) {
+  if (requireDoctor && !session.isDoctor) {
     return <Navigate to="/dashboard" replace />;
   }
   

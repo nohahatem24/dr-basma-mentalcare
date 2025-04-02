@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
+import DoctorReviews from '@/components/DoctorReviews';
 
 type SessionsResponse = {
-  count: number; // Define the expected structure of the response
+  count: number; 
 };
 
 const About = () => {
-  const [sessionsCount, setSessionsCount] = useState(0); // Start with 0 until fetched
+  const [sessionsCount, setSessionsCount] = useState(0); 
 
-  // Fetch the initial session count from the backend
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.get<SessionsResponse>('/api/sessions'); // Use the defined type
-        setSessionsCount(response.data.count); // Access the 'count' property safely
+        const response = await axios.get<SessionsResponse>('/api/sessions');
+        setSessionsCount(response.data.count);
       } catch (error) {
         console.error('Error fetching session count:', error);
       }
@@ -211,6 +211,11 @@ const About = () => {
             and achieve emotional well-being.
           </p>
         </div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto mt-16">
+        <h2 className="text-2xl font-semibold mb-6 header-gradient text-center">Patient Reviews</h2>
+        <DoctorReviews />
       </div>
     </div>
   );

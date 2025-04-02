@@ -11,6 +11,7 @@ import ChatSupport from "@/components/ChatSupport";
 import BookingFloatingButton from "@/components/BookingFloatingButton";
 import ScrollToTop from "@/components/ScrollToTop";
 import AuthProvider from "@/components/auth/AuthProvider";
+import { ReviewsProvider } from "@/components/reviews/ReviewsContext";
 import AppRoutes from "@/routes/AppRoutes";
 
 const queryClient = new QueryClient();
@@ -24,15 +25,17 @@ const App = () => (
         <Router>
           <ScrollToTop />
           <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">
-                <AppRoutes />
-              </main>
-              <Footer />
-              <ChatSupport />
-              <BookingFloatingButton />
-            </div>
+            <ReviewsProvider>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-grow">
+                  <AppRoutes />
+                </main>
+                <Footer />
+                <ChatSupport />
+                <BookingFloatingButton />
+              </div>
+            </ReviewsProvider>
           </AuthProvider>
         </Router>
       </TooltipProvider>
