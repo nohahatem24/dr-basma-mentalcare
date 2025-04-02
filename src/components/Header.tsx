@@ -37,6 +37,7 @@ const Header = () => {
     { path: '/dashboard', label: language === 'en' ? 'MindTrack' : 'مايند تراك', requireAuth: true },
     { path: '/book-appointment', label: language === 'en' ? 'Book Appointment' : 'حجز موعد' },
     { path: '/contact', label: language === 'en' ? 'Contact' : 'التواصل' },
+    { path: '/profile', label: language === 'en' ? 'My Profile' : 'الملف الشخصي', requireAuth: true },
     { path: '/doctor-admin', label: language === 'en' ? 'Doctor Admin' : 'لوحة تحكم الطبيب', requireDoctor: true },
   ];
 
