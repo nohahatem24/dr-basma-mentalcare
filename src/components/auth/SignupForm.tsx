@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,6 +80,9 @@ const SignupForm = ({ language }: SignupFormProps) => {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
       
+      // Format phone number with + if it doesn't already have it
+      const formattedPhone = signupPhone.startsWith('+') ? signupPhone : `+${signupPhone}`;
+      
       const { data, error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
@@ -86,7 +90,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
           data: {
             first_name: firstName,
             last_name: lastName,
-            phone: signupPhone,
+            phone: formattedPhone,
             role: 'patient', // Default role for new users
             full_name: signupName,
             gender: signupGender,
@@ -106,11 +110,13 @@ const SignupForm = ({ language }: SignupFormProps) => {
       if (data.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({
+          .upsert({
+            id: data.user.id,
             first_name: firstName,
             last_name: lastName,
+            phone: formattedPhone
           })
-          .eq('id', data.user.id);
+          .select();
           
         if (profileError) {
           console.error("Error updating profile:", profileError);
@@ -179,7 +185,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
       
       <div className="space-y-2">
         <Label htmlFor="signup-phone">
-          {language === 'en' ? 'Phone Number' : 'رقم الهاتف'}
+          {language === 'en' ? 'Phone Number (with country code)' : 'رقم الهاتف (مع رمز البلد)'}
         </Label>
         <div className="relative">
           <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -193,6 +199,11 @@ const SignupForm = ({ language }: SignupFormProps) => {
             required
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          {language === 'en' 
+            ? "Include country code (e.g., +1 for US, +44 for UK)"
+            : "تضمين رمز البلد (مثل +٩٦٦ للسعودية، +٢٠ لمصر)"}
+        </p>
       </div>
       
       <div className="grid grid-cols-2 gap-4">

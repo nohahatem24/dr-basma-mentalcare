@@ -74,14 +74,19 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       
       // Add email from auth user to profile
       if (data) {
+        // Get user metadata from current session
         const userEmail = session.user?.email;
+        const userMetadata = session.user?.user_metadata || {};
+        
+        // Create complete profile with user data from both auth user and profile table
         const profile: UserProfile = {
           ...data,
           email: userEmail || '',
-          phone: session.user?.phone || session.user?.user_metadata?.phone || null,
-          date_of_birth: session.user?.user_metadata?.date_of_birth || null,
-          gender: session.user?.user_metadata?.gender || null,
+          phone: data.phone || userMetadata?.phone || null,
+          date_of_birth: data.date_of_birth || userMetadata?.date_of_birth || null,
+          gender: data.gender || userMetadata?.gender || null,
         };
+        
         return profile;
       }
       
@@ -145,7 +150,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
           isDoctor: authSession?.user?.user_metadata?.role === 'doctor',
           isLoading: false,
           user: authSession?.user || null,
-          profile: null,
+          profile: null as UserProfile | null,
         };
         
         // If user is authenticated, fetch their profile
@@ -173,7 +178,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         isDoctor: authSession?.user?.user_metadata?.role === 'doctor',
         isLoading: false,
         user: authSession?.user || null,
-        profile: null,
+        profile: null as UserProfile | null,
       };
       
       // If user is authenticated, fetch their profile
