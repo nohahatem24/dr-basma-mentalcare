@@ -49,14 +49,15 @@ const DoctorProfile = () => {
     { startTime: "06:29 PM", endTime: "06:59 PM", duration: "30" },
     { startTime: "06:59 PM", endTime: "07:29 PM", duration: "30" },
     { startTime: "07:29 PM", endTime: "07:59 PM", duration: "30" },
+    { startTime: "07:59 PM", endTime: "08:59 PM", duration: "60" },
     { startTime: "08:59 PM", endTime: "09:59 PM", duration: "60" },
     { startTime: "09:59 PM", endTime: "10:59 PM", duration: "60" },
     { startTime: "10:59 PM", endTime: "11:59 PM", duration: "60" },
   ];
 
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>(defaultTimeSlots);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
 
-  // Update available slots when date changes
+  // Update available slots when date or duration changes
   useEffect(() => {
     if (!selectedDate) return;
 
@@ -65,12 +66,14 @@ const DoctorProfile = () => {
     const selected = new Date(selectedDate);
     selected.setHours(0, 0, 0, 0);
 
+    let filteredSlots = defaultTimeSlots.filter(slot => slot.duration === selectedDuration);
+
     if (selected.getTime() === today.getTime()) {
       // If selected date is today, only show future time slots
       const currentHour = new Date().getHours();
       const currentMinutes = new Date().getMinutes();
       
-      const filteredSlots = defaultTimeSlots.filter(slot => {
+      filteredSlots = filteredSlots.filter(slot => {
         const [time, period] = slot.startTime.split(' ');
         const [hours, minutes] = time.split(':').map(Number);
         let slotHour = hours;
@@ -79,16 +82,20 @@ const DoctorProfile = () => {
         return (slotHour > currentHour) || 
                (slotHour === currentHour && Number(minutes) > currentMinutes);
       });
-      
-      setAvailableSlots(filteredSlots);
-    } else if (selected.getTime() > today.getTime()) {
-      // Future dates show all slots
-      setAvailableSlots(defaultTimeSlots);
-    } else {
+    } else if (selected.getTime() < today.getTime()) {
       // Past dates show no slots
-      setAvailableSlots([]);
+      filteredSlots = [];
     }
-  }, [selectedDate]);
+    // Future dates show all slots for selected duration (already filtered above)
+
+    setAvailableSlots(filteredSlots);
+    setSelectedSlot(null); // Reset selected slot when duration changes
+  }, [selectedDate, selectedDuration]);
+
+  const handleDurationChange = (duration: '30' | '60') => {
+    setSelectedDuration(duration);
+    setSelectedSlot(null); // Reset selected slot when duration changes
+  };
 
   const getFeeByDuration = (duration: '30' | '60', isCustomRequest: boolean = false) => {
     if (isCustomRequest) {
@@ -323,7 +330,7 @@ const DoctorProfile = () => {
                         <div className="grid grid-cols-2 gap-4">
                           <Button
                             variant={selectedDuration === '30' ? "default" : "outline"}
-                            onClick={() => setSelectedDuration('30')}
+                            onClick={() => handleDurationChange('30')}
                             className={`h-auto py-4 ${selectedDuration === '30' ? 'bg-primary text-white' : ''}`}
                           >
                             <div className="text-center">
@@ -333,7 +340,7 @@ const DoctorProfile = () => {
                           </Button>
                           <Button
                             variant={selectedDuration === '60' ? "default" : "outline"}
-                            onClick={() => setSelectedDuration('60')}
+                            onClick={() => handleDurationChange('60')}
                             className={`h-auto py-4 ${selectedDuration === '60' ? 'bg-primary text-white' : ''}`}
                           >
                             <div className="text-center">
