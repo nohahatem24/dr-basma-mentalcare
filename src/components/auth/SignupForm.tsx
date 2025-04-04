@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +19,6 @@ const SignupForm = ({ language }: SignupFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  // Signup form state
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
@@ -30,7 +28,6 @@ const SignupForm = ({ language }: SignupFormProps) => {
   const [signupDateOfBirth, setSignupDateOfBirth] = useState<string>('');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   
-  // Password validation
   const validatePassword = (password: string): { valid: boolean; message: string } => {
     if (password.length < 8) {
       return { valid: false, message: 'Password must be at least 8 characters' };
@@ -50,7 +47,6 @@ const SignupForm = ({ language }: SignupFormProps) => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
     if (!agreeToTerms) {
       toast.error(language === 'en' 
         ? 'You must agree to the terms and conditions' 
@@ -58,14 +54,12 @@ const SignupForm = ({ language }: SignupFormProps) => {
       return;
     }
     
-    // Validate password
     const passwordValidation = validatePassword(signupPassword);
     if (!passwordValidation.valid) {
       toast.error(passwordValidation.message);
       return;
     }
     
-    // Validate passwords match
     if (signupPassword !== signupConfirmPassword) {
       toast.error(language === 'en' ? 'Passwords do not match' : 'كلمات المرور غير متطابقة');
       return;
@@ -75,12 +69,10 @@ const SignupForm = ({ language }: SignupFormProps) => {
     
     try {
       console.log("Starting signup process for:", signupEmail);
-      // Split the name into first and last name
       const nameParts = signupName.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
       
-      // Format phone number with + if it doesn't already have it
       const formattedPhone = signupPhone.startsWith('+') ? signupPhone : `+${signupPhone}`;
       
       const { data, error } = await supabase.auth.signUp({
@@ -91,7 +83,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
             first_name: firstName,
             last_name: lastName,
             phone: formattedPhone,
-            role: 'patient', // Default role for new users
+            role: 'patient',
             full_name: signupName,
             gender: signupGender,
             date_of_birth: signupDateOfBirth || null
@@ -106,7 +98,6 @@ const SignupForm = ({ language }: SignupFormProps) => {
       
       console.log("Signup successful:", data);
       
-      // Also update the profiles table with additional info
       if (data.user) {
         const { error: profileError } = await supabase
           .from('profiles')
@@ -114,13 +105,14 @@ const SignupForm = ({ language }: SignupFormProps) => {
             id: data.user.id,
             first_name: firstName,
             last_name: lastName,
-            phone: formattedPhone
+            phone: formattedPhone,
+            gender: signupGender,
+            date_of_birth: signupDateOfBirth
           })
           .select();
           
         if (profileError) {
           console.error("Error updating profile:", profileError);
-          // Continue anyway, this is not critical
         }
       }
       
@@ -128,7 +120,6 @@ const SignupForm = ({ language }: SignupFormProps) => {
         ? 'Account created successfully! Please check your email to confirm your account' 
         : 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك');
       
-      // If email confirmation is disabled in Supabase, redirect to dashboard
       if (data.session) {
         console.log("Session available, redirecting to dashboard");
         navigate('/dashboard');
@@ -192,7 +183,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
           <Input
             id="signup-phone"
             type="tel"
-            placeholder={language === 'en' ? '+1 (555) 000-0000' : '+٩٦٦ ٥٥ ٠٠٠ ٠٠٠٠'}
+            placeholder={language === 'en' ? '+1 (555) 000-0000' : '+٩٥٥ ٥٥ ٠٠٠ ٠٠٠٠'}
             value={signupPhone}
             onChange={(e) => setSignupPhone(e.target.value)}
             className="pl-10"
@@ -202,7 +193,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
         <p className="text-xs text-muted-foreground">
           {language === 'en' 
             ? "Include country code (e.g., +1 for US, +44 for UK)"
-            : "تضمين رمز البلد (مثل +٩٦٦ للسعودية، +٢٠ لمصر)"}
+            : "تضمين رمز البلد (مثل +٩٥٥ للسعودية، +٢٠ لمصر)"}
         </p>
       </div>
       
