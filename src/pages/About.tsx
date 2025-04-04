@@ -1,192 +1,221 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/components/Header';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 import DoctorReviews from '@/components/DoctorReviews';
 
+type SessionsResponse = {
+  count: number; 
+};
+
 const About = () => {
-  const { language } = useLanguage();
+  const [sessionsCount, setSessionsCount] = useState(0); 
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const response = await axios.get<SessionsResponse>('/api/sessions');
+        setSessionsCount(response.data.count);
+      } catch (error) {
+        console.error('Error fetching session count:', error);
+      }
+    };
+
+    fetchSessions();
+  }, []);
 
   return (
-    <div className="container">
-      <div className="py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="order-2 md:order-1">
-            <div className="space-y-6">
+    <div className="container py-12">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 header-gradient text-center">About Dr. Bassma Adel</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+          <div className="col-span-1">
+            <div className="aspect-square rounded-xl overflow-hidden">
+              <img 
+                src={BassmaAdelImage} 
+                alt="Dr. Bassma Adel" 
+                className="h-full w-full object-cover" 
+              />
+            </div>
+          </div>
+          
+          <div className="col-span-2">
+            <h2 className="text-2xl font-semibold mb-4">Professional Profile</h2>
+            <p className="mb-4 text-muted-foreground">
+              Dr. Bassma Adel is a dedicated mental health professional specializing in various psychological 
+              treatments and therapies. With years of experience and comprehensive training, she is committed 
+              to helping individuals navigate their mental health journey with compassion and expertise.
+            </p>
+            <p className="text-muted-foreground">
+              Her approach combines evidence-based practices with a deep understanding of individual needs, 
+              creating personalized treatment plans that address the unique challenges faced by each client.
+            </p>
+          </div>
+        </div>
+
+        {/* Highlighted Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Years of Experience */}
+          <div className="p-6 rounded-lg bg-primary/10 text-center">
+            <h3 className="text-4xl font-bold text-primary">
+              {new Date().getFullYear() - 2016}+
+            </h3>
+            <p className="text-muted-foreground">Years of Experience</p>
+          </div>
+
+          {/* Average Rating */}
+          <div className="p-6 rounded-lg bg-primary/10 text-center">
+            <h3 className="text-4xl font-bold text-primary">4.9</h3>
+            <p className="text-muted-foreground">Average Rating</p>
+          </div>
+
+          {/* Number of Sessions */}
+          <div className="p-6 rounded-lg bg-primary/10 text-center">
+            <h3 className="text-4xl font-bold text-primary">{sessionsCount}+</h3>
+            <p className="text-muted-foreground">Sessions Completed</p>
+          </div>
+        </div>
+        
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6 header-gradient">Specializations</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Anxiety Disorders</h3>
+              <p className="text-sm text-muted-foreground">General anxiety, social phobia</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Depression</h3>
+              <p className="text-sm text-muted-foreground">Treatment and management</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Family Counseling</h3>
+              <p className="text-sm text-muted-foreground">Resolving family dynamics</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Marital Problems</h3>
+              <p className="text-sm text-muted-foreground">Conflict resolution</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Behavioral Problems</h3>
+              <p className="text-sm text-muted-foreground">Children and adolescents</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Personality Disorders</h3>
+              <p className="text-sm text-muted-foreground">Borderline and others</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">OCD</h3>
+              <p className="text-sm text-muted-foreground">Obsessive-compulsive disorder</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Addiction</h3>
+              <p className="text-sm text-muted-foreground">Counseling and support</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">CBT</h3>
+              <p className="text-sm text-muted-foreground">Cognitive-behavioral therapy</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">PTSD</h3>
+              <p className="text-sm text-muted-foreground">Post-traumatic stress disorder</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Psychological Assessments</h3>
+              <p className="text-sm text-muted-foreground">Comprehensive evaluations</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6 header-gradient">Education & Certifications</h2>
+          <ul className="space-y-4">
+            <li className="flex items-start">
+              <div className="h-6 w-6 rounded-full bg-mindtrack-green flex items-center justify-center text-white mr-3 mt-0.5 flex-shrink-0">✓</div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tighter header-gradient mb-2">
-                  {language === 'en' ? 'Dr. Besma Adel' : 'د. بسمة عادل'}
-                </h1>
-                <p className="text-xl md:text-2xl text-accent-foreground mb-2">
-                  {language === 'en' ? 'Clinical Psychologist' : 'أخصائية نفسية سريرية'}
-                </p>
-                <p className="text-muted-foreground">
-                  {language === 'en' 
-                    ? 'PhD in Clinical Psychology with over 15 years of experience' 
-                    : 'دكتوراه في علم النفس السريري مع أكثر من 15 عامًا من الخبرة'}
-                </p>
+                <h3 className="font-medium">Master's Degree in Positive Psychology</h3>
+                <p className="text-sm text-muted-foreground">Mansoura University</p>
               </div>
-              
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
-                  {language === 'en' ? 'Education & Credentials' : 'التعليم والشهادات'}
-                </h2>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>
-                    {language === 'en' 
-                      ? 'PhD in Clinical Psychology, University of Cambridge, UK' 
-                      : 'دكتوراه في علم النفس السريري، جامعة كامبريدج، المملكة المتحدة'}
-                  </li>
-                  <li>
-                    {language === 'en' 
-                      ? 'Masters in Psychological Medicine, University of Oxford, UK' 
-                      : 'ماجستير في الطب النفسي، جامعة أكسفورد، المملكة المتحدة'}
-                  </li>
-                  <li>
-                    {language === 'en' 
-                      ? 'Licensed Clinical Psychologist (License #23581)' 
-                      : 'أخصائية نفسية سريرية مرخصة (ترخيص رقم 23581)'}
-                  </li>
-                  <li>
-                    {language === 'en' 
-                      ? 'Certified in Cognitive Behavioral Therapy (CBT)' 
-                      : 'معتمدة في العلاج المعرفي السلوكي (CBT)'}
-                  </li>
-                </ul>
+            </li>
+            <li className="flex items-start">
+              <div className="h-6 w-6 rounded-full bg-mindtrack-green flex items-center justify-center text-white mr-3 mt-0.5 flex-shrink-0">✓</div>
+              <div>
+                <h3 className="font-medium">Bachelor of Arts in Psychology</h3>
+                <p className="text-sm text-muted-foreground">Mansoura University</p>
               </div>
-              
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
-                  {language === 'en' ? 'Areas of Expertise' : 'مجالات الخبرة'}
-                </h2>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>
-                    {language === 'en' ? 'Anxiety & Depression' : 'القلق والاكتئاب'}
-                  </li>
-                  <li>
-                    {language === 'en' ? 'Trauma & PTSD' : 'الصدمات واضطراب ما بعد الصدمة'}
-                  </li>
-                  <li>
-                    {language === 'en' ? 'Relationship Counseling' : 'استشارات العلاقات'}
-                  </li>
-                  <li>
-                    {language === 'en' ? 'Stress Management' : 'إدارة الضغط النفسي'}
-                  </li>
-                  <li>
-                    {language === 'en' ? 'Personal Growth & Development' : 'النمو والتطور الشخصي'}
-                  </li>
-                </ul>
+            </li>
+            <li className="flex items-start">
+              <div className="h-6 w-6 rounded-full bg-mindtrack-green flex items-center justify-center text-white mr-3 mt-0.5 flex-shrink-0">✓</div>
+              <div>
+                <h3 className="font-medium">Clinical Psychology Diploma</h3>
+                <p className="text-sm text-muted-foreground">Mansoura University</p>
               </div>
-              
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
-                  {language === 'en' ? 'Treatment Approach' : 'نهج العلاج'}
-                </h2>
-                <p className="text-muted-foreground">
-                  {language === 'en' 
-                    ? 'My approach combines evidence-based techniques with a warm, empathetic style. I believe in creating a safe, judgment-free space where clients can explore their challenges and develop practical strategies for growth and healing.'
-                    : 'يجمع نهجي بين التقنيات المستندة إلى الأدلة وأسلوب دافئ ومتعاطف. أؤمن بخلق مساحة آمنة وخالية من الأحكام حيث يمكن للعملاء استكشاف تحدياتهم وتطوير استراتيجيات عملية للنمو والشفاء.'}
-                </p>
+            </li>
+            <li className="flex items-start">
+              <div className="h-6 w-6 rounded-full bg-mindtrack-green flex items-center justify-center text-white mr-3 mt-0.5 flex-shrink-0">✓</div>
+              <div>
+                <h3 className="font-medium">Member of the Association of Psychologists (Ranm)</h3>
               </div>
-              
-              <Button asChild size="lg" className="mt-2">
-                <Link to="/book-appointment">
-                  {language === 'en' ? 'Book an Appointment' : 'حجز موعد'}
-                </Link>
-              </Button>
-            </div>
-          </div>
-          
-          <div className="order-1 md:order-2">
-            <img 
-              src="/assets/images/BassmaAdel.jpg" 
-              alt={language === 'en' ? 'Dr. Besma Adel' : 'د. بسمة عادل'} 
-              className="rounded-lg shadow-lg w-full max-w-md mx-auto aspect-[3/4] object-cover" 
-            />
-          </div>
+            </li>
+            <li className="flex items-start">
+              <div className="h-6 w-6 rounded-full bg-mindtrack-green flex items-center justify-center text-white mr-3 mt-0.5 flex-shrink-0">✓</div>
+              <div>
+                <h3 className="font-medium">Member of the Egyptian Association for Psychotherapists</h3>
+              </div>
+            </li>
+          </ul>
         </div>
         
-        {/* Timeline section */}
-        <div className="mt-16 space-y-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center">
-            {language === 'en' ? 'Professional Journey' : 'المسيرة المهنية'}
-          </h2>
-          
-          <div className="relative border-l border-primary pl-8 space-y-12 py-4 ml-6">
-            <div className="relative">
-              <span className="absolute flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full -left-[3.25rem] top-0">
-                2022
-              </span>
-              <h3 className="text-xl font-semibold">
-                {language === 'en' 
-                  ? 'Established Dr. Besma Mental Health Clinic' 
-                  : 'تأسيس عيادة د. بسمة للصحة النفسية'}
-              </h3>
-              <p className="text-muted-foreground mt-2">
-                {language === 'en' 
-                  ? 'Founded a specialized mental health practice focusing on holistic psychological care and innovative therapeutic approaches.'
-                  : 'تأسيس ممارسة متخصصة في الصحة النفسية تركز على الرعاية النفسية الشاملة والنهج العلاجية المبتكرة.'}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6 header-gradient">Professional Experience</h2>
+          <div className="space-y-6">
+            <div className="p-6 rounded-xl bg-accent/10">
+              <h3 className="font-medium mb-2">Clinical Training</h3>
+              <p className="text-muted-foreground">
+                Trained as a clinical psychotherapist at prestigious institutions including Abbasiya Hospital, 
+                Jamal Madi Abu al-Azayem Hospitals, and Mansoura University Hospital.
               </p>
             </div>
             
-            <div className="relative">
-              <span className="absolute flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full -left-[3.25rem] top-0">
-                2018
-              </span>
-              <h3 className="text-xl font-semibold">
-                {language === 'en' 
-                  ? 'Senior Clinical Psychologist at Royal Medical Center' 
-                  : 'أخصائية نفسية سريرية أولى في المركز الطبي الملكي'}
-              </h3>
-              <p className="text-muted-foreground mt-2">
-                {language === 'en' 
-                  ? 'Led a team of mental health professionals and developed specialized treatment programs for complex psychological conditions.'
-                  : 'قادت فريقًا من المتخصصين في الصحة النفسية وطورت برامج علاجية متخصصة للحالات النفسية المعقدة.'}
+            <div className="p-6 rounded-xl bg-accent/10">
+              <h3 className="font-medium mb-2">Volunteer Work</h3>
+              <p className="text-muted-foreground">
+                Volunteering as a psychotherapist in the Resala Charity Association, providing 
+                mental health support to underserved communities.
               </p>
             </div>
             
-            <div className="relative">
-              <span className="absolute flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full -left-[3.25rem] top-0">
-                2015
-              </span>
-              <h3 className="text-xl font-semibold">
-                {language === 'en' 
-                  ? 'Research Fellowship at Harvard Medical School' 
-                  : 'زمالة بحثية في كلية الطب بجامعة هارفارد'}
-              </h3>
-              <p className="text-muted-foreground mt-2">
-                {language === 'en' 
-                  ? 'Conducted pioneering research on trauma recovery and resilience building strategies in diverse populations.'
-                  : 'أجرت بحثًا رائدًا حول التعافي من الصدمات واستراتيجيات بناء المرونة في مجموعات سكانية متنوعة.'}
+            <div className="p-6 rounded-xl bg-accent/10">
+              <h3 className="font-medium mb-2">Awareness Campaigns</h3>
+              <p className="text-muted-foreground">
+                Participation in campaigns to raise awareness of mental illness and prevention through 
+                the hotline for psychological support and emergencies in the General Secretariat of Abbasiya.
               </p>
             </div>
             
-            <div className="relative">
-              <span className="absolute flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full -left-[3.25rem] top-0">
-                2010
-              </span>
-              <h3 className="text-xl font-semibold">
-                {language === 'en' 
-                  ? 'Clinical Psychologist at London Psychiatric Institute' 
-                  : 'أخصائية نفسية سريرية في معهد لندن للطب النفسي'}
-              </h3>
-              <p className="text-muted-foreground mt-2">
-                {language === 'en' 
-                  ? 'Provided psychological assessments and therapy to diverse clients while specializing in anxiety and mood disorders.'
-                  : 'قدمت التقييمات النفسية والعلاج لعملاء متنوعين مع التخصص في اضطرابات القلق والمزاج.'}
+            <div className="p-6 rounded-xl bg-accent/10">
+              <h3 className="font-medium mb-2">Current Practice</h3>
+              <p className="text-muted-foreground">
+                Works as a psychologist at Dr. Mustafa Abu Al-Azaim Clinics for Mental Health, 
+                providing comprehensive psychological care to patients.
               </p>
             </div>
           </div>
         </div>
         
-        {/* Doctor Reviews Section */}
-        <div className="mt-16 space-y-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center">
-            {language === 'en' ? 'Patient Reviews' : 'تقييمات المرضى'}
-          </h2>
-          <DoctorReviews />
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-4 header-gradient">Professional Philosophy</h2>
+          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+            Dr. Bassma believes in a holistic approach to mental health that considers each 
+            individual's unique circumstances, challenges, and strengths. Her goal is to 
+            empower patients with the tools and insights they need to navigate life's challenges 
+            and achieve emotional well-being.
+          </p>
         </div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto mt-16">
+        <h2 className="text-2xl font-semibold mb-6 header-gradient text-center">Patient Reviews</h2>
+        <DoctorReviews />
       </div>
     </div>
   );

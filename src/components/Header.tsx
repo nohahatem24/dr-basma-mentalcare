@@ -2,19 +2,9 @@
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Moon, Sun, Globe, User } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
-import { useAuth } from './auth/AuthProvider';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // Create a context to share language state throughout the app
 export type LanguageType = 'en' | 'ar';
@@ -33,20 +23,13 @@ const Header = () => {
   const [language, setLanguage] = useState<LanguageType>('en');
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  const { session, signOut } = useAuth();
+
+  const isAuthenticated = true; // For demo purposes
+  const isDoctor = false; // For demo purposes
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleLanguage = () => setLanguage(language === 'en' ? 'ar' : 'en');
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
-  
-  // Function to get user initials for avatar fallback
-  const getUserInitials = () => {
-    const firstName = session.profile?.first_name || '';
-    const lastName = session.profile?.last_name || '';
-    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
-    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
-    return firstInitial + lastInitial || 'U';
-  };
 
   const routes = [
     { path: '/', label: language === 'en' ? 'Home' : 'الرئيسية' },
@@ -59,8 +42,8 @@ const Header = () => {
   ];
 
   const filteredRoutes = routes.filter(route => {
-    if (route.requireAuth && !session.isAuthenticated) return false;
-    if (route.requireDoctor && !session.isDoctor) return false;
+    if (route.requireAuth && !isAuthenticated) return false;
+    if (route.requireDoctor && !isDoctor) return false;
     return true;
   });
 
@@ -111,54 +94,17 @@ const Header = () => {
                   <Moon className="h-5 w-5" />
                 )}
               </Button>
-              
-              {session.isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar>
-                        <AvatarImage src={session.user?.user_metadata?.avatar_url || ''} />
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          {getUserInitials()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>
-                      {session.profile?.first_name || ''} {session.profile?.last_name || ''}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile">
-                        {language === 'en' ? 'My Profile' : 'الملف الشخصي'}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard">
-                        {language === 'en' ? 'Dashboard' : 'لوحة التحكم'}
-                      </Link>
-                    </DropdownMenuItem>
-                    {session.isDoctor && (
-                      <DropdownMenuItem asChild>
-                        <Link to="/doctor-admin">
-                          {language === 'en' ? 'Doctor Admin' : 'إدارة الطبيب'}
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut}>
-                      {language === 'en' ? 'Sign Out' : 'تسجيل الخروج'}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button size="sm" className="btn-primary" asChild>
+              <Button size="sm" className="btn-primary" asChild>
+                {isAuthenticated ? (
+                  <Link to="/profile">
+                    {language === 'en' ? 'My Profile' : 'الملف الشخصي'}
+                  </Link>
+                ) : (
                   <Link to="/auth">
                     {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
                   </Link>
-                </Button>
-              )}
+                )}
+              </Button>
             </div>
 
             <div className="flex md:hidden items-center gap-2">
@@ -205,33 +151,17 @@ const Header = () => {
                   <span>{route.label}</span>
                 </Link>
               ))}
-              {session.isAuthenticated ? (
-                <>
-                  <Link 
-                    to="/profile" 
-                    className="text-sm font-medium transition-colors hover:text-primary"
-                    onClick={() => setIsOpen(false)}
-                  >
+              <Button size="sm" className="btn-primary w-full" asChild>
+                {isAuthenticated ? (
+                  <Link to="/profile">
                     {language === 'en' ? 'My Profile' : 'الملف الشخصي'}
                   </Link>
-                  <Button 
-                    size="sm" 
-                    className="btn-primary w-full" 
-                    onClick={() => {
-                      signOut();
-                      setIsOpen(false);
-                    }}
-                  >
-                    {language === 'en' ? 'Sign Out' : 'تسجيل الخروج'}
-                  </Button>
-                </>
-              ) : (
-                <Button size="sm" className="btn-primary w-full" asChild>
-                  <Link to="/auth" onClick={() => setIsOpen(false)}>
+                ) : (
+                  <Link to="/auth">
                     {language === 'en' ? 'Sign In' : 'تسجيل الدخول'}
                   </Link>
-                </Button>
-              )}
+                )}
+              </Button>
             </nav>
           </div>
         )}
