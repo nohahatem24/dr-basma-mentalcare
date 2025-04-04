@@ -6,13 +6,16 @@ import { toast } from 'sonner';
 // Type for session and user
 export interface UserProfile {
   id: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   avatar_url: string | null;
   phone: string | null;
   date_of_birth: string | null;
   gender: string | null;
   email: string;
+  language?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SessionState {
@@ -69,7 +72,20 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         return null;
       }
       
-      return data;
+      // Add email from auth user to profile
+      if (data) {
+        const userEmail = session.user?.email;
+        const profile: UserProfile = {
+          ...data,
+          email: userEmail || '',
+          phone: session.user?.phone || session.user?.user_metadata?.phone || null,
+          date_of_birth: session.user?.user_metadata?.date_of_birth || null,
+          gender: session.user?.user_metadata?.gender || null,
+        };
+        return profile;
+      }
+      
+      return null;
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
       return null;
@@ -112,7 +128,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const refreshProfile = async () => {
     if (session.user?.id) {
       const profile = await fetchUserProfile(session.user.id);
-      setSession(prev => ({ ...prev, profile }));
+      if (profile) {
+        setSession(prev => ({ ...prev, profile }));
+      }
     }
   };
 
@@ -132,13 +150,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         
         // If user is authenticated, fetch their profile
         if (authSession?.user) {
+          setSession(newSessionState); // Set initial state without profile
+          
           setTimeout(async () => {
             const profile = await fetchUserProfile(authSession.user.id);
-            setSession(prev => ({ ...prev, profile }));
+            if (profile) {
+              setSession(prev => ({ ...prev, profile }));
+            }
           }, 0);
+        } else {
+          setSession(newSessionState);
         }
-        
-        setSession(newSessionState);
       }
     );
 
@@ -156,11 +178,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       
       // If user is authenticated, fetch their profile
       if (authSession?.user) {
+        setSession(newSessionState); // Set initial state without profile
+        
         const profile = await fetchUserProfile(authSession.user.id);
-        newSessionState.profile = profile;
+        if (profile) {
+          setSession(prev => ({ ...prev, profile }));
+        }
+      } else {
+        setSession(newSessionState);
       }
-      
-      setSession(newSessionState);
     });
 
     return () => subscription.unsubscribe();

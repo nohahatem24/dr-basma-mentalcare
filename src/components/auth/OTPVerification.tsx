@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { VerifyOtpParams } from '@supabase/supabase-js';
 
 interface OTPVerificationProps {
   language: string;
@@ -28,9 +29,21 @@ const OTPVerification = ({ language, email, setOtpSent }: OTPVerificationProps) 
     setIsLoading(true);
     
     try {
-      const verifyData = isPhone 
-        ? { phone: email, token: otp, type: 'sms' } 
-        : { email: email, token: otp, type: 'email' };
+      let verifyData: VerifyOtpParams;
+      
+      if (isPhone) {
+        verifyData = {
+          phone: email,
+          token: otp,
+          type: 'sms'
+        };
+      } else {
+        verifyData = {
+          email: email,
+          token: otp,
+          type: 'email'
+        };
+      }
         
       const { data, error } = await supabase.auth.verifyOtp(verifyData);
       
