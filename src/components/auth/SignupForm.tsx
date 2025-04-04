@@ -3,17 +3,21 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Phone, Shield, Eye, EyeOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Calendar, Mail, Phone, Shield, Eye, EyeOff, User, Binary } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 interface SignupFormProps {
   language: string;
 }
 
 const SignupForm = ({ language }: SignupFormProps) => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,21 +28,52 @@ const SignupForm = ({ language }: SignupFormProps) => {
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [signupPhone, setSignupPhone] = useState('');
   const [signupName, setSignupName] = useState('');
+  const [signupGender, setSignupGender] = useState<string>('');
+  const [signupDateOfBirth, setSignupDateOfBirth] = useState<Date | undefined>(undefined);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  
+  // Password validation
+  const validatePassword = (password: string): { valid: boolean; message: string } => {
+    if (password.length < 8) {
+      return { valid: false, message: 'Password must be at least 8 characters' };
+    }
+    if (!/[A-Z]/.test(password)) {
+      return { valid: false, message: 'Password must contain at least 1 uppercase letter' };
+    }
+    if (!/[0-9]/.test(password)) {
+      return { valid: false, message: 'Password must contain at least 1 number' };
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      return { valid: false, message: 'Password must contain at least 1 special character' };
+    }
+    return { valid: true, message: '' };
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    // Validate form
+    if (!agreeToTerms) {
+      toast.error(language === 'en' 
+        ? 'You must agree to the terms and conditions' 
+        : 'يجب أن توافق على الشروط والأحكام');
+      return;
+    }
+    
+    // Validate password
+    const passwordValidation = validatePassword(signupPassword);
+    if (!passwordValidation.valid) {
+      toast.error(passwordValidation.message);
+      return;
+    }
     
     // Validate passwords match
     if (signupPassword !== signupConfirmPassword) {
-      setIsLoading(false);
-      toast({
-        title: language === 'en' ? 'Passwords do not match' : 'كلمات المرور غير متطابقة',
-        description: language === 'en' ? 'Please ensure both passwords are the same.' : 'يرجى التأكد من تطابق كلمتي المرور.',
-        variant: 'destructive',
-      });
+      toast.error(language === 'en' ? 'Passwords do not match' : 'كلمات المرور غير متطابقة');
       return;
     }
+    
+    setIsLoading(true);
     
     try {
       console.log("Starting signup process for:", signupEmail);
@@ -57,6 +92,8 @@ const SignupForm = ({ language }: SignupFormProps) => {
             phone: signupPhone,
             role: 'patient', // Default role for new users
             full_name: signupName,
+            gender: signupGender,
+            date_of_birth: signupDateOfBirth ? format(signupDateOfBirth, 'yyyy-MM-dd') : null
           }
         }
       });
@@ -68,12 +105,25 @@ const SignupForm = ({ language }: SignupFormProps) => {
       
       console.log("Signup successful:", data);
       
-      toast({
-        title: language === 'en' ? 'Account created successfully' : 'تم إنشاء الحساب بنجاح',
-        description: language === 'en' 
-          ? 'Please check your email to confirm your account' 
-          : 'يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك',
-      });
+      // Also update the profiles table with additional info
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: firstName,
+            last_name: lastName,
+          })
+          .eq('id', data.user.id);
+          
+        if (profileError) {
+          console.error("Error updating profile:", profileError);
+          // Continue anyway, this is not critical
+        }
+      }
+      
+      toast(language === 'en' 
+        ? 'Account created successfully! Please check your email to confirm your account' 
+        : 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك');
       
       // If email confirmation is disabled in Supabase, redirect to dashboard
       if (data.session) {
@@ -82,11 +132,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
       }
     } catch (error: any) {
       console.error("Signup failed:", error);
-      toast({
-        title: language === 'en' ? 'Signup failed' : 'فشل إنشاء الحساب',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -102,14 +148,18 @@ const SignupForm = ({ language }: SignupFormProps) => {
         <Label htmlFor="signup-name">
           {language === 'en' ? 'Full Name' : 'الاسم الكامل'}
         </Label>
-        <Input
-          id="signup-name"
-          type="text"
-          placeholder={language === 'en' ? 'John Doe' : 'محمد أحمد'}
-          value={signupName}
-          onChange={(e) => setSignupName(e.target.value)}
-          required
-        />
+        <div className="relative">
+          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="signup-name"
+            type="text"
+            placeholder={language === 'en' ? 'John Doe' : 'محمد أحمد'}
+            value={signupName}
+            onChange={(e) => setSignupName(e.target.value)}
+            className="pl-10"
+            required
+          />
+        </div>
       </div>
       
       <div className="space-y-2">
@@ -143,7 +193,62 @@ const SignupForm = ({ language }: SignupFormProps) => {
             value={signupPhone}
             onChange={(e) => setSignupPhone(e.target.value)}
             className="pl-10"
+            required
           />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="signup-dob">
+            {language === 'en' ? 'Date of Birth' : 'تاريخ الميلاد'}
+          </Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal"
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                {signupDateOfBirth ? (
+                  format(signupDateOfBirth, 'PPP')
+                ) : (
+                  <span className="text-muted-foreground">
+                    {language === 'en' ? 'Pick a date' : 'اختر تاريخ'}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarComponent
+                mode="single"
+                selected={signupDateOfBirth}
+                onSelect={setSignupDateOfBirth}
+                initialFocus
+                disabled={(date) => date > new Date()}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="signup-gender">
+            {language === 'en' ? 'Gender' : 'الجنس'}
+          </Label>
+          <Select value={signupGender} onValueChange={setSignupGender}>
+            <SelectTrigger className="w-full">
+              <div className="flex items-center">
+                <Binary className="mr-2 h-4 w-4 text-muted-foreground" />
+                <SelectValue placeholder={language === 'en' ? 'Select gender' : 'اختر الجنس'} />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">{language === 'en' ? 'Male' : 'ذكر'}</SelectItem>
+              <SelectItem value="female">{language === 'en' ? 'Female' : 'أنثى'}</SelectItem>
+              <SelectItem value="other">{language === 'en' ? 'Other' : 'آخر'}</SelectItem>
+              <SelectItem value="prefer_not_to_say">{language === 'en' ? 'Prefer not to say' : 'أفضل عدم الإجابة'}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       
@@ -175,6 +280,11 @@ const SignupForm = ({ language }: SignupFormProps) => {
             )}
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground">
+          {language === 'en' 
+            ? 'Password must be at least 8 characters and include uppercase, number, and special character'
+            : 'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتتضمن حرفًا كبيرًا ورقمًا وحرفًا خاصًا'}
+        </p>
       </div>
       
       <div className="space-y-2">
@@ -192,6 +302,21 @@ const SignupForm = ({ language }: SignupFormProps) => {
             required
           />
         </div>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <Checkbox 
+          id="terms"
+          checked={agreeToTerms}
+          onCheckedChange={(checked) => setAgreeToTerms(!!checked)}
+          required
+        />
+        <Label htmlFor="terms" className="text-sm">
+          {language === 'en' 
+            ? 'I agree to the Terms of Service and Privacy Policy'
+            : 'أوافق على شروط الخدمة وسياسة الخصوصية'
+          }
+        </Label>
       </div>
       
       <Button type="submit" className="w-full" disabled={isLoading}>

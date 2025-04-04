@@ -18,6 +18,7 @@ import Report from "@/components/Report";
 import UserProfile from "@/components/user/UserProfile";
 import DoctorAdmin from "@/components/doctor/DoctorAdmin";
 import PaymentPage from "@/pages/PaymentPage";
+import UserProfilePage from "@/pages/UserProfilePage";
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -58,9 +59,7 @@ const AppRoutes = () => {
       
       <Route path="/profile" element={
         <ProtectedRoute>
-          <div className="container py-8">
-            <UserProfile />
-          </div>
+          <UserProfilePage />
         </ProtectedRoute>
       } />
       
