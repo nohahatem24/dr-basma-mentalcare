@@ -10,7 +10,7 @@ const BookingFloatingButton = () => {
 
   return (
     <Button
-      className="fixed bottom-20 right-6 md:right-10 shadow-lg rounded-full h-14 w-14 p-0 bg-gradient-to-r from-mindtrack-blue to-mindtrack-green hover:opacity-90 z-50"
+      className="fixed bottom-24 right-6 rounded-full h-16 w-16 shadow-lg z-50 bg-primary hover:bg-primary/90"
       asChild
     >
       <Link to="/book-appointment" aria-label={language === 'en' ? 'Book a session' : 'حجز جلسة'}>
