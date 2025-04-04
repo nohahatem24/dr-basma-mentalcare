@@ -45,7 +45,7 @@ const Header = () => {
     const lastName = session.profile?.last_name || '';
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
-    return firstInitial + lastInitial;
+    return firstInitial + lastInitial || 'U';
   };
 
   const routes = [
@@ -118,7 +118,7 @@ const Header = () => {
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar>
                         <AvatarImage src={session.user?.user_metadata?.avatar_url || ''} />
-                        <AvatarFallback className="bg-primary text-white">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
                           {getUserInitials()}
                         </AvatarFallback>
                       </Avatar>
@@ -126,7 +126,7 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>
-                      {session.profile?.first_name} {session.profile?.last_name}
+                      {session.profile?.first_name || ''} {session.profile?.last_name || ''}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>

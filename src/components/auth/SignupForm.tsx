@@ -1,17 +1,14 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar, Mail, Phone, Shield, Eye, EyeOff, User, Binary } from 'lucide-react';
+import { Mail, Phone, Shield, Eye, EyeOff, User, Binary } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import DateOfBirthInput from './DateOfBirthInput';
 
 interface SignupFormProps {
   language: string;
@@ -29,7 +26,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
   const [signupPhone, setSignupPhone] = useState('');
   const [signupName, setSignupName] = useState('');
   const [signupGender, setSignupGender] = useState<string>('');
-  const [signupDateOfBirth, setSignupDateOfBirth] = useState<Date | undefined>(undefined);
+  const [signupDateOfBirth, setSignupDateOfBirth] = useState<string>('');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   
   // Password validation
@@ -93,7 +90,7 @@ const SignupForm = ({ language }: SignupFormProps) => {
             role: 'patient', // Default role for new users
             full_name: signupName,
             gender: signupGender,
-            date_of_birth: signupDateOfBirth ? format(signupDateOfBirth, 'yyyy-MM-dd') : null
+            date_of_birth: signupDateOfBirth || null
           }
         }
       });
@@ -200,35 +197,10 @@ const SignupForm = ({ language }: SignupFormProps) => {
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="signup-dob">
-            {language === 'en' ? 'Date of Birth' : 'تاريخ الميلاد'}
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
-                <Calendar className="mr-2 h-4 w-4" />
-                {signupDateOfBirth ? (
-                  format(signupDateOfBirth, 'PPP')
-                ) : (
-                  <span className="text-muted-foreground">
-                    {language === 'en' ? 'Pick a date' : 'اختر تاريخ'}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <CalendarComponent
-                mode="single"
-                selected={signupDateOfBirth}
-                onSelect={setSignupDateOfBirth}
-                initialFocus
-                disabled={(date) => date > new Date()}
-              />
-            </PopoverContent>
-          </Popover>
+          <DateOfBirthInput 
+            value={signupDateOfBirth} 
+            onChange={setSignupDateOfBirth} 
+          />
         </div>
         
         <div className="space-y-2">
