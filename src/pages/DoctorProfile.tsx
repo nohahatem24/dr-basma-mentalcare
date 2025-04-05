@@ -37,6 +37,7 @@ const DoctorProfile = () => {
   const [customNotes, setCustomNotes] = useState<string>("");
   const [customDuration, setCustomDuration] = useState<'30' | '60'>('30');
   const [defaultValue, setDefaultValue] = useState<"calendar" | "custom">("calendar");
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]); // This would come from your backend
 
   interface TimeSlot {
     startTime: string;
@@ -62,35 +63,69 @@ const DoctorProfile = () => {
     if (!selectedDate) return;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
     const selected = new Date(selectedDate);
     selected.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
 
     let filteredSlots = defaultTimeSlots.filter(slot => slot.duration === selectedDuration);
 
     if (selected.getTime() === today.getTime()) {
       // If selected date is today, only show future time slots
-      const currentHour = new Date().getHours();
-      const currentMinutes = new Date().getMinutes();
+      const currentTime = new Date();
+      const currentHour = currentTime.getHours();
+      const currentMinute = currentTime.getMinutes();
       
       filteredSlots = filteredSlots.filter(slot => {
         const [time, period] = slot.startTime.split(' ');
         const [hours, minutes] = time.split(':').map(Number);
+        
+        // Convert slot time to 24-hour format
         let slotHour = hours;
         if (period === 'PM' && hours !== 12) slotHour += 12;
+        else if (period === 'AM' && hours === 12) slotHour = 0;
         
-        return (slotHour > currentHour) || 
-               (slotHour === currentHour && Number(minutes) > currentMinutes);
+        // Compare hours and minutes
+        if (slotHour > currentHour) return true;
+        if (slotHour === currentHour && minutes > currentMinute + 15) return true;
+        return false;
       });
     } else if (selected.getTime() < today.getTime()) {
       // Past dates show no slots
       filteredSlots = [];
     }
-    // Future dates show all slots for selected duration (already filtered above)
 
     setAvailableSlots(filteredSlots);
-    setSelectedSlot(null); // Reset selected slot when duration changes
+    setSelectedSlot(null);
   }, [selectedDate, selectedDuration]);
+
+  const handleSlotSelection = (slot: TimeSlot) => {
+    const slotDateTime = new Date(selectedDate!);
+    const [time, period] = slot.startTime.split(' ');
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    // Convert to 24 hour format
+    let slotHour = hours;
+    if (period === 'PM' && hours !== 12) slotHour += 12;
+    else if (period === 'AM' && hours === 12) slotHour = 0;
+    
+    slotDateTime.setHours(slotHour, minutes, 0, 0);
+
+    // Check if slot is at least 15 minutes in the future
+    const minTime = new Date(Date.now() + 15 * 60000);
+    if (slotDateTime <= minTime) {
+      toast({
+        title: language === 'en' ? "Invalid Time Slot" : "موعد غير صالح",
+        description: language === 'en' 
+          ? "Please select a time slot at least 15 minutes from now" 
+          : "يرجى اختيار موعد يبعد 15 دقيقة على الأقل من الآن",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedSlot(`${slot.startTime}-${slot.endTime}`);
+    setSelectedDuration(slot.duration);
+  };
 
   const handleDurationChange = (duration: '30' | '60') => {
     setSelectedDuration(duration);
@@ -114,16 +149,63 @@ const DoctorProfile = () => {
       return;
     }
 
+    const [startTimeStr] = selectedSlot.split('-');
+    const [time, period] = startTimeStr.trim().split(' ');
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    const startTime = new Date(selectedDate!);
+    let startHour = hours;
+    if (period === 'PM' && hours !== 12) startHour += 12;
+    else if (period === 'AM' && hours === 12) startHour = 0;
+    startTime.setHours(startHour, minutes, 0, 0);
+    
+    const endTime = new Date(startTime.getTime() + (selectedDuration === '30' ? 30 : 60) * 60000);
+
     navigate('/payment', { 
       state: { 
         date: selectedDate,
-        time: selectedSlot,
+        startTime: format(startTime, 'hh:mm a'),
+        endTime: format(endTime, 'hh:mm a'),
         duration: selectedDuration,
         doctorName: "Dr. Bassma Adel",
         fee: getFeeByDuration(selectedDuration, false),
-        appointmentType: "standard"
+        appointmentType: "standard",
+        currency: "EGP"
       } 
     });
+  };
+
+  const isTimeValid = (time: string, date: Date) => {
+    const now = new Date();
+    const selectedDateTime = new Date(date);
+    const [hours, minutes] = time.split(':').map(Number);
+    selectedDateTime.setHours(hours, minutes, 0, 0);
+
+    // Check if time is at least 15 minutes in the future
+    const minTime = new Date(now.getTime() + 15 * 60000);
+    return selectedDateTime > minTime;
+  };
+
+  const isSlotBooked = (startTime: string, endTime: string, date: Date) => {
+    // This would need to be integrated with your backend
+    // For now, we'll use the bookedSlots array
+    const slotKey = `${date.toDateString()}-${startTime}-${endTime}`;
+    return bookedSlots.includes(slotKey);
+  };
+
+  const handleCustomTimeChange = (time: string) => {
+    setCustomTime(time);
+    if (customDate && time) {
+      if (!isTimeValid(time, customDate)) {
+        toast({
+          title: language === 'en' ? "Invalid Time" : "وقت غير صالح",
+          description: language === 'en' 
+            ? "Please select a time at least 15 minutes from now" 
+            : "يرجى اختيار وقت يبعد 15 دقيقة على الأقل من الآن",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const sendCustomRequest = () => {
@@ -136,28 +218,56 @@ const DoctorProfile = () => {
       return;
     }
 
-    navigate('/payment', { 
-      state: { 
-        date: customDate,
-        time: customTime,
-        duration: customDuration,
-        doctorName: "Dr. Bassma Adel",
-        fee: getFeeByDuration(customDuration, true),
-        notes: customNotes,
-        appointmentType: "custom"
-      } 
+    if (!isTimeValid(customTime, customDate)) {
+      toast({
+        title: language === 'en' ? "Invalid Time" : "وقت غير صالح",
+        description: language === 'en' 
+          ? "Please select a time at least 15 minutes from now" 
+          : "يرجى اختيار وقت يبعد 15 دقيقة على الأقل من الآن",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const [hours, minutes] = customTime.split(':').map(Number);
+    const startTime = new Date(customDate);
+    startTime.setHours(hours, minutes, 0, 0);
+    const endTime = new Date(startTime.getTime() + (customDuration === '30' ? 30 : 60) * 60000);
+
+    // Here you would send the request to your backend with the calculated times
+    toast({
+      title: language === 'en' ? "Request Sent" : "تم إرسال الطلب",
+      description: language === 'en' 
+        ? `Request sent for ${format(startTime, 'hh:mm a')} - ${format(endTime, 'hh:mm a')}` 
+        : `تم إرسال الطلب للفترة ${format(endTime, 'hh:mm a')} - ${format(startTime, 'hh:mm a')}`,
     });
   };
 
   const requestImmediateSession = () => {
+    const startTime = new Date(Date.now() + 15 * 60000); // 15 minutes from now
+    const endTime = new Date(startTime.getTime() + 30 * 60000); // 30 minutes session
+
+    if (!doctorOnline) {
+      toast({
+        title: language === 'en' ? "Doctor Offline" : "الطبيب غير متصل",
+        description: language === 'en' 
+          ? "Immediate sessions are only available when the doctor is online" 
+          : "الجلسات الفورية متاحة فقط عندما يكون الطبيب متصل",
+        variant: "destructive",
+      });
+      return;
+    }
+
     navigate('/payment', { 
       state: { 
         doctorName: "Dr. Bassma Adel",
-        fee: getFeeByDuration('30'),
-        duration: '30',
+        fee: 260, // Fixed price for immediate sessions
+        duration: '30', // Only 30 minutes for immediate sessions
         appointmentType: "immediate",
-        date: new Date(),
-        time: "Now"
+        date: startTime,
+        startTime: format(startTime, 'hh:mm a'),
+        endTime: format(endTime, 'hh:mm a'),
+        currency: "EGP"
       } 
     });
   };
@@ -278,7 +388,7 @@ const DoctorProfile = () => {
                     {language === 'en' ? "Request Custom Time" : "طلب وقت مخصص"}
                   </Button>
                 </div>
-
+                
                 <TabsContent value="calendar" className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
@@ -335,7 +445,7 @@ const DoctorProfile = () => {
                           >
                             <div className="text-center">
                               <div className="font-semibold">30 {language === 'en' ? "Minutes" : "دقيقة"}</div>
-                              <div className="text-sm">{getFeeByDuration('30')} EGP</div>
+                              <div className="text-sm">{getFeeByDuration('30')} {language === 'en' ? "EGP" : "جنيه"}</div>
                             </div>
                           </Button>
                           <Button
@@ -345,13 +455,13 @@ const DoctorProfile = () => {
                           >
                             <div className="text-center">
                               <div className="font-semibold">60 {language === 'en' ? "Minutes" : "دقيقة"}</div>
-                              <div className="text-sm">{getFeeByDuration('60')} EGP</div>
+                              <div className="text-sm">{getFeeByDuration('60')} {language === 'en' ? "EGP" : "جنيه"}</div>
                             </div>
                           </Button>
                         </div>
                       </div>
                     </div>
-
+                    
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">
                         {language === 'en' ? "Available Time Slots" : "الأوقات المتاحة"}
@@ -362,10 +472,7 @@ const DoctorProfile = () => {
                           <Button
                             key={index}
                             variant="outline"
-                            onClick={() => {
-                              setSelectedSlot(`${slot.startTime}-${slot.endTime}`);
-                              setSelectedDuration(slot.duration);
-                            }}
+                            onClick={() => handleSlotSelection(slot)}
                             className={`
                               relative flex flex-col items-center justify-center 
                               w-full min-h-[80px] p-2 rounded-lg 
@@ -415,31 +522,37 @@ const DoctorProfile = () => {
                 </TabsContent>
                 
                 <TabsContent value="custom">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        {language === 'en' ? "Request Custom Appointment" : "طلب موعد مخصص"}
-                      </CardTitle>
-                      <CardDescription>
-                        {language === 'en' 
-                          ? "If none of the available times work for you, send a custom request" 
-                          : "إذا لم تكن أي من الأوقات المتاحة مناسبة لك، أرسل طلبًا مخصصًا"}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {language === 'en' ? "Preferred Date" : "التاريخ المفضل"}
-                        </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
                         <Calendar
                           mode="single"
                           selected={customDate}
                           onSelect={setCustomDate}
-                          className="rounded-md border"
+                        className="rounded-lg border shadow-sm w-full max-w-[360px] mx-auto"
+                        classNames={{
+                          head_row: "flex w-full",
+                          head_cell: "w-full text-muted-foreground font-medium text-sm rounded-md m-0.5 text-center",
+                          row: "flex w-full mt-1",
+                          cell: "w-full text-center relative p-0 focus-within:relative focus-within:z-20",
+                          day: "h-10 w-10 p-0 font-normal text-sm aria-selected:opacity-100 hover:bg-primary/10 rounded-full mx-auto",
+                          day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-full",
+                          day_today: "bg-accent text-accent-foreground rounded-full",
+                          day_outside: "text-muted-foreground opacity-50",
+                          day_disabled: "text-muted-foreground opacity-50",
+                          day_hidden: "invisible",
+                          nav_button: "h-7 w-7 bg-transparent hover:bg-primary/10 rounded-full transition-colors",
+                          nav_button_previous: "absolute left-2 top-3",
+                          nav_button_next: "absolute right-2 top-3",
+                          caption: "relative text-base font-medium py-3 px-10",
+                          caption_label: "text-center",
+                          table: "w-full border-collapse space-y-1",
+                        }}
                           disabled={(date) => date < new Date()}
                         />
                       </div>
                       
+                    <div className="space-y-6">
+                      <div className="space-y-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
                           {language === 'en' ? "Preferred Time" : "الوقت المفضل"}
@@ -447,32 +560,38 @@ const DoctorProfile = () => {
                         <Input 
                           type="time"
                           value={customTime}
-                          onChange={(e) => setCustomTime(e.target.value)}
-                          placeholder={language === 'en' ? "Select time" : "اختر الوقت"}
+                            onChange={(e) => handleCustomTimeChange(e.target.value)}
+                            className="w-full"
                         />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {language === 'en' ? "Session Duration" : "مدة الجلسة"}
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Button
-                            variant={customDuration === '30' ? "default" : "outline"}
-                            onClick={() => setCustomDuration('30')}
-                            className="justify-center"
-                          >
-                            30 {language === 'en' ? "Minutes" : "دقيقة"} - {getFeeByDuration('30', true)} EGP
-                          </Button>
-                          <Button
-                            variant={customDuration === '60' ? "default" : "outline"}
-                            onClick={() => setCustomDuration('60')}
-                            className="justify-center"
-                          >
-                            60 {language === 'en' ? "Minutes" : "دقيقة"} - {getFeeByDuration('60', true)} EGP
-                          </Button>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            {language === 'en' ? "Session Duration" : "مدة الجلسة"}
+                          </label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <Button
+                              variant={customDuration === '30' ? "default" : "outline"}
+                              onClick={() => setCustomDuration('30')}
+                              className={`h-auto py-4 ${customDuration === '30' ? 'bg-primary text-white' : ''}`}
+                            >
+                              <div className="text-center">
+                                <div className="font-semibold">30 {language === 'en' ? "Minutes" : "دقيقة"}</div>
+                                <div className="text-sm">{getFeeByDuration('30', true)} {language === 'en' ? "EGP" : "جنيه"}</div>
+                              </div>
+                            </Button>
+                            <Button
+                              variant={customDuration === '60' ? "default" : "outline"}
+                              onClick={() => setCustomDuration('60')}
+                              className={`h-auto py-4 ${customDuration === '60' ? 'bg-primary text-white' : ''}`}
+                            >
+                              <div className="text-center">
+                                <div className="font-semibold">60 {language === 'en' ? "Minutes" : "دقيقة"}</div>
+                                <div className="text-sm">{getFeeByDuration('60', true)} {language === 'en' ? "EGP" : "جنيه"}</div>
+                              </div>
+                            </Button>
+                          </div>
                         </div>
-                      </div>
                       
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
@@ -491,14 +610,19 @@ const DoctorProfile = () => {
                       <p className="text-sm text-muted-foreground">
                         {language === 'en' 
                           ? "Dr. Bassma will review your request and confirm if she can accommodate your preferred time." 
-                          : "ستراجع الدكتورة بسمة طلبك وتؤكد ما إذا كان بإمكانها استيعاب الوقت المفضل لديك."}
-                      </p>
-                      
-                      <Button className="w-full" onClick={sendCustomRequest}>
+                            : "ستراجع د. بسمة طلبك وتؤكد ما إذا كان بإمكانها استيعاب الوقت المفضل لديك."}
+                        </p>
+
+                        <Button 
+                          className="w-full py-6 text-lg font-semibold"
+                          onClick={sendCustomRequest}
+                          disabled={!customDate || !customTime}
+                        >
                         {language === 'en' ? "Send Request" : "إرسال الطلب"}
                       </Button>
-                    </CardContent>
-                  </Card>
+                      </div>
+                    </div>
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ interface PaymentFormProps {
   isProcessing: boolean;
   handleBookingComplete: (e: React.FormEvent) => void;
   fee: number;
+  currency: string;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
@@ -31,7 +31,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   handleCardInfoChange,
   isProcessing,
   handleBookingComplete,
-  fee
+  fee,
+  currency = 'EGP'
 }) => {
   const { language } = useLanguage();
   
@@ -84,8 +85,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           ) : (
             <>
               {language === 'en' 
-                ? `Pay Now $${fee}` 
-                : `ادفع الآن $${fee}`}
+                ? `Pay Now ${fee} ${currency}` 
+                : `ادفع الآن ${fee} ${currency === 'EGP' ? "جنيه مصري" : currency}`}
             </>
           )}
         </Button>

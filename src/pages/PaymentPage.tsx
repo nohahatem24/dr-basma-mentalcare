@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -11,11 +10,14 @@ import { format } from 'date-fns';
 
 interface AppointmentDetails {
   date?: Date;
-  time?: string;
   doctorName: string;
   fee: number;
+  duration: string;
   appointmentType: 'standard' | 'custom' | 'immediate';
+  startTime?: string;
+  endTime?: string;
   notes?: string;
+  currency: string;
 }
 
 const PaymentPage = () => {
@@ -83,7 +85,7 @@ const PaymentPage = () => {
   };
   
   const goBack = () => {
-    navigate('/doctor');
+    navigate('/book-appointment');
   };
   
   return (
@@ -140,16 +142,25 @@ const PaymentPage = () => {
                 <p className="font-medium">{getAppointmentTypeDisplay()}</p>
               </div>
               
-              {appointmentDetails.date && appointmentDetails.time && (
+              {appointmentDetails.date && appointmentDetails.startTime && appointmentDetails.endTime && (
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">
                     {language === 'en' ? "Date & Time" : "التاريخ والوقت"}
                   </p>
                   <p className="font-medium">
-                    {formatDate(appointmentDetails.date)} - {appointmentDetails.time}
+                    {formatDate(appointmentDetails.date)} - {appointmentDetails.startTime} to {appointmentDetails.endTime}
                   </p>
                 </div>
               )}
+              
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  {language === 'en' ? "Duration" : "المدة"}
+                </p>
+                <p className="font-medium">
+                  {appointmentDetails.duration} {language === 'en' ? "Minutes" : "دقيقة"}
+                </p>
+              </div>
               
               {appointmentDetails.notes && (
                 <div className="space-y-1">
@@ -164,7 +175,9 @@ const PaymentPage = () => {
                 <p className="text-sm text-muted-foreground">
                   {language === 'en' ? "Fee" : "الرسوم"}
                 </p>
-                <p className="font-medium">${appointmentDetails.fee}</p>
+                <p className="font-medium">
+                  {appointmentDetails.fee} {language === 'en' ? "EGP" : "جنيه مصري"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -178,6 +191,7 @@ const PaymentPage = () => {
             isProcessing={isProcessing}
             handleBookingComplete={handleBookingComplete}
             fee={appointmentDetails.fee}
+            currency={appointmentDetails.currency || 'EGP'}
           />
         </div>
       )}
