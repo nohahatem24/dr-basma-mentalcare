@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
 import DoctorReviews from '@/components/DoctorReviews';
+import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 
 type SessionsResponse = {
   count: number; 
@@ -9,6 +10,7 @@ type SessionsResponse = {
 
 const About = () => {
   const [sessionsCount, setSessionsCount] = useState(0); 
+  const { averageRating } = useDoctorRating();
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -65,7 +67,9 @@ const About = () => {
 
           {/* Average Rating */}
           <div className="p-6 rounded-lg bg-primary/10 text-center">
-            <h3 className="text-4xl font-bold text-primary">4.9</h3>
+            <h3 className="text-4xl font-bold text-primary" key={averageRating}>
+              {averageRating}
+            </h3>
             <p className="text-muted-foreground">Average Rating</p>
           </div>
 

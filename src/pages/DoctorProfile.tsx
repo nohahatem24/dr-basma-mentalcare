@@ -15,11 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
 import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
+import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 
 const DoctorProfile = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { averageRating, totalReviews, addReview, updateRating } = useDoctorRating();
   
   const calculateExperienceYears = () => {
     const startYear = 2016;
@@ -284,8 +286,8 @@ const DoctorProfile = () => {
       language === 'en' ? "Certified CBT Specialist" : "متخصصة معتمدة في العلاج المعرفي السلوكي",
       language === 'en' ? "Member of the Egyptian Association for Psychotherapists" : "عضو في الجمعية المصرية للمعالجين النفسيين"
     ],
-    rating: 4.9,
-    reviewCount: 87
+    rating: averageRating,
+    reviewCount: totalReviews
   };
 
   return (

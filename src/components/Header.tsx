@@ -1,10 +1,10 @@
-
 import React, { useState, useContext, createContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Moon, Sun, Globe } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import NotificationSystem from './NotificationSystem';
+import NameInitialsIcon from '@/components/NameInitialsIcon';
 
 // Create a context to share language state throughout the app
 export type LanguageType = 'en' | 'ar';

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import AuthProvider from "@/components/auth/AuthProvider";
 import { ReviewsProvider } from "@/components/reviews/ReviewsContext";
 import AppRoutes from "@/routes/AppRoutes";
+import { DoctorRatingProvider } from '@/contexts/DoctorRatingContext';
 
 const queryClient = new QueryClient();
 
@@ -26,15 +26,17 @@ const App = () => (
           <ScrollToTop />
           <AuthProvider>
             <ReviewsProvider>
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow">
-                  <AppRoutes />
-                </main>
-                <Footer />
-                <ChatSupport />
-                <BookingFloatingButton />
-              </div>
+              <DoctorRatingProvider>
+                <div className="flex flex-col min-h-screen">
+                  <Header />
+                  <main className="flex-grow">
+                    <AppRoutes />
+                  </main>
+                  <Footer />
+                  <ChatSupport />
+                  <BookingFloatingButton />
+                </div>
+              </DoctorRatingProvider>
             </ReviewsProvider>
           </AuthProvider>
         </Router>
