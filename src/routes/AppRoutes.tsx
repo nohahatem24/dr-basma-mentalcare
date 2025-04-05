@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
@@ -18,6 +17,7 @@ import Report from "@/components/Report";
 import UserProfile from "@/components/user/UserProfile";
 import DoctorAdmin from "@/components/doctor/DoctorAdmin";
 import PaymentPage from "@/pages/PaymentPage";
+import AccountSettings from "@/components/user/AccountSettings";
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -61,6 +61,12 @@ const AppRoutes = () => {
           <div className="container py-8">
             <UserProfile />
           </div>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/account-settings" element={
+        <ProtectedRoute>
+          <AccountSettings />
         </ProtectedRoute>
       } />
       
