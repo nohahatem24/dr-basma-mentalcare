@@ -328,7 +328,7 @@ const UserProfile = () => {
           <div className="grid gap-4 md:grid-cols-2">
             {upcomingSessions.map(session => (
               <Card key={session.id} className="relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-2 h-full bg-green-500`}></div>
+                <div className="absolute top-0 right-0 w-2 h-full bg-green-500"></div>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center justify-between">
                     <span>{language === 'en' ? 'Session with Dr. Bassma' : 'جلسة مع د. بسمة'}</span>
@@ -338,31 +338,33 @@ const UserProfile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{formatDate(session.date)}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{session.startTime} - {session.endTime}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock3 className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>
-                        {session.duration} {language === 'en' ? 'Minutes' : 'دقيقة'}
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <Video className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>
-                        {session.type === 'video' 
-                          ? (language === 'en' ? 'Video Session' : 'جلسة فيديو')
-                          : (language === 'en' ? 'In-person Session' : 'جلسة شخصية')}
-                      </span>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>{formatDate(session.date)}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>{session.startTime} - {session.endTime}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock3 className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>
+                          {session.duration} {language === 'en' ? 'Minutes' : 'دقيقة'}
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <Video className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>
+                          {session.type === 'video' 
+                            ? (language === 'en' ? 'Video Session' : 'جلسة فيديو')
+                            : (language === 'en' ? 'In-person Session' : 'جلسة شخصية')}
+                        </span>
+                      </div>
                     </div>
                     
-                    <div className="pt-4 flex flex-wrap gap-2">
+                    <div className="flex gap-2">
                       {session.type === 'video' && (
                         <Button asChild className="flex-1">
                           <Link to="/video-session">
@@ -379,7 +381,7 @@ const UserProfile = () => {
                       </Button>
                     </div>
                     
-                    <div className="pt-2 flex flex-wrap gap-2">
+                    <div className="flex gap-2">
                       <Button 
                         variant="ghost" 
                         className="flex-1 text-destructive hover:text-destructive"
@@ -424,7 +426,7 @@ const UserProfile = () => {
           <div className="grid gap-4 md:grid-cols-2">
             {previousSessions.map(session => (
               <Card key={session.id} className="relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-2 h-full bg-gray-400`}></div>
+                <div className="absolute top-0 right-0 w-2 h-full bg-gray-400"></div>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center justify-between">
                     <span>{language === 'en' ? 'Session with Dr. Bassma' : 'جلسة مع د. بسمة'}</span>
@@ -434,34 +436,30 @@ const UserProfile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{formatDate(session.date)}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{session.startTime} - {session.endTime}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock3 className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>
-                        {session.duration} {language === 'en' ? 'Minutes' : 'دقيقة'}
-                      </span>
-                    </div>
-                    {session.notes && (
-                      <div className="pt-2">
-                        <h4 className="text-sm font-medium">
-                          {language === 'en' ? 'Notes:' : 'ملاحظات:'}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">{session.notes}</p>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>{formatDate(session.date)}</span>
                       </div>
-                    )}
-                    
-                    <div className="pt-4">
-                      <Button variant="outline" size="sm" className="w-full">
-                        {language === 'en' ? 'View Session Notes' : 'عرض ملاحظات الجلسة'}
-                      </Button>
+                      <div className="flex items-center">
+                        <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>{session.startTime} - {session.endTime}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock3 className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>
+                          {session.duration} {language === 'en' ? 'Minutes' : 'دقيقة'}
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <Video className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>
+                          {session.type === 'video' 
+                            ? (language === 'en' ? 'Video Session' : 'جلسة فيديو')
+                            : (language === 'en' ? 'In-person Session' : 'جلسة شخصية')}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
