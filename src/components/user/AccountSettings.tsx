@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface UserData {
   email: string;
@@ -21,45 +24,206 @@ const AccountSettings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // State for user data
   const [userData, setUserData] = useState<UserData>({
-    email: 'nohahatem234@gmail.com',
-    phone: '201554199143',
-    username: 'Noha Hatem',
-    birthday: '24/04/2002',
-    gender: 'Female',
-    country: 'Egypt'
+    email: '',
+    phone: '',
+    username: '',
+    birthday: '',
+    gender: '',
+    country: ''
   });
 
-  const handleLogout = () => {
-    // Implement logout logic here
-    navigate('/auth');
+  // State for password change
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // State for edit dialogs
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editField, setEditField] = useState<keyof UserData | null>(null);
+  const [editValue, setEditValue] = useState('');
+
+  // Fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setUserData({
+            email: user.email || '',
+            phone: data.phone || '',
+            username: data.username || '',
+            birthday: data.birthday || '',
+            gender: data.gender || '',
+            country: data.country || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: language === 'en' ? 'Error' : 'خطأ',
+          description: language === 'en' 
+            ? 'Failed to load your account information' 
+            : 'فشل في تحميل معلومات حسابك',
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchUserData();
+  }, [language, toast]);
+
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' 
+          ? 'New passwords do not match' 
+          : 'كلمات المرور الجديدة غير متطابقة',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      setPasswordDialogOpen(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+
+      toast({
+        title: language === 'en' ? 'Success' : 'تم بنجاح',
+        description: language === 'en' 
+          ? 'Your password has been updated successfully' 
+          : 'تم تحديث كلمة المرور بنجاح',
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Error updating password:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' 
+          ? 'Failed to update password' 
+          : 'فشل في تحديث كلمة المرور',
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleChange = (field: keyof UserData) => {
-    toast({
-      title: language === 'en' ? 'Coming Soon' : 'قريباً',
-      description: language === 'en' 
-        ? 'This feature will be available soon' 
-        : 'هذه الميزة ستكون متاحة قريباً',
-      variant: "default",
-    });
+  const handleEdit = (field: keyof UserData) => {
+    setEditField(field);
+    setEditValue(userData[field]);
+    setEditDialogOpen(true);
   };
 
-  const handleAddInsurance = () => {
-    toast({
-      title: language === 'en' ? 'Coming Soon' : 'قريباً',
-      description: language === 'en' 
-        ? 'Insurance company feature will be available soon' 
-        : 'ميزة شركة التأمين ستكون متاحة قريباً',
-      variant: "default",
-    });
+  const handleUpdateField = async () => {
+    if (!editField) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      if (editField === 'email') {
+        const { error } = await supabase.auth.updateUser({
+          email: editValue
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ [editField]: editValue })
+          .eq('id', user.id);
+
+        if (error) throw error;
+      }
+
+      setUserData(prev => ({
+        ...prev,
+        [editField]: editValue
+      }));
+
+      setEditDialogOpen(false);
+      setEditField(null);
+      setEditValue('');
+
+      toast({
+        title: language === 'en' ? 'Success' : 'تم بنجاح',
+        description: language === 'en' 
+          ? `Your ${editField} has been updated successfully` 
+          : `تم تحديث ${editField === 'email' ? 'البريد الإلكتروني' : 
+              editField === 'phone' ? 'رقم الهاتف' :
+              editField === 'username' ? 'اسم المستخدم' :
+              editField === 'birthday' ? 'تاريخ الميلاد' :
+              editField === 'gender' ? 'الجنس' :
+              'البلد'} بنجاح`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Error updating field:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' 
+          ? `Failed to update ${editField}` 
+          : `فشل في تحديث ${editField === 'email' ? 'البريد الإلكتروني' : 
+              editField === 'phone' ? 'رقم الهاتف' :
+              editField === 'username' ? 'اسم المستخدم' :
+              editField === 'birthday' ? 'تاريخ الميلاد' :
+              editField === 'gender' ? 'الجنس' :
+              'البلد'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' 
+          ? 'Failed to sign out' 
+          : 'فشل في تسجيل الخروج',
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="container py-8 max-w-7xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold">
-          {language === 'en' ? 'My Account' : 'حسابي'}
+          {language === 'en' ? 'Account Settings' : 'إعدادات الحساب'}
         </h1>
         <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
           <LogOut className="h-5 w-5" />
@@ -67,7 +231,7 @@ const AccountSettings = () => {
         </Button>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-8">
         {/* Account Details */}
         <Card>
           <CardContent className="p-6">
@@ -80,7 +244,7 @@ const AccountSettings = () => {
                 <label className="text-sm text-muted-foreground">Email</label>
                 <div className="flex items-center gap-2">
                   <Input value={userData.email} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('email')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => handleEdit('email')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -92,7 +256,7 @@ const AccountSettings = () => {
                 </label>
                 <div className="flex items-center gap-2">
                   <Input value={userData.phone} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('phone')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => handleEdit('phone')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -102,19 +266,8 @@ const AccountSettings = () => {
                 <label className="text-sm text-muted-foreground">Password</label>
                 <div className="flex items-center gap-2">
                   <Input type="password" value="••••••••" readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('password')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => setPasswordDialogOpen(true)} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold">
-                    {language === 'en' ? 'Insurance Company' : 'شركة التأمين'}
-                  </h3>
-                  <Button variant="ghost" onClick={handleAddInsurance} className="text-primary hover:text-primary">
-                    {language === 'en' ? 'Add' : 'إضافة'}
                   </Button>
                 </div>
               </div>
@@ -134,7 +287,7 @@ const AccountSettings = () => {
                 <label className="text-sm text-muted-foreground">Username</label>
                 <div className="flex items-center gap-2">
                   <Input value={userData.username} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('username')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => handleEdit('username')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -144,7 +297,7 @@ const AccountSettings = () => {
                 <label className="text-sm text-muted-foreground">Birthday</label>
                 <div className="flex items-center gap-2">
                   <Input value={userData.birthday} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('birthday')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => handleEdit('birthday')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -154,7 +307,7 @@ const AccountSettings = () => {
                 <label className="text-sm text-muted-foreground">Gender</label>
                 <div className="flex items-center gap-2">
                   <Input value={userData.gender} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('gender')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => handleEdit('gender')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -164,7 +317,7 @@ const AccountSettings = () => {
                 <label className="text-sm text-muted-foreground">Country</label>
                 <div className="flex items-center gap-2">
                   <Input value={userData.country} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleChange('country')} className="text-primary hover:text-primary">
+                  <Button variant="ghost" onClick={() => handleEdit('country')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -172,36 +325,156 @@ const AccountSettings = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Subscription */}
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold mb-6">
-              {language === 'en' ? 'My Subscription' : 'اشتراكي'}
-            </h2>
-            <div className="text-center py-8 text-muted-foreground">
-              {language === 'en' 
-                ? 'There is no subscription for this user' 
-                : 'لا يوجد اشتراك لهذا المستخدم'}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Wallet */}
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold mb-6">
-              {language === 'en' ? 'My Wallet' : 'محفظتي'}
-            </h2>
-            <div>
-              <label className="text-sm text-muted-foreground">
-                {language === 'en' ? 'Current Balance' : 'الرصيد الحالي'}
-              </label>
-              <Input value="0 EGP" readOnly className="bg-muted" />
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Password Change Dialog */}
+      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'en' ? 'Change Password' : 'تغيير كلمة المرور'}
+            </DialogTitle>
+            <DialogDescription>
+              {language === 'en' 
+                ? 'Enter your current password and choose a new one.' 
+                : 'أدخل كلمة المرور الحالية واختر كلمة مرور جديدة.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {language === 'en' ? 'Current Password' : 'كلمة المرور الحالية'}
+              </label>
+              <Input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {language === 'en' ? 'New Password' : 'كلمة المرور الجديدة'}
+              </label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {language === 'en' ? 'Confirm New Password' : 'تأكيد كلمة المرور الجديدة'}
+              </label>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPasswordDialogOpen(false);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+              }}
+              disabled={isSubmitting}
+            >
+              {language === 'en' ? 'Cancel' : 'إلغاء'}
+            </Button>
+            <Button
+              onClick={handlePasswordChange}
+              disabled={isSubmitting || !currentPassword || !newPassword || !confirmPassword}
+            >
+              {isSubmitting ? (
+                language === 'en' ? 'Updating...' : 'جارٍ التحديث...'
+              ) : (
+                language === 'en' ? 'Update Password' : 'تحديث كلمة المرور'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Field Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'en' 
+                ? `Update ${editField === 'email' ? 'Email' :
+                    editField === 'phone' ? 'Phone Number' :
+                    editField === 'username' ? 'Username' :
+                    editField === 'birthday' ? 'Birthday' :
+                    editField === 'gender' ? 'Gender' :
+                    editField === 'country' ? 'Country' : ''}`
+                : `تحديث ${editField === 'email' ? 'البريد الإلكتروني' :
+                    editField === 'phone' ? 'رقم الهاتف' :
+                    editField === 'username' ? 'اسم المستخدم' :
+                    editField === 'birthday' ? 'تاريخ الميلاد' :
+                    editField === 'gender' ? 'الجنس' :
+                    editField === 'country' ? 'البلد' : ''}`}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {editField === 'gender' ? (
+              <Select value={editValue} onValueChange={setEditValue}>
+                <SelectTrigger>
+                  <SelectValue placeholder={language === 'en' ? "Select gender" : "اختر الجنس"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">{language === 'en' ? "Male" : "ذكر"}</SelectItem>
+                  <SelectItem value="female">{language === 'en' ? "Female" : "أنثى"}</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : editField === 'birthday' ? (
+              <Input
+                type="date"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+              />
+            ) : (
+              <Input
+                type={editField === 'email' ? 'email' : 'text'}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+              />
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditDialogOpen(false);
+                setEditField(null);
+                setEditValue('');
+              }}
+              disabled={isSubmitting}
+            >
+              {language === 'en' ? 'Cancel' : 'إلغاء'}
+            </Button>
+            <Button
+              onClick={handleUpdateField}
+              disabled={isSubmitting || !editValue.trim()}
+            >
+              {isSubmitting ? (
+                language === 'en' ? 'Updating...' : 'جارٍ التحديث...'
+              ) : (
+                language === 'en' ? 'Update' : 'تحديث'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

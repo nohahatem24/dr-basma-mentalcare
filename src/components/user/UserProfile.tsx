@@ -443,8 +443,8 @@ const UserProfile = () => {
                         >
                           <Paperclip className="mr-1 h-4 w-4" />
                           {language === 'en' ? 'Send Message' : 'إرسال رسالة'}
-                        </Button>
-                      </div>
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
