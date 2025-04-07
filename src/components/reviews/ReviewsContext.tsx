@@ -31,11 +31,18 @@ export const ReviewsProvider = ({ children }: { children: ReactNode }) => {
       isRecommended: rating > 3,
     };
     
-    setReviews([newReview, ...reviews]);
+    // Add new review and sort by rating in descending order
+    setReviews(prevReviews => {
+      const updatedReviews = [...prevReviews, newReview];
+      return updatedReviews.sort((a, b) => b.rating - a.rating);
+    });
   };
 
   return (
-    <ReviewsContext.Provider value={{ reviews, addReview }}>
+    <ReviewsContext.Provider value={{ 
+      reviews: reviews.sort((a, b) => b.rating - a.rating), 
+      addReview 
+    }}>
       {children}
     </ReviewsContext.Provider>
   );

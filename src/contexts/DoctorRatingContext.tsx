@@ -23,12 +23,15 @@ interface DoctorRatingProviderProps {
 
 export const DoctorRatingProvider = ({ children }: DoctorRatingProviderProps) => {
   const [ratings, setRatings] = useState<number[]>([]);
-  const [averageRating, setAverageRating] = useState(4.9);
-  const [totalReviews, setTotalReviews] = useState(87);
+  const [averageRating, setAverageRating] = useState(5);
+  const [totalReviews, setTotalReviews] = useState(0);
 
   useEffect(() => {
-    // هنا يمكنك إضافة منطق لجلب التقييمات من قاعدة البيانات
-    // For now, we'll use the initial state
+    setTotalReviews(ratings.length);
+    if (ratings.length === 0) {
+      setAverageRating(5);
+      return;
+    }
     calculateAverageRating();
   }, [ratings]);
 
@@ -40,12 +43,11 @@ export const DoctorRatingProvider = ({ children }: DoctorRatingProviderProps) =>
   };
 
   const updateRating = (newRating: number) => {
-    setAverageRating(newRating);
+    setRatings(prev => [...prev, newRating]);
   };
 
   const addReview = (rating: number) => {
     setRatings(prev => [...prev, rating]);
-    setTotalReviews(prev => prev + 1);
   };
 
   return (

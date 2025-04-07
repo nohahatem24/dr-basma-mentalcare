@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Filter } from 'lucide-react';
 import { useLanguage } from '@/components/Header';
@@ -25,13 +24,14 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
   const getFilteredReviews = () => {
     switch(filter) {
       case 'highest':
+      case 'all':
         return [...reviews].sort((a, b) => b.rating - a.rating);
       case 'lowest':
         return [...reviews].sort((a, b) => a.rating - b.rating);
       case 'recent':
         return [...reviews].sort((a, b) => b.date.getTime() - a.date.getTime());
       default:
-        return reviews;
+        return [...reviews].sort((a, b) => b.rating - a.rating);
     }
   };
 
@@ -48,10 +48,10 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
             onChange={(e) => setFilter(e.target.value)}
             className="text-sm border rounded px-2 py-1"
           >
-            <option value="all">{language === 'en' ? 'All Reviews' : 'جميع المراجعات'}</option>
             <option value="highest">{language === 'en' ? 'Highest Rated' : 'أعلى تقييم'}</option>
-            <option value="lowest">{language === 'en' ? 'Lowest Rated' : 'أدنى تقييم'}</option>
             <option value="recent">{language === 'en' ? 'Most Recent' : 'الأحدث'}</option>
+            <option value="lowest">{language === 'en' ? 'Lowest Rated' : 'أدنى تقييم'}</option>
+            <option value="all">{language === 'en' ? 'All Reviews' : 'جميع المراجعات'}</option>
           </select>
         </div>
       </div>
