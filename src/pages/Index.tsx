@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Brain, Heart, LineChart, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
-import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
+import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
 
 const Index = () => {
   const { language } = useLanguage();
@@ -15,7 +15,7 @@ const Index = () => {
       icon: <Brain className="h-10 w-10 text-mindtrack-blue" />,
       title: language === 'en' ? 'Online Sessions' : 'جلسات عبر الإنترنت',
       description: language === 'en'
-        ? 'Book personalized online sessions with Dr. Bassma to address your mental health needs from the comfort of your home.'
+        ? 'Book personalized online sessions with Dr. Basma to address your mental health needs from the comfort of your home.'
         : 'احجز جلسات شخصية عبر الإنترنت مع الدكتورة بسمة لتلبية احتياجات صحتك النفسية من راحة منزلك.',
     },
     {
@@ -52,7 +52,7 @@ const Index = () => {
           </h2>
           <p className="text-muted-foreground">
             {language === 'en'
-              ? 'MindTrack provides you with tools and insights to understand your emotional patterns and improve your mental well-being under the guidance of Dr. Bassma Adel.'
+              ? 'MindTrack provides you with tools and insights to understand your emotional patterns and improve your mental well-being under the guidance of Dr. Basma Adel.'
               : 'يوفر مايند تراك لك الأدوات والرؤى لفهم أنماطك العاطفية وتحسين صحتك النفسية تحت إشراف الدكتورة بسمة عادل.'}
           </p>
         </div>
@@ -77,11 +77,11 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6 header-gradient">
-                {language === 'en' ? 'Meet Dr. Bassma Adel' : 'تعرف على د. بسمة عادل'}
+                {language === 'en' ? 'Meet Dr. Basma Adel' : 'تعرف على د. بسمة عادل'}
               </h2>
               <p className="text-muted-foreground mb-6">
                 {language === 'en'
-                  ? 'Specialized in anxiety, depression, family counseling, and more. Dr. Bassma combines her expertise in positive psychology with clinical experience to provide compassionate mental health care.'
+                  ? 'Specialized in anxiety, depression, family counseling, and more. Dr. Basma combines her expertise in positive psychology with clinical experience to provide compassionate mental health care.'
                   : 'متخصصة في القلق والاكتئاب والاستشارات العائلية والمزيد. تجمع د. بسمة بين خبرتها في علم النفس الإيجابي والخبرة السريرية لتقديم رعاية صحية نفسية رحيمة.'}
               </p>
               <ul className="space-y-2 mb-6">
@@ -99,13 +99,13 @@ const Index = () => {
                 </li>
               </ul>
               <Button asChild className="btn-secondary">
-                <Link to="/about">{language === 'en' ? 'Learn More About Dr. Bassma' : 'تعرف أكثر على د. بسمة'}</Link>
+                <Link to="/about">{language === 'en' ? 'Learn More About Dr. Basma' : 'تعرف أكثر على د. بسمة'}</Link>
               </Button>
             </div>
             <div className="relative rounded-xl overflow-hidden">
               <img 
-                src={BassmaAdelImage} 
-                alt={language === 'en' ? 'Dr. Bassma Adel' : 'د. بسمة عادل'} 
+                src={BasmaAdelImage} 
+                alt={language === 'en' ? 'Dr. Basma Adel' : 'د. بسمة عادل'} 
                 className="h-full w-full object-cover" 
               />
             </div>

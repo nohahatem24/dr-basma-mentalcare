@@ -62,7 +62,7 @@ const ChatSupport = () => {
         const therapistMessage = {
           id: Date.now().toString(),
           text: language === 'en'
-            ? 'Dr. Bassma has replied to your message. Click to view.'
+            ? 'Dr. Basma has replied to your message. Click to view.'
             : 'لقد ردت د. بسمة على رسالتك. انقر للعرض.',
           sender: 'agent' as const,
           timestamp: new Date()
@@ -70,7 +70,7 @@ const ChatSupport = () => {
         
         addNotification({
           message: language === 'en' 
-            ? 'Dr. Bassma: Thanks for reaching out. How are you feeling today?'
+            ? 'Dr. Basma: Thanks for reaching out. How are you feeling today?'
             : 'د. بسمة: شكراً للتواصل. كيف تشعر اليوم؟',
           type: 'message'
         });
@@ -120,12 +120,12 @@ const ChatSupport = () => {
           description: language === 'en' ? 'A human agent will assist you soon.' : 'سيقوم أحد المختصين بمساعدتك قريبًا.',
         });
         
-        // Add notification for when the user is requesting to speak with Dr. Bassma
+        // Add notification for when the user is requesting to speak with Dr. Basma
         setTimeout(() => {
           if (!isOpen) {
             addNotification({
               message: language === 'en' 
-                ? 'Dr. Bassma will review your message soon'
+                ? 'Dr. Basma will review your message soon'
                 : 'ستقوم د. بسمة بمراجعة رسالتك قريبًا',
               type: 'message'
             });
@@ -139,7 +139,7 @@ const ChatSupport = () => {
           : "فريقنا لا يزال يعمل على طلبك السابق. سيرد عليك أحد المختصين في أقرب وقت ممكن.";
       } else {
         responseText = language === 'en' 
-          ? "Thank you for your message. Is there anything specific about Dr. Bassma's services you'd like to know?"
+          ? "Thank you for your message. Is there anything specific about Dr. Basma's services you'd like to know?"
           : "شكراً لرسالتك. هل هناك أي شيء محدد حول خدمات د. بسمة ترغب في معرفته؟";
       }
       

@@ -51,13 +51,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, renderStars }) => {
         {review.isRecommended && (
           <div className="flex items-center gap-1 text-green-600 text-sm mb-3">
             <ThumbsUp className="h-4 w-4" />
-            <span>{language === 'en' ? 'Recommends Dr. Bassma' : 'يوصي بالدكتورة بسمة'}</span>
+            <span>{language === 'en' ? 'Recommends Dr. Basma' : 'يوصي بالدكتورة بسمة'}</span>
           </div>
         )}
         
         {review.reply && (
           <div className="bg-muted/40 p-3 rounded text-sm mt-3">
-            <p className="font-medium mb-1">{language === 'en' ? 'Dr. Bassma replied:' : 'رد الدكتورة بسمة:'}</p>
+            <p className="font-medium mb-1">{language === 'en' ? 'Dr. Basma replied:' : 'رد الدكتورة بسمة:'}</p>
             <p className="text-muted-foreground">{review.reply}</p>
           </div>
         )}

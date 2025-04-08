@@ -14,7 +14,7 @@ import { Star, Video, Clock, Calendar as CalendarIcon, CheckCircle } from 'lucid
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
-import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
+import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 
 const DoctorProfile = () => {
@@ -169,7 +169,7 @@ const DoctorProfile = () => {
         startTime: format(startTime, 'hh:mm a'),
         endTime: format(endTime, 'hh:mm a'),
         duration: selectedDuration,
-        doctorName: "Dr. Bassma Adel",
+        doctorName: "Dr. Basma Adel",
         fee: getFeeByDuration(selectedDuration, false),
         appointmentType: "standard",
         currency: "EGP"
@@ -262,7 +262,7 @@ const DoctorProfile = () => {
 
     navigate('/payment', { 
       state: { 
-        doctorName: "Dr. Bassma Adel",
+        doctorName: "Dr. Basma Adel",
         fee: 260, // Fixed price for immediate sessions
         duration: '30', // Only 30 minutes for immediate sessions
         appointmentType: "immediate",
@@ -275,10 +275,10 @@ const DoctorProfile = () => {
   };
 
   const doctorInfo = {
-    name: language === 'en' ? "Dr. Bassma Adel" : "د. بسمة عادل",
+    name: language === 'en' ? "Dr. Basma Adel" : "د. بسمة عادل",
     title: language === 'en' ? "Clinical Psychologist" : "أخصائية نفسية سريرية",
     bio: language === 'en'
-      ? `Dr. Bassma Adel is a licensed clinical psychologist with over ${calculateExperienceYears()} years of experience, specializing in cognitive-behavioral therapy (CBT), anxiety disorders, depression, and personality disorders. She has helped numerous patients improve their mental well-being through evidence-based therapy.`
+      ? `Dr. Basma Adel is a licensed clinical psychologist with over ${calculateExperienceYears()} years of experience, specializing in cognitive-behavioral therapy (CBT), anxiety disorders, depression, and personality disorders. She has helped numerous patients improve their mental well-being through evidence-based therapy.`
       : `د. بسمة عادل هي أخصائية نفسية سريرية مرخصة تتمتع بخبرة تزيد عن ${calculateExperienceYears()} سنوات، متخصصة في العلاج المعرفي السلوكي (CBT)، واضطرابات القلق، والاكتئاب، والاكتئاب، واضطرابات الشخصية. ساعدت العديد من المرضى على تحسين صحتهم النفسية من خلال العلاج القائم على الأدلة.`,
     certifications: [
       language === 'en' ? "Master's in Positive Psychology – Mansoura University" : "ماجستير في علم النفس الإيجابي - جامعة المنصورة",
@@ -297,7 +297,7 @@ const DoctorProfile = () => {
           <Card className="col-span-1">
             <CardHeader className="text-center">
               <Avatar className="h-24 w-24 mx-auto">
-                <img src={BassmaAdelImage} alt={doctorInfo.name} className="h-full w-full object-cover" />
+                <img src={BasmaAdelImage} alt={doctorInfo.name} className="h-full w-full object-cover" />
               </Avatar>
               
               <CardTitle className="mt-4">{doctorInfo.name}</CardTitle>
@@ -357,7 +357,7 @@ const DoctorProfile = () => {
               </CardTitle>
               <CardDescription className="text-lg text-muted-foreground">
                 {language === 'en' 
-                  ? "Select a date and time for your session with Dr. Bassma" 
+                  ? "Select a date and time for your session with Dr. Basma" 
                   : "اختر تاريخًا ووقتًا لجلستك مع الدكتورة بسمة"}
               </CardDescription>
             </CardHeader>
@@ -611,7 +611,7 @@ const DoctorProfile = () => {
                       
                       <p className="text-sm text-muted-foreground">
                         {language === 'en' 
-                          ? "Dr. Bassma will review your request and confirm if she can accommodate your preferred time." 
+                          ? "Dr. Basma will review your request and confirm if she can accommodate your preferred time." 
                             : "ستراجع د. بسمة طلبك وتؤكد ما إذا كان بإمكانها استيعاب الوقت المفضل لديك."}
                         </p>
 
@@ -635,7 +635,7 @@ const DoctorProfile = () => {
               <CardTitle>{language === 'en' ? "Patient Reviews" : "آراء المرضى"}</CardTitle>
               <CardDescription>
                 {language === 'en' 
-                  ? "See what other patients are saying about Dr. Bassma" 
+                  ? "See what other patients are saying about Dr. Basma" 
                   : "انظر ماذا يقول المرضى الآخرون عن الدكتورة بسمة"}
               </CardDescription>
             </CardHeader>

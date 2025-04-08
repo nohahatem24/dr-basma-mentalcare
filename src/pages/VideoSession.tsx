@@ -52,7 +52,7 @@ const VideoSession = () => {
               </h2>
               <p className="text-muted-foreground mb-6">
                 {language === 'en' 
-                  ? "Your session with Dr. Bassma Adel has ended" 
+                  ? "Your session with Dr. Basma Adel has ended" 
                   : "انتهت جلستك مع الدكتورة بسمة عادل"}
               </p>
               <Button 
@@ -65,7 +65,7 @@ const VideoSession = () => {
           ) : (
             <div className="h-[70vh]">
               <VideoCall 
-                doctorName="Dr. Bassma Adel"
+                doctorName="Dr. Basma Adel"
                 onEndCall={handleEndCall}
               />
             </div>
@@ -82,7 +82,7 @@ const VideoSession = () => {
             </DialogTitle>
             <DialogDescription>
               {language === 'en' 
-                ? "How was your experience with Dr. Bassma Adel?" 
+                ? "How was your experience with Dr. Basma Adel?" 
                 : "كيف كانت تجربتك مع الدكتورة بسمة عادل؟"}
             </DialogDescription>
           </DialogHeader>

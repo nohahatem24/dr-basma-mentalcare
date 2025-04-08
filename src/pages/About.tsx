@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BassmaAdelImage from '@/assets/images/BassmaAdel.jpg';
+import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
 import DoctorReviews from '@/components/DoctorReviews';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 
@@ -28,14 +28,14 @@ const About = () => {
   return (
     <div className="container py-12">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 header-gradient text-center">About Dr. Bassma Adel</h1>
+        <h1 className="text-4xl font-bold mb-8 header-gradient text-center">About Dr. Basma Adel</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="col-span-1">
             <div className="aspect-square rounded-xl overflow-hidden">
               <img 
-                src={BassmaAdelImage} 
-                alt="Dr. Bassma Adel" 
+                src={BasmaAdelImage} 
+                alt="Dr. Basma Adel" 
                 className="h-full w-full object-cover" 
               />
             </div>
@@ -44,7 +44,7 @@ const About = () => {
           <div className="col-span-2">
             <h2 className="text-2xl font-semibold mb-4">Professional Profile</h2>
             <p className="mb-4 text-muted-foreground">
-              Dr. Bassma Adel is a dedicated mental health professional specializing in various psychological 
+              Dr. Basma Adel is a dedicated mental health professional specializing in various psychological 
               treatments and therapies. With years of experience and comprehensive training, she is committed 
               to helping individuals navigate their mental health journey with compassion and expertise.
             </p>
@@ -209,7 +209,7 @@ const About = () => {
         <div className="text-center">
           <h2 className="text-2xl font-semibold mb-4 header-gradient">Professional Philosophy</h2>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Dr. Bassma believes in a holistic approach to mental health that considers each 
+            Dr. Basma believes in a holistic approach to mental health that considers each 
             individual's unique circumstances, challenges, and strengths. Her goal is to 
             empower patients with the tools and insights they need to navigate life's challenges 
             and achieve emotional well-being.

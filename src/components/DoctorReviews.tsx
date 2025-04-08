@@ -46,7 +46,7 @@ const DoctorReviews = () => {
         </CardTitle>
         <CardDescription>
           {language === 'en'
-            ? 'Read what others are saying about Dr. Bassma\'s services'
+            ? 'Read what others are saying about Dr. Basma\'s services'
             : 'اقرأ ما يقوله الآخرون عن خدمات الدكتورة بسمة'}
         </CardDescription>
       </CardHeader>

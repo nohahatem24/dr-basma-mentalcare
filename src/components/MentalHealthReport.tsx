@@ -76,15 +76,13 @@ const MentalHealthReport = () => {
   const handleSendReport = () => {
     toast({
       title: language === 'en' ? 'Report Sent' : 'تم إرسال التقرير',
-      description: language === 'en' ? 'Your report has been sent to Dr. Bassma.' : 'تم إرسال تقريرك إلى الدكتورة بسمة.',
+      description: language === 'en' ? 'Your report has been sent to Dr. Basma.' : 'تم إرسال تقريرك إلى الدكتورة بسمة.',
     });
   };
   
   const formatDate = (date: Date | undefined) => {
     if (!date) return '';
-    return format(date, 'PPP', {
-      locale: language === 'ar' ? ar : undefined,
-    });
+    return format(date, 'PPP');
   };
 
   return (

@@ -52,12 +52,12 @@ const BookAppointment = () => {
       
       // Simulate fetching slots from the database
       const mockTimeSlots: TimeSlot[] = [
-        { id: '1', date: formattedDate, time: '09:00 AM', isAvailable: true, doctorId: 'dr-bassma' },
-        { id: '2', date: formattedDate, time: '10:00 AM', isAvailable: true, doctorId: 'dr-bassma' },
-        { id: '3', date: formattedDate, time: '11:00 AM', isAvailable: false, doctorId: 'dr-bassma' },
-        { id: '4', date: formattedDate, time: '01:00 PM', isAvailable: true, doctorId: 'dr-bassma' },
-        { id: '5', date: formattedDate, time: '02:00 PM', isAvailable: true, doctorId: 'dr-bassma' },
-        { id: '6', date: formattedDate, time: '03:00 PM', isAvailable: false, doctorId: 'dr-bassma' },
+        { id: '1', date: formattedDate, time: '09:00 AM', isAvailable: true, doctorId: 'dr-Basma' },
+        { id: '2', date: formattedDate, time: '10:00 AM', isAvailable: true, doctorId: 'dr-Basma' },
+        { id: '3', date: formattedDate, time: '11:00 AM', isAvailable: false, doctorId: 'dr-Basma' },
+        { id: '4', date: formattedDate, time: '01:00 PM', isAvailable: true, doctorId: 'dr-Basma' },
+        { id: '5', date: formattedDate, time: '02:00 PM', isAvailable: true, doctorId: 'dr-Basma' },
+        { id: '6', date: formattedDate, time: '03:00 PM', isAvailable: false, doctorId: 'dr-Basma' },
       ];
       
       setTimeSlots(mockTimeSlots);
@@ -177,7 +177,7 @@ const BookAppointment = () => {
               appointment={{
                 date: selectedSlot.date,
                 time: selectedSlot.time,
-                doctorName: 'Dr. Bassma Adel',
+                doctorName: 'Dr. Basma Adel',
                 fee: 120
               }} 
             />
@@ -193,6 +193,7 @@ const BookAppointment = () => {
               isProcessing={isProcessing}
               handleBookingComplete={handleBookingComplete}
               fee={120}
+              currency="EGP"
             />
           )}
         </div>

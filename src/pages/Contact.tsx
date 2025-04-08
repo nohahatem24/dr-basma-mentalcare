@@ -11,9 +11,9 @@ const Contact = () => {
   return (
     <div className="container py-12">
       <div className="max-w-4xl mx-auto text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4 header-gradient">Contact Dr. Bassma</h1>
+        <h1 className="text-4xl font-bold mb-4 header-gradient">Contact Dr. </h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Have questions or want to inquire about Dr. Bassma's services? Use our secure messaging 
+          Have questions or want to inquire about Dr. 's services? Use our secure messaging 
           system or contact information below to get in touch.
         </p>
       </div>
@@ -29,7 +29,7 @@ const Contact = () => {
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              Send a secure message to Dr. Bassma through our platform's 
+              Send a secure message to Dr.  through our platform's 
               encrypted messaging system.
             </p>
             <Button className="btn-primary" size="sm" asChild>
@@ -50,8 +50,8 @@ const Contact = () => {
             <p className="text-sm text-muted-foreground mb-4">
               For general inquiries or information, you can send an email to:
             </p>
-            <a href="mailto:info@drbassma.com" className="text-primary hover:underline">
-              info@drbassma.com
+            <a href="mailto:info@drbasma.com" className="text-primary hover:underline">
+              info@drbasma.com
             </a>
           </CardContent>
         </Card>
@@ -128,7 +128,7 @@ const Contact = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Dr. Bassma's consultation hours vary. Please contact us through the messaging 
+                Dr. basma's consultation hours vary. Please contact us through the messaging 
                 system to inquire about availability.
               </p>
             </CardContent>
@@ -162,7 +162,7 @@ const Contact = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Yes, Dr. Bassma offers both in-person and online consultations depending on your needs.
+                Yes, Dr. basma offers both in-person and online consultations depending on your needs.
               </p>
             </CardContent>
           </Card>

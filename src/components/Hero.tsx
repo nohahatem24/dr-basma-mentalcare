@@ -22,14 +22,14 @@ const Hero = () => {
       title: language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية',
       subtitle: language === 'en' ? 'Evidence-based CBT techniques' : 'تقنيات العلاج المعرفي السلوكي المستندة إلى الأدلة',
       description: language === 'en'
-        ? 'Practice proven exercises from Dr. Bassma\'s therapeutic methods to improve your mental well-being.'
+        ? 'Practice proven exercises from Dr. Basma\'s therapeutic methods to improve your mental well-being.'
         : 'ممارسة التمارين المثبتة من أساليب الدكتورة بسمة العلاجية لتحسين صحتك النفسية.',
     },
     {
       title: language === 'en' ? 'Online Sessions' : 'الجلسات عبر الإنترنت',
-      subtitle: language === 'en' ? 'Connect with Dr. Bassma from anywhere' : 'تواصل مع د. بسمة من أي مكان',
+      subtitle: language === 'en' ? 'Connect with Dr. Basma from anywhere' : 'تواصل مع د. بسمة من أي مكان',
       description: language === 'en'
-        ? 'Book secure video sessions with Dr. Bassma and receive professional mental health support from the comfort of your home.'
+        ? 'Book secure video sessions with Dr. Basma and receive professional mental health support from the comfort of your home.'
         : 'احجز جلسات فيديو آمنة مع د. بسمة واحصل على دعم الصحة النفسية المهني من راحة منزلك.',
     },
   ], [language]);
@@ -56,7 +56,7 @@ const Hero = () => {
             </h1>
             <p className="text-xl text-muted-foreground">
               {language === 'en'
-                ? 'Welcome to Dr. Bassma Mental Care. Track your emotional well-being and get personalized insights for better mental health.'
+                ? 'Welcome to Dr. Basma Mental Care. Track your emotional well-being and get personalized insights for better mental health.'
                 : 'مرحبًا بك في مركز د. بسمة للرعاية النفسية. تتبع صحتك العاطفية واحصل على رؤى مخصصة لصحة نفسية أفضل.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">

@@ -54,7 +54,7 @@ const Header = () => {
           <div className="flex items-center justify-between w-full">
             <Link to="/" className="flex items-center gap-2">
               <span className="font-montserrat text-xl font-bold header-gradient">
-                {language === 'en' ? 'Dr. Bassma Mental Care' : 'د. بسمة للرعاية النفسية'}
+                {language === 'en' ? 'Dr. Basma Mental Care' : 'د. بسمة للرعاية النفسية'}
               </span>
             </Link>
 

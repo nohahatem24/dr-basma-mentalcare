@@ -42,7 +42,7 @@ const TherapyExercises = () => {
         </CardTitle>
         <CardDescription>
           {language === 'en' 
-            ? 'Practice mental health exercises recommended by Dr. Bassma' 
+            ? 'Practice mental health exercises recommended by Dr. Basma' 
             : 'مارس تمارين الصحة النفسية الموصى بها من قبل د. بسمة'}
         </CardDescription>
       </CardHeader>

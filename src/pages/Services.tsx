@@ -73,7 +73,7 @@ const Services = () => {
       <div className="max-w-4xl mx-auto text-center mb-12">
         <h1 className="text-4xl font-bold mb-4 header-gradient">Our Services</h1>
         <p className="text-muted-foreground">
-          Dr. Bassma Adel offers a range of mental health services to support you on your journey to emotional well-being.
+          Dr. Basma Adel offers a range of mental health services to support you on your journey to emotional well-being.
           Each service is delivered with compassion, expertise, and a commitment to your individual needs.
         </p>
       </div>
@@ -113,7 +113,7 @@ const Services = () => {
             </div>
           </div>
           <Button className="btn-primary" asChild>
-            <Link to="/contact">Contact Dr. Bassma</Link>
+            <Link to="/contact">Contact Dr. Basma</Link>
           </Button>
         </div>
       </div>
@@ -124,14 +124,14 @@ const Services = () => {
           <div className="bg-card rounded-lg p-6 shadow-sm">
             <h3 className="font-medium mb-2">What is the MindTrack platform?</h3>
             <p className="text-sm text-muted-foreground">
-              MindTrack is Dr. Bassma's digital mental health platform that allows you to track your mood, 
+              MindTrack is Dr. Basma's digital mental health platform that allows you to track your mood, 
               journal your thoughts, identify emotional triggers, and receive AI-powered insights based on your data.
             </p>
           </div>
           <div className="bg-card rounded-lg p-6 shadow-sm">
             <h3 className="font-medium mb-2">How is my privacy protected?</h3>
             <p className="text-sm text-muted-foreground">
-              Your data is securely encrypted and only accessible to you and Dr. Bassma. We follow strict 
+              Your data is securely encrypted and only accessible to you and Dr. Basma. We follow strict 
               confidentiality protocols to ensure your information remains private.
             </p>
           </div>
@@ -143,9 +143,9 @@ const Services = () => {
             </p>
           </div>
           <div className="bg-card rounded-lg p-6 shadow-sm">
-            <h3 className="font-medium mb-2">What therapeutic approaches does Dr. Bassma use?</h3>
+            <h3 className="font-medium mb-2">What therapeutic approaches does Dr. Basma use?</h3>
             <p className="text-sm text-muted-foreground">
-              Dr. Bassma utilizes various evidence-based approaches including Cognitive-Behavioral Therapy (CBT), 
+              Dr. Basma utilizes various evidence-based approaches including Cognitive-Behavioral Therapy (CBT), 
               positive psychology techniques, and personalized treatment plans based on individual needs.
             </p>
           </div>

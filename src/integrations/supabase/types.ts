@@ -270,6 +270,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sessions: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          start_time: string
+          end_time: string
+          duration: '30' | '60'
+          type: 'video' | 'in-person'
+          status: 'completed' | 'upcoming' | 'cancelled'
+          notes?: string
+          fee: number
+          created_at?: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          date: string
+          start_time: string
+          end_time: string
+          duration: '30' | '60'
+          type: 'video' | 'in-person'
+          status: 'completed' | 'upcoming' | 'cancelled'
+          notes?: string
+          fee: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          date?: string
+          start_time?: string
+          end_time?: string
+          duration?: '30' | '60'
+          type?: 'video' | 'in-person'
+          status?: 'completed' | 'upcoming' | 'cancelled'
+          notes?: string
+          fee?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

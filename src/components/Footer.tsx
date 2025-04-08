@@ -12,7 +12,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4 header-gradient">
-              {language === 'en' ? 'Dr. Bassma Mental Care' : 'د. بسمة للرعاية النفسية'}
+              {language === 'en' ? 'Dr. Basma Mental Care' : 'د. بسمة للرعاية النفسية'}
             </h3>
             <p className="text-muted-foreground text-sm mb-4">
               {language === 'en' 
@@ -60,7 +60,7 @@ const Footer = () => {
             </h4>
             <address className="not-italic text-sm text-muted-foreground">
               <p className="mb-2">
-                {language === 'en' ? 'Email: info@drbassma.com' : 'البريد الإلكتروني: info@drbassma.com'}
+                {language === 'en' ? 'Email: info@drbasma.com' : 'البريد الإلكتروني: info@drbasma.com'}
               </p>
               <p className="mb-2">
                 {language === 'en' ? 'Phone: +123 456 7890' : 'الهاتف: +123 456 7890'}
@@ -91,7 +91,7 @@ const Footer = () => {
         <div className="mt-8 border-t pt-4 text-center">
           <p className="text-xs text-muted-foreground">
             {language === 'en' 
-              ? `© ${new Date().getFullYear()} Dr. Bassma Mental Care. All rights reserved.`
+              ? `© ${new Date().getFullYear()} Dr. Basma Mental Care. All rights reserved.`
               : `© ${new Date().getFullYear()} د. بسمة للرعاية النفسية. جميع الحقوق محفوظة.`}
           </p>
         </div>

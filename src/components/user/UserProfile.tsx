@@ -11,20 +11,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
-interface Session {
-  id: string;
-  user_id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  duration: '30' | '60';
-  type: 'video' | 'in-person';
-  status: 'completed' | 'upcoming' | 'cancelled';
-  notes?: string;
-  fee: number;
-  created_at?: string;
-}
+type Session = Database['public']['Tables']['sessions']['Row'];
 
 interface UserData {
   email: string;
@@ -82,7 +71,7 @@ const UserProfile = () => {
           .order('date', { ascending: true });
 
         if (error) throw error;
-        setSessions(data || []);
+        setSessions(data as Session[]);
       } catch (error) {
         console.error('Error fetching sessions:', error);
         toast({
@@ -110,7 +99,7 @@ const UserProfile = () => {
         if (!user) return;
 
         const booking = location.state.newBooking;
-        const newSession: Omit<Session, 'id'> = {
+        const newSession: Database['public']['Tables']['sessions']['Insert'] = {
           user_id: user.id,
           date: format(new Date(booking.date), 'yyyy-MM-dd'),
           start_time: booking.startTime,
@@ -135,7 +124,7 @@ const UserProfile = () => {
           .order('date', { ascending: true });
 
         if (fetchError) throw fetchError;
-        setSessions(data || []);
+        setSessions(data as Session[]);
 
         // Clear location state and navigate to profile
         window.history.replaceState({}, document.title);
@@ -281,8 +270,8 @@ const UserProfile = () => {
         title: language === 'en' ? "Message Sent" : "تم إرسال الرسالة",
         description: language === 'en' 
           ? attachment 
-            ? "Your attachment and note have been sent to Dr. Bassma" 
-            : "Your message has been sent to Dr. Bassma"
+            ? "Your attachment and note have been sent to Dr. Basma" 
+            : "Your message has been sent to Dr. Basma"
           : attachment 
             ? "تم إرسال المرفق والملاحظة إلى د. بسمة" 
             : "تم إرسال رسالتك إلى د. بسمة",
@@ -377,7 +366,7 @@ const UserProfile = () => {
                   <div className="absolute top-0 right-0 w-2 h-full bg-green-500"></div>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center justify-between">
-                    <span>{language === 'en' ? 'Session with Dr. Bassma' : 'جلسة مع د. بسمة'}</span>
+                    <span>{language === 'en' ? 'Session with Dr. Basma' : 'جلسة مع د. بسمة'}</span>
                       <span className="text-sm font-normal bg-primary/10 text-primary py-1 px-2 rounded-full">
                         {session.fee} {language === 'en' ? 'EGP' : 'جنيه'}
                       </span>
@@ -479,7 +468,7 @@ const UserProfile = () => {
                   <div className="absolute top-0 right-0 w-2 h-full bg-gray-400"></div>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center justify-between">
-                    <span>{language === 'en' ? 'Session with Dr. Bassma' : 'جلسة مع د. بسمة'}</span>
+                    <span>{language === 'en' ? 'Session with Dr. Basma' : 'جلسة مع د. بسمة'}</span>
                       <span className="text-sm font-normal bg-muted text-muted-foreground py-1 px-2 rounded-full">
                         {session.fee} {language === 'en' ? 'EGP' : 'جنيه'}
                       </span>
@@ -649,7 +638,7 @@ const UserProfile = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {language === 'en' ? 'Send Message to Dr. Bassma' : 'إرسال رسالة إلى د. بسمة'}
+              {language === 'en' ? 'Send Message to Dr. Basma' : 'إرسال رسالة إلى د. بسمة'}
             </DialogTitle>
             <DialogDescription>
               {language === 'en' 
@@ -696,7 +685,7 @@ const UserProfile = () => {
                 value={attachmentNote}
                 onChange={(e) => setAttachmentNote(e.target.value)}
                 placeholder={language === 'en' 
-                  ? 'Write a message to Dr. Bassma' 
+                  ? 'Write a message to Dr. Basma' 
                   : 'اكتب رسالة إلى د. بسمة'}
                 rows={3}
               />

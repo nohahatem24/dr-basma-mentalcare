@@ -25,7 +25,7 @@ interface VideoCallProps {
 
 const VideoCall: React.FC<VideoCallProps> = ({ 
   sessionId = "session-123", 
-  doctorName = "Dr. Bassma Adel",
+  doctorName = "Dr. Basma Adel",
   onEndCall = () => {}
 }) => {
   const { language } = useLanguage();

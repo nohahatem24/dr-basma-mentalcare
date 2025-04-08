@@ -69,7 +69,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, onCancel }) => {
         <Textarea 
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder={language === 'en' ? 'Share your experience with Dr. Bassma...' : 'شارك تجربتك مع الدكتورة بسمة...'}
+          placeholder={language === 'en' ? 'Share your experience with Dr. Basma...' : 'شارك تجربتك مع الدكتورة بسمة...'}
           className="h-32"
         />
       </div>
