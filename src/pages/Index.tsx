@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Brain, Heart, LineChart, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
-import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
+import BasmaAdelImage from '@/assets/images/BasmaAdel3.jpg';
 
 const Index = () => {
   const { language } = useLanguage();

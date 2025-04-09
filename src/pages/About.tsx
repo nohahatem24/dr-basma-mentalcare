@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
+import BasmaAdelImage from '@/assets/images/BasmaAdel2.jpg';
 import DoctorReviews from '@/components/DoctorReviews';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 

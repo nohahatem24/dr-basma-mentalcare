@@ -14,7 +14,7 @@ import { Star, Video, Clock, Calendar as CalendarIcon, CheckCircle } from 'lucid
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
-import BasmaAdelImage from '@/assets/images/BasmaAdel.jpg';
+import BasmaAdelImage from '@/assets/images/BasmaAdel2.jpg';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 
 const DoctorProfile = () => {
