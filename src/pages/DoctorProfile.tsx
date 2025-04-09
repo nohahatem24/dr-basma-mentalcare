@@ -24,7 +24,7 @@ const DoctorProfile = () => {
   const { averageRating, totalReviews, addReview, updateRating } = useDoctorRating();
   
   const calculateExperienceYears = () => {
-    const startYear = 2016;
+    const startYear = 2014;
     const currentYear = new Date().getFullYear();
     return currentYear - startYear;
   };

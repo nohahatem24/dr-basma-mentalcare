@@ -60,7 +60,7 @@ const About = () => {
           {/* Years of Experience */}
           <div className="p-6 rounded-lg bg-primary/10 text-center">
             <h3 className="text-4xl font-bold text-primary">
-              {new Date().getFullYear() - 2016}+
+              {new Date().getFullYear() - 2014}+
             </h3>
             <p className="text-muted-foreground">Years of Experience</p>
           </div>
