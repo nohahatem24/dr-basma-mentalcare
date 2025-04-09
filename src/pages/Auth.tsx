@@ -36,7 +36,7 @@ const Auth = () => {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            {language === 'en' ? 'Welcome to Dr. Basma Mental Hub' : 'مرحبًا بك في مركز د. بسمة للصحة النفسية'}
+            {language === 'en' ? 'Welcome to Dr. Basma Mental Health' : 'مرحبًا بك في مركز د. بسمة للصحة النفسية'}
           </CardTitle>
           <CardDescription className="text-center">
             {language === 'en'

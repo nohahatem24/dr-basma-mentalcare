@@ -56,8 +56,8 @@ const Hero = () => {
             </h1>
             <p className="text-xl text-muted-foreground">
               {language === 'en'
-                ? 'Welcome to Dr. Basma Mental Care. Track your emotional well-being and get personalized insights for better mental health.'
-                : 'مرحبًا بك في مركز د. بسمة للرعاية النفسية. تتبع صحتك العاطفية واحصل على رؤى مخصصة لصحة نفسية أفضل.'}
+                ? 'Welcome to Dr. Basma Mental Health. Track your emotional well-being and get personalized insights for better mental health.'
+                : 'مرحبًا بك في مركز د. بسمة للصحة النفسية. تتبع صحتك العاطفية واحصل على رؤى مخصصة لصحة نفسية أفضل.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button className="btn-primary" size="lg" asChild>

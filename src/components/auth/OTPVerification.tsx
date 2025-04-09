@@ -42,7 +42,7 @@ const OTPVerification = ({ language, email, setOtpSent }: OTPVerificationProps) 
       
       toast({
         title: language === 'en' ? 'Successfully verified' : 'تم التحقق بنجاح',
-        description: language === 'en' ? 'Welcome to Dr. Basma Mental Hub!' : 'مرحبًا بك في مركز د. بسمة للصحة النفسية!',
+        description: language === 'en' ? 'Welcome to Dr. Basma Mental Health!' : 'مرحبًا بك في مركز د. بسمة للصحة النفسية!',
       });
       
       // Redirect to dashboard
