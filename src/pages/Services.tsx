@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,6 +48,16 @@ const services = [
     title: 'Cognitive-Behavioral Therapy',
     description: 'Structured approach to identifying and changing negative thought patterns and behaviors.',
     icon: '💭',
+  },
+  {
+    title: 'Dialectical Behavior Therapy (DBT)',
+    description: 'Skills-based therapy focusing on mindfulness, emotion regulation, distress tolerance, and interpersonal effectiveness.',
+    icon: '🎯',
+  },
+  {
+    title: 'Acceptance and Commitment Therapy (ACT)',
+    description: 'Helping clients accept difficult thoughts and feelings while committing to behavior change aligned with personal values.',
+    icon: '🌱',
   },
   {
     title: 'Post-Traumatic Stress Disorder',

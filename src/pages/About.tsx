@@ -120,6 +120,14 @@ const About = () => {
               <p className="text-sm text-muted-foreground">Cognitive-behavioral therapy</p>
             </div>
             <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Dialectical Behavior Therapy (DBT)</h3>
+              <p className="text-sm text-muted-foreground">Mindfulness, emotion regulation</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
+              <h3 className="font-medium">Acceptance and Commitment Therapy (ACT)</h3>
+              <p className="text-sm text-muted-foreground">Acceptance, behavior change</p>
+            </div>
+            <div className="p-4 rounded-lg bg-accent/10">
               <h3 className="font-medium">PTSD</h3>
               <p className="text-sm text-muted-foreground">Post-traumatic stress disorder</p>
             </div>
