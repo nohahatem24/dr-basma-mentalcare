@@ -38,6 +38,7 @@ const DoctorProfile = () => {
   const navigate = useNavigate();
   const { averageRating, totalReviews, addReview, updateRating } = useDoctorRating();
   const { theme } = useTheme();
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const doctorImage = theme === 'dark' ? BasmaAdelDarkImage : BasmaAdelLightImage;
   
   const calculateExperienceYears = () => {
@@ -307,16 +308,47 @@ const DoctorProfile = () => {
     reviewCount: totalReviews
   };
 
+  useEffect(() => {
+    // تحميل الصور مسبقاً
+    const preloadImages = async () => {
+      const images = [BasmaAdelLightImage, BasmaAdelDarkImage];
+      const imagePromises = images.map((src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+      });
+
+      try {
+        await Promise.all(imagePromises);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error('Error preloading images:', error);
+      }
+    };
+
+    preloadImages();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <Card className="col-span-1">
+          <Card className="col-span-1 lg:col-span-1">
             <CardHeader className="text-center">
-              <Avatar className="h-24 w-24 mx-auto">
-                <img src={doctorImage} alt={doctorInfo.name} className="h-full w-full object-cover" />
-              </Avatar>
-              
+              <div className="flex justify-center w-full mb-4">
+                <Avatar className="h-32 w-32 lg:h-24 lg:w-24">
+                  <img 
+                    src={doctorImage} 
+                    alt={doctorInfo.name} 
+                    className={`h-full w-full object-cover transition-opacity duration-300 ${
+                      imagesLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                </Avatar>
+              </div>
               <CardTitle className="mt-4">{doctorInfo.name}</CardTitle>
               <CardDescription>{doctorInfo.title}</CardDescription>
               
