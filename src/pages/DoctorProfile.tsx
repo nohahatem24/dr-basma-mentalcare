@@ -14,14 +14,31 @@ import { Star, Video, Clock, Calendar as CalendarIcon, CheckCircle } from 'lucid
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
-import BasmaAdelImage from '@/assets/images/BasmaAdel2.jpg';
+import BasmaAdelLightImage from '@/assets/images/BasmaAdelLight1.jpg';
+import BasmaAdelDarkImage from '@/assets/images/BasmaAdelDark1.jpg';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter as Router } from "react-router-dom";
+import { ThemeProvider, useTheme } from "@/hooks/use-theme";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ChatSupport from "@/components/ChatSupport";
+import BookingFloatingButton from "@/components/BookingFloatingButton";
+import ScrollToTop from "@/components/ScrollToTop";
+import AuthProvider from "@/components/auth/AuthProvider";
+import { ReviewsProvider } from "@/components/reviews/ReviewsContext";
+import AppRoutes from "@/routes/AppRoutes";
 
 const DoctorProfile = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { averageRating, totalReviews, addReview, updateRating } = useDoctorRating();
+  const { theme } = useTheme();
+  const doctorImage = theme === 'dark' ? BasmaAdelDarkImage : BasmaAdelLightImage;
   
   const calculateExperienceYears = () => {
     const startYear = 2014;
@@ -297,7 +314,7 @@ const DoctorProfile = () => {
           <Card className="col-span-1">
             <CardHeader className="text-center">
               <Avatar className="h-24 w-24 mx-auto">
-                <img src={BasmaAdelImage} alt={doctorInfo.name} className="h-full w-full object-cover" />
+                <img src={doctorImage} alt={doctorInfo.name} className="h-full w-full object-cover" />
               </Avatar>
               
               <CardTitle className="mt-4">{doctorInfo.name}</CardTitle>

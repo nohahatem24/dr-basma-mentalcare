@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/components/Header';
+import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentSummary from '@/components/booking/AppointmentSummary';
 import PaymentForm from '@/components/booking/PaymentForm';
+import BookingImageLight from '@/assets/images/BasmaAdelLight.jpg';
+import BookingImageDark from '@/assets/images/BasmaAdelDark.jpg';
 
 interface TimeSlot {
   id: string;
@@ -19,6 +22,7 @@ interface TimeSlot {
 
 const BookAppointment = () => {
   const { language } = useLanguage();
+  const { theme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -126,6 +130,13 @@ const BookAppointment = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="aspect-video rounded-lg overflow-hidden mb-4">
+              <img 
+                src={theme === 'dark' ? BookingImageDark : BookingImageLight} 
+                alt="Booking Session" 
+                className="h-full w-full object-cover" 
+              />
+            </div>
             {/* Calendar for date selection */}
             <Calendar
               mode="single"

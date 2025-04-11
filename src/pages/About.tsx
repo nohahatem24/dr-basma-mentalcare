@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BasmaAdelImage from '@/assets/images/BasmaAdel2.jpg';
+import BasmaAdelImageLight from '@/assets/images/BasmaAdelLight.jpg';
+import BasmaAdelImageDark from '@/assets/images/BasmaAdelDark.jpg';
 import DoctorReviews from '@/components/DoctorReviews';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
+import { useTheme } from '@/hooks/use-theme';
 
 type SessionsResponse = {
   count: number; 
@@ -11,6 +13,7 @@ type SessionsResponse = {
 const About = () => {
   const [sessionsCount, setSessionsCount] = useState(0); 
   const { averageRating } = useDoctorRating();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -34,7 +37,7 @@ const About = () => {
           <div className="col-span-1">
             <div className="aspect-square rounded-xl overflow-hidden">
               <img 
-                src={BasmaAdelImage} 
+                src={theme === 'dark' ? BasmaAdelImageDark : BasmaAdelImageLight} 
                 alt="Dr. Basma Adel" 
                 className="h-full w-full object-cover" 
               />
