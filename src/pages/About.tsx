@@ -34,12 +34,17 @@ const About = () => {
         <h1 className="text-4xl font-bold mb-8 header-gradient text-center">About Dr. Basma Adel</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-          <div className="col-span-1">
-            <div className="aspect-square rounded-xl overflow-hidden">
+          <div className="col-span-1 flex justify-center">
+            <div className="aspect-square rounded-xl overflow-hidden max-w-[280px] w-full relative">
               <img 
-                src={theme === 'dark' ? BasmaAdelImageDark : BasmaAdelImageLight} 
+                src={BasmaAdelImageLight}
                 alt="Dr. Basma Adel" 
-                className="h-full w-full object-cover" 
+                className={`h-full w-full object-cover absolute top-0 left-0 ${theme === 'dark' ? 'opacity-0' : 'opacity-100'}`}
+              />
+              <img 
+                src={BasmaAdelImageDark}
+                alt="Dr. Basma Adel" 
+                className={`h-full w-full object-cover absolute top-0 left-0 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
               />
             </div>
           </div>
