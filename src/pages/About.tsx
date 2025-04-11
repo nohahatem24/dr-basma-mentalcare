@@ -31,11 +31,11 @@ const About = () => {
   return (
     <div className="container py-12">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 header-gradient text-center">About Dr. Basma Adel</h1>
+        <h1 className="text-3xl font-bold mb-8 header-gradient text-center">About Dr. Basma Adel</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-          <div className="col-span-1 flex justify-center">
-            <div className="aspect-square rounded-xl overflow-hidden max-w-[280px] w-full relative">
+          <div className="col-span-1 mx-auto w-full flex items-center justify-center">
+            <div className="aspect-square rounded-xl overflow-hidden w-full max-w-[480px] sm:max-w-[300px] md:max-w-full relative">
               <img 
                 src={BasmaAdelImageLight}
                 alt="Dr. Basma Adel" 
