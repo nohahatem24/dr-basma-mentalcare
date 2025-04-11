@@ -337,9 +337,9 @@ const DoctorProfile = () => {
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <Card className="col-span-1 lg:col-span-1">
-            <CardHeader className="text-center">
+            <CardHeader className="text-center flex flex-col items-center">
               <div className="flex justify-center w-full mb-4">
-                <Avatar className="h-32 w-32 lg:h-24 lg:w-24">
+                <Avatar className="h-32 w-32 lg:h-24 lg:w-24 mx-auto">
                   <img 
                     src={doctorImage} 
                     alt={doctorInfo.name} 
