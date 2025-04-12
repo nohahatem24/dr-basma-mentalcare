@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
 import BasmaAdelLightImage from '@/assets/images/BasmaAdelLight1.jpg';
-import BasmaAdelDarkImage from '@/assets/images/BasmaAdelDark1.jpg';
+import BasmaAdelDarkImage from '@/assets/images/BasmaAdelDark.jpg';
 import { useDoctorRating } from '@/contexts/DoctorRatingContext';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
