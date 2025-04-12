@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -191,14 +190,26 @@ export const useUserSessions = (language: string) => {
     setRescheduleDialogOpen(true);
   };
 
-  const submitReschedule = () => {
+  const submitReschedule = async () => {
     if (!selectedSession) return;
     
     setIsSubmitting(true);
     
-    setTimeout(() => {
+    try {
+      // Update the session status to 'rescheduled'
+      const { error } = await supabase
+        .from('sessions')
+        .update({ 
+          status: 'rescheduled'
+        })
+        .eq('id', selectedSession.id);
+
+      if (error) throw error;
+
       setIsSubmitting(false);
       setRescheduleDialogOpen(false);
+      
+      // Navigate to booking page with rescheduling info
       navigate('/book-appointment', { 
         state: { 
           rescheduling: true, 
@@ -206,7 +217,17 @@ export const useUserSessions = (language: string) => {
           originalSession: selectedSession
         } 
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error updating session status:', error);
+      setIsSubmitting(false);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' 
+          ? 'Failed to reschedule your session' 
+          : 'فشل في إعادة جدولة جلستك',
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAttachment = (session: Session) => {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,13 +55,61 @@ const CreditCardForm: React.FC<CreditCardFormProps> = ({ cardInfo, onChange }) =
           <Label htmlFor="expiry">
             {language === 'en' ? "Expiry Date" : "تاريخ الانتهاء"}
           </Label>
-          <Input 
-            id="expiry"
-            name="expiry"
-            placeholder="MM/YY"
-            value={cardInfo.expiry}
-            onChange={onChange}
-          />
+          <div className="grid grid-cols-2 gap-2">
+            <select 
+              id="expiryMonth"
+              name="expiryMonth"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              onChange={(e) => {
+                const month = e.target.value.padStart(2, '0');
+                const year = cardInfo.expiry.split('/')[1] || '';
+                onChange({
+                  target: {
+                    name: 'expiry',
+                    value: `${month}/${year}`
+                  }
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+              value={cardInfo.expiry.split('/')[0] || ''}
+            >
+              <option value="" disabled>{language === 'en' ? 'MM' : 'شهر'}</option>
+              {Array.from({ length: 12 }, (_, i) => {
+                const month = String(i + 1).padStart(2, '0');
+                return (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
+                );
+              })}
+            </select>
+            
+            <select 
+              id="expiryYear"
+              name="expiryYear"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              onChange={(e) => {
+                const month = cardInfo.expiry.split('/')[0] || '';
+                const year = e.target.value.slice(-2);
+                onChange({
+                  target: {
+                    name: 'expiry',
+                    value: `${month}/${year}`
+                  }
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+              value={cardInfo.expiry.split('/')[1] ? `20${cardInfo.expiry.split('/')[1]}` : ''}
+            >
+              <option value="" disabled>{language === 'en' ? 'YY' : 'سنة'}</option>
+              {Array.from({ length: 10 }, (_, i) => {
+                const year = new Date().getFullYear() + i;
+                return (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
         
         <div className="space-y-2">

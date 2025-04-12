@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -67,18 +66,22 @@ export const usePaymentProcess = (appointmentDetails: AppointmentDetails) => {
         type: appointmentDetails.appointmentType === 'standard' ? 'video' : 'in-person',
         status: 'upcoming',
         fee: appointmentDetails.fee,
-        notes: appointmentDetails.notes || null
+        created_at: new Date().toISOString()
       };
       
       // Insert the session into Supabase
       const { data, error } = await supabase
         .from('sessions')
         .insert([newSession])
-        .select();
+        .select('*');
       
       if (error) throw error;
       
-      console.log('Session saved successfully:', data);
+      if (!data || data.length === 0) {
+        throw new Error('Failed to create session');
+      }
+      
+      console.log('Session saved successfully:', data[0]);
       
       setIsProcessing(false);
       setIsComplete(true);
@@ -92,13 +95,15 @@ export const usePaymentProcess = (appointmentDetails: AppointmentDetails) => {
       
       // After a short delay to allow users to see the confirmation screen
       setTimeout(() => {
-        // Navigate to profile with activeTab set to upcoming
+        // Navigate to profile with activeTab set to upcoming and trigger a refresh
         navigate('/profile', { 
           state: { 
-            activeTab: 'upcoming'
+            activeTab: 'upcoming',
+            newBooking: true,
+            sessionId: data[0].id
           }
         });
-      }, 3000);
+      }, 2000);
     } catch (error: any) {
       console.error('Error saving booking:', error);
       setIsProcessing(false);

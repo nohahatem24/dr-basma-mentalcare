@@ -96,7 +96,19 @@ const BookAppointment = () => {
     const duration = 60;
     const timeFormat = 'h:mm a';
     const startTime = selectedSlot.time;
-    const parsedStartTime = parse(startTime, timeFormat, new Date());
+    
+    // Create a date object for the selected slot
+    const today = new Date();
+    const [hours, minutes] = startTime.split(':').map((part, index) => {
+      if (index === 0) return parseInt(part);
+      return parseInt(part.split(' ')[0]);
+    });
+    const isPM = startTime.toLowerCase().includes('pm');
+    const parsedHours = isPM && hours !== 12 ? hours + 12 : hours;
+    const parsedStartTime = new Date(today);
+    parsedStartTime.setHours(parsedHours);
+    parsedStartTime.setMinutes(minutes);
+    
     const endTimeDate = addMinutes(parsedStartTime, duration);
     const endTime = format(endTimeDate, timeFormat);
     
