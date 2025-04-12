@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/components/Header';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, Check } from 'lucide-react';
 import PaymentForm from '@/components/booking/PaymentForm';
 import { format, addMinutes, parse } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AppointmentDetails {
   date?: Date;
@@ -26,6 +28,7 @@ const PaymentPage = () => {
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
+  const { session: authSession } = useAuth();
   
   // Get appointment details from location state
   const appointmentDetails = location.state as AppointmentDetails;
@@ -55,8 +58,42 @@ const PaymentPage = () => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate payment processing
-    setTimeout(() => {
+    try {
+      // Make sure user is authenticated
+      if (!authSession.user) {
+        throw new Error('You must be logged in to book an appointment');
+      }
+      
+      // Calculate session end time (assuming duration in minutes)
+      const durationMinutes = parseInt(appointmentDetails.duration) || 60;
+      const formattedDate = appointmentDetails.date 
+        ? format(appointmentDetails.date, 'yyyy-MM-dd')
+        : format(new Date(), 'yyyy-MM-dd');
+      
+      // Create new booking session in database
+      const newSession = {
+        user_id: authSession.user.id,
+        doctor_id: "basma_adel_123", // Using fixed doctor ID for Dr. Basma
+        date: formattedDate,
+        start_time: appointmentDetails.startTime,
+        end_time: appointmentDetails.endTime,
+        duration: durationMinutes,
+        type: appointmentDetails.appointmentType === 'standard' ? 'video' : 'in-person',
+        status: 'upcoming',
+        fee: appointmentDetails.fee,
+        notes: appointmentDetails.notes || null
+      };
+      
+      // Insert the session into Supabase
+      const { data, error } = await supabase
+        .from('sessions')
+        .insert([newSession])
+        .select();
+      
+      if (error) throw error;
+      
+      console.log('Session saved successfully:', data);
+      
       setIsProcessing(false);
       setIsComplete(true);
       
@@ -67,32 +104,27 @@ const PaymentPage = () => {
           : "تم تأكيد موعدك",
       });
       
-      // Prepare the new booking object for profile page
-      const durationMinutes = parseInt(appointmentDetails.duration) || 60;
-      
-      // Create new booking session object to pass to profile page
-      const newBooking = {
-        date: appointmentDetails.date,
-        startTime: appointmentDetails.startTime,
-        endTime: appointmentDetails.endTime,
-        duration: durationMinutes,
-        appointmentType: appointmentDetails.appointmentType === 'standard' ? 'video' : 'in-person',
-        fee: appointmentDetails.fee,
-        currency: appointmentDetails.currency,
-        notes: appointmentDetails.notes
-      };
-      
       // After a short delay to allow users to see the confirmation screen
       setTimeout(() => {
-        // Navigate to profile with the new booking
+        // Navigate to profile with activeTab set to upcoming
         navigate('/profile', { 
           state: { 
-            activeTab: 'upcoming',
-            newBooking: newBooking
+            activeTab: 'upcoming'
           }
         });
       }, 3000);
-    }, 2000);
+    } catch (error: any) {
+      console.error('Error saving booking:', error);
+      setIsProcessing(false);
+      
+      toast({
+        title: language === 'en' ? "Booking Failed" : "فشل الحجز",
+        description: error.message || (language === 'en' 
+          ? "There was an error processing your booking" 
+          : "حدث خطأ أثناء معالجة حجزك"),
+        variant: "destructive",
+      });
+    }
   };
   
   const getAppointmentTypeDisplay = () => {

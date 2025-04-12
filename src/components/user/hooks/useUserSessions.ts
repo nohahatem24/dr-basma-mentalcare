@@ -4,11 +4,12 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@/types/mindtrack';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const useUserSessions = (language: string) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -23,152 +24,119 @@ export const useUserSessions = (language: string) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch user sessions
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+  const fetchSessions = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-        const { data, error } = await supabase
-          .from('sessions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('date', { ascending: true });
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: true });
 
-        if (error) throw error;
+      if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        console.log('No sessions found for user');
+        setIsLoading(false);
+        setSessions([]);
+        return;
+      }
+      
+      // Process sessions and update their status based on date and time
+      const processedSessions = data.map(session => {
+        const sessionDate = new Date(session.date);
+        const sessionEndTime = session.end_time;
         
-        // Process sessions and update their status based on date and time
-        const processedSessions = (data as Session[]).map(session => {
-          const sessionDate = new Date(session.date);
-          const sessionEndTime = session.end_time;
-          const [hours, minutes] = sessionEndTime.split(':').map(part => 
-            part.includes(' ') ? 
-              part.split(' ')[0] : part
-          );
-          
-          // Convert 12-hour format to 24-hour if needed
-          let hour = parseInt(hours);
-          if (sessionEndTime.toLowerCase().includes('pm') && hour < 12) {
-            hour += 12;
-          }
-          if (sessionEndTime.toLowerCase().includes('am') && hour === 12) {
-            hour = 0;
-          }
-          
-          // Set the session end time
-          sessionDate.setHours(hour, parseInt(minutes || '0'));
-          
-          // Mark session as completed if it's in the past and was 'upcoming'
-          if (session.status === 'upcoming' && sessionDate < new Date()) {
-            return { ...session, status: 'completed' };
-          }
-          
-          return session;
-        });
+        // Parse hours and minutes from the end time string
+        let hours = 0;
+        let minutes = 0;
         
-        // Update any sessions that have changed status in the database
-        const sessionsToUpdate = processedSessions.filter(
-          session => session.status !== (data as Session[]).find(s => s.id === session.id)?.status
-        );
-        
-        if (sessionsToUpdate.length > 0) {
-          await Promise.all(sessionsToUpdate.map(session => 
-            supabase
-              .from('sessions')
-              .update({ status: session.status })
-              .eq('id', session.id)
-          ));
+        if (sessionEndTime) {
+          // Handle different time formats (12-hour or 24-hour)
+          if (sessionEndTime.includes(':')) {
+            const timeParts = sessionEndTime.split(':');
+            hours = parseInt(timeParts[0]);
+            
+            // Handle minutes and AM/PM if present
+            const minutesPart = timeParts[1];
+            if (minutesPart.includes(' ')) {
+              const [mins, period] = minutesPart.split(' ');
+              minutes = parseInt(mins);
+              if (period.toLowerCase() === 'pm' && hours < 12) {
+                hours += 12;
+              }
+              if (period.toLowerCase() === 'am' && hours === 12) {
+                hours = 0;
+              }
+            } else {
+              minutes = parseInt(minutesPart);
+            }
+          } else if (sessionEndTime.toLowerCase().includes('am') || sessionEndTime.toLowerCase().includes('pm')) {
+            // Handle format like "10 AM" or "2 PM"
+            const timeParts = sessionEndTime.split(' ');
+            hours = parseInt(timeParts[0]);
+            if (timeParts[1].toLowerCase() === 'pm' && hours < 12) {
+              hours += 12;
+            }
+            if (timeParts[1].toLowerCase() === 'am' && hours === 12) {
+              hours = 0;
+            }
+          }
         }
         
-        setSessions(processedSessions);
-      } catch (error) {
-        console.error('Error fetching sessions:', error);
-        toast({
-          title: language === 'en' ? 'Error' : 'خطأ',
-          description: language === 'en' 
-            ? 'Failed to load your sessions' 
-            : 'فشل في تحميل جلساتك',
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
+        // Set the session end time
+        sessionDate.setHours(hours, minutes);
+        
+        // Mark session as completed if it's in the past and was 'upcoming'
+        if (session.status === 'upcoming' && sessionDate < new Date()) {
+          return { ...session, status: 'completed' };
+        }
+        
+        return session;
+      });
+      
+      // Update any sessions that have changed status in the database
+      const sessionsToUpdate = processedSessions.filter(
+        session => session.status !== data.find(s => s.id === session.id)?.status
+      );
+      
+      if (sessionsToUpdate.length > 0) {
+        await Promise.all(sessionsToUpdate.map(session => 
+          supabase
+            .from('sessions')
+            .update({ status: session.status })
+            .eq('id', session.id)
+        ));
       }
-    };
-
-    fetchSessions();
-  }, [language, toast]);
-
-  // Process new booking from location state
-  useEffect(() => {
-    const handleNewBooking = async (newBooking: any) => {
-      if (!newBooking) return;
-
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const newSession = {
-          user_id: user.id,
-          doctor_id: "basma_adel_123",
-          date: format(new Date(newBooking.date), 'yyyy-MM-dd'),
-          start_time: newBooking.startTime,
-          end_time: newBooking.endTime,
-          duration: newBooking.duration,
-          type: newBooking.appointmentType === 'video' ? 'video' : 'in-person',
-          status: 'upcoming',
-          fee: newBooking.fee
-        };
-
-        const { error } = await supabase
-          .from('sessions')
-          .insert([newSession]);
-
-        if (error) throw error;
-
-        // Refresh sessions
-        const { data, error: fetchError } = await supabase
-          .from('sessions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('date', { ascending: true });
-
-        if (fetchError) throw fetchError;
-        setSessions(data as Session[]);
-
-        // Clear location state and navigate to profile
-        window.history.replaceState({}, document.title);
-        navigate('/profile', { 
-          state: { 
-            activeTab: 'upcoming',
-            newBooking: true 
-          }
-        });
-
-        toast({
-          title: language === 'en' ? "Booking Confirmed" : "تم تأكيد الحجز",
-          description: language === 'en' 
-            ? "Your new session has been added to your schedule" 
-            : "تمت إضافة الجلسة الجديدة إلى جدولك",
-          variant: "default",
-        });
-      } catch (error) {
-        console.error('Error processing new booking:', error);
-        toast({
-          title: language === 'en' ? 'Error' : 'خطأ',
-          description: language === 'en' 
-            ? 'Failed to process your booking' 
-            : 'فشل في معالجة حجزك',
-          variant: "destructive",
-        });
-      }
-    };
-
-    // Check location state for new booking
-    const locationState = window.history.state?.state;
-    if (locationState?.newBooking) {
-      handleNewBooking(locationState.newBooking);
+      
+      setSessions(processedSessions);
+      console.log('Sessions loaded successfully:', processedSessions);
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' 
+          ? 'Failed to load your sessions' 
+          : 'فشل في تحميل جلساتك',
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  }, [navigate, toast, language]);
+  };
+
+  // Initial load of sessions
+  useEffect(() => {
+    fetchSessions();
+    
+    // Handle location state if coming from a successful booking
+    if (location.state?.activeTab === 'upcoming') {
+      console.log('Redirected from successful booking, refreshing sessions');
+    }
+  }, [language, toast, location.state]);
 
   const handleCancelSession = async () => {
     if (!selectedSession || !cancellationReason.trim()) return;
@@ -299,7 +267,7 @@ export const useUserSessions = (language: string) => {
   return {
     sessions,
     upcomingSessions: sessions.filter(session => session.status === 'upcoming'),
-    previousSessions: sessions.filter(session => session.status === 'completed'),
+    previousSessions: sessions.filter(session => ['completed', 'cancelled'].includes(session.status)),
     isLoading,
     cancelDialogOpen,
     setCancelDialogOpen,
@@ -321,6 +289,7 @@ export const useUserSessions = (language: string) => {
     submitReschedule,
     submitAttachment,
     handleFileChange,
-    formatDate
+    formatDate,
+    fetchSessions // Export this to allow manual refresh when needed
   };
 };

@@ -53,19 +53,23 @@ const UserProfile = () => {
     submitReschedule,
     submitAttachment,
     handleFileChange,
-    formatDate
+    formatDate,
+    fetchSessions
   } = useUserSessions(language);
   
   // Handle location state for new bookings
   useEffect(() => {
-    if (location.state?.newBooking) {
-      setActiveTab('upcoming');
-    }
-    
+    // If we're coming from a successful booking or payment
     if (location.state?.activeTab) {
       setActiveTab(location.state.activeTab);
+      
+      // Refresh sessions to show the newly booked session
+      fetchSessions();
+      
+      // Clear the state to avoid unnecessary refreshing
+      window.history.replaceState({}, document.title);
     }
-  }, [location.state, setActiveTab]);
+  }, [location.state, setActiveTab, fetchSessions]);
   
   const openCancelDialog = (session: any) => {
     setSelectedSession(session);

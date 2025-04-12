@@ -1,15 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from '@/components/Header';
 import { useTheme } from '@/hooks/use-theme';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppointmentSummary from '@/components/booking/AppointmentSummary';
-import PaymentForm from '@/components/booking/PaymentForm';
 import BookingImageLight from '@/assets/images/BasmaAdelLight.jpg';
 import BookingImageDark from '@/assets/images/BasmaAdelDark.jpg';
 import { format, addMinutes, parse } from 'date-fns';
@@ -27,6 +26,7 @@ const BookAppointment = () => {
   const { theme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { session: authSession } = useAuth();
   
   // State for selected date
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -34,18 +34,6 @@ const BookAppointment = () => {
   // State for time slots
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
-  
-  // State for payment
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
-  const [cardInfo, setCardInfo] = useState({
-    cardNumber: '',
-    cardName: '',
-    expiry: '',
-    cvv: '',
-  });
-  
-  // State for processing payment
-  const [isProcessing, setIsProcessing] = useState(false);
   
   // Fetch time slots when date changes
   useEffect(() => {
@@ -73,14 +61,26 @@ const BookAppointment = () => {
     fetchTimeSlots();
   }, [selectedDate]);
   
-  const handleCardInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCardInfo((prev) => ({ ...prev, [name]: value }));
-  };
-  
-  const handleBookingComplete = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!authSession.isAuthenticated) {
+        toast({
+          title: language === 'en' ? "Login Required" : "مطلوب تسجيل الدخول",
+          description: language === 'en' 
+            ? "Please login to book an appointment" 
+            : "الرجاء تسجيل الدخول لحجز موعد",
+          variant: "default",
+        });
+        
+        navigate('/auth', { state: { from: { pathname: '/book-appointment' } } });
+      }
+    };
     
+    checkAuth();
+  }, [authSession.isAuthenticated, navigate, toast, language]);
+  
+  const handleBookAppointment = () => {
     if (!selectedSlot) {
       toast({
         title: language === 'en' ? "Error" : "خطأ",
@@ -92,8 +92,6 @@ const BookAppointment = () => {
       return;
     }
     
-    setIsProcessing(true);
-    
     // Calculate session end time (assuming 60 minutes duration)
     const duration = 60;
     const timeFormat = 'h:mm a';
@@ -102,38 +100,19 @@ const BookAppointment = () => {
     const endTimeDate = addMinutes(parsedStartTime, duration);
     const endTime = format(endTimeDate, timeFormat);
     
-    // Here we would normally save to Supabase and process payment
-    // For now, we'll simulate the process
-    
-    setTimeout(() => {
-      setIsProcessing(false);
-      
-      toast({
-        title: language === 'en' ? "Booking Successful" : "تم الحجز بنجاح",
-        description: language === 'en' 
-          ? "Your appointment has been confirmed" 
-          : "تم تأكيد موعدك",
-      });
-      
-      // Create new booking session object to pass to profile page
-      const newBooking = {
+    // Navigate to payment page with appointment details
+    navigate('/payment', { 
+      state: { 
         date: selectedDate,
+        doctorName: 'Dr. Basma Adel',
+        fee: 120,
+        duration: duration.toString(),
+        appointmentType: 'standard',
         startTime: startTime,
         endTime: endTime,
-        duration: duration,
-        appointmentType: 'video',
-        fee: 120,
-        currency: 'EGP',
-      };
-      
-      // Navigate to profile with the new booking
-      navigate('/profile', { 
-        state: { 
-          activeTab: 'upcoming',
-          newBooking: newBooking
-        }
-      });
-    }, 2000);
+        currency: 'EGP'
+      } 
+    });
   };
   
   return (
@@ -222,16 +201,9 @@ const BookAppointment = () => {
           
           {/* Payment Information - Only show if a slot is selected */}
           {selectedSlot && (
-            <PaymentForm 
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
-              cardInfo={cardInfo}
-              handleCardInfoChange={handleCardInfoChange}
-              isProcessing={isProcessing}
-              handleBookingComplete={handleBookingComplete}
-              fee={120}
-              currency="EGP"
-            />
+            <Button onClick={handleBookAppointment} className="w-full">
+              {language === 'en' ? "Book Now" : "حجز الآن"}
+            </Button>
           )}
         </div>
       </div>
