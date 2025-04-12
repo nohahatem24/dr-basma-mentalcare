@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,12 +10,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Profile } from '@/types/mindtrack';
 
 interface UserData {
   email: string;
   phone: string;
-  username: string;
-  birthday: string;
+  fullName: string;
+  dateOfBirth: string;
   gender: string;
   country: string;
 }
@@ -28,8 +30,8 @@ const AccountSettings = () => {
   const [userData, setUserData] = useState<UserData>({
     email: '',
     phone: '',
-    username: '',
-    birthday: '',
+    fullName: '',
+    dateOfBirth: '',
     gender: '',
     country: ''
   });
@@ -65,10 +67,10 @@ const AccountSettings = () => {
           setUserData({
             email: user.email || '',
             phone: data.phone || '',
-            username: data.username || '',
-            birthday: data.birthday || '',
+            fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+            dateOfBirth: data.date_of_birth || '',
             gender: data.gender || '',
-            country: data.country || ''
+            country: data.language || '' // Using language field as country for now
           });
         }
       } catch (error) {
@@ -154,9 +156,31 @@ const AccountSettings = () => {
         });
         if (error) throw error;
       } else {
+        // Map the UserData fields to profile fields
+        let updateData = {};
+        
+        switch (editField) {
+          case 'fullName':
+            const [firstName = '', lastName = ''] = editValue.split(' ', 2);
+            updateData = { first_name: firstName, last_name: lastName };
+            break;
+          case 'phone':
+            updateData = { phone: editValue };
+            break;
+          case 'dateOfBirth':
+            updateData = { date_of_birth: editValue };
+            break;
+          case 'gender':
+            updateData = { gender: editValue };
+            break;
+          case 'country':
+            updateData = { language: editValue }; // Using language field for country
+            break;
+        }
+
         const { error } = await supabase
           .from('profiles')
-          .update({ [editField]: editValue })
+          .update(updateData)
           .eq('id', user.id);
 
         if (error) throw error;
@@ -177,8 +201,8 @@ const AccountSettings = () => {
           ? `Your ${editField} has been updated successfully` 
           : `تم تحديث ${editField === 'email' ? 'البريد الإلكتروني' : 
               editField === 'phone' ? 'رقم الهاتف' :
-              editField === 'username' ? 'اسم المستخدم' :
-              editField === 'birthday' ? 'تاريخ الميلاد' :
+              editField === 'fullName' ? 'اسم المستخدم' :
+              editField === 'dateOfBirth' ? 'تاريخ الميلاد' :
               editField === 'gender' ? 'الجنس' :
               'البلد'} بنجاح`,
         variant: "default",
@@ -191,8 +215,8 @@ const AccountSettings = () => {
           ? `Failed to update ${editField}` 
           : `فشل في تحديث ${editField === 'email' ? 'البريد الإلكتروني' : 
               editField === 'phone' ? 'رقم الهاتف' :
-              editField === 'username' ? 'اسم المستخدم' :
-              editField === 'birthday' ? 'تاريخ الميلاد' :
+              editField === 'fullName' ? 'اسم المستخدم' :
+              editField === 'dateOfBirth' ? 'تاريخ الميلاد' :
               editField === 'gender' ? 'الجنس' :
               'البلد'}`,
         variant: "destructive",
@@ -284,20 +308,20 @@ const AccountSettings = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-muted-foreground">Username</label>
+                <label className="text-sm text-muted-foreground">Full Name</label>
                 <div className="flex items-center gap-2">
-                  <Input value={userData.username} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleEdit('username')} className="text-primary hover:text-primary">
+                  <Input value={userData.fullName} readOnly className="bg-muted" />
+                  <Button variant="ghost" onClick={() => handleEdit('fullName')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
               </div>
 
               <div>
-                <label className="text-sm text-muted-foreground">Birthday</label>
+                <label className="text-sm text-muted-foreground">Date of Birth</label>
                 <div className="flex items-center gap-2">
-                  <Input value={userData.birthday} readOnly className="bg-muted" />
-                  <Button variant="ghost" onClick={() => handleEdit('birthday')} className="text-primary hover:text-primary">
+                  <Input value={userData.dateOfBirth} readOnly className="bg-muted" />
+                  <Button variant="ghost" onClick={() => handleEdit('dateOfBirth')} className="text-primary hover:text-primary">
                     {language === 'en' ? 'Change' : 'تغيير'}
                   </Button>
                 </div>
@@ -411,14 +435,14 @@ const AccountSettings = () => {
               {language === 'en' 
                 ? `Update ${editField === 'email' ? 'Email' :
                     editField === 'phone' ? 'Phone Number' :
-                    editField === 'username' ? 'Username' :
-                    editField === 'birthday' ? 'Birthday' :
+                    editField === 'fullName' ? 'Full Name' :
+                    editField === 'dateOfBirth' ? 'Date of Birth' :
                     editField === 'gender' ? 'Gender' :
                     editField === 'country' ? 'Country' : ''}`
                 : `تحديث ${editField === 'email' ? 'البريد الإلكتروني' :
                     editField === 'phone' ? 'رقم الهاتف' :
-                    editField === 'username' ? 'اسم المستخدم' :
-                    editField === 'birthday' ? 'تاريخ الميلاد' :
+                    editField === 'fullName' ? 'اسم المستخدم' :
+                    editField === 'dateOfBirth' ? 'تاريخ الميلاد' :
                     editField === 'gender' ? 'الجنس' :
                     editField === 'country' ? 'البلد' : ''}`}
             </DialogTitle>
@@ -435,7 +459,7 @@ const AccountSettings = () => {
                   <SelectItem value="female">{language === 'en' ? "Female" : "أنثى"}</SelectItem>
                 </SelectContent>
               </Select>
-            ) : editField === 'birthday' ? (
+            ) : editField === 'dateOfBirth' ? (
               <Input
                 type="date"
                 value={editValue}

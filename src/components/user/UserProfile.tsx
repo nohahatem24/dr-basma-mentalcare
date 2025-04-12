@@ -11,9 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
-
-type Session = Database['public']['Tables']['sessions']['Row'];
+import { Session } from '@/types/mindtrack';
 
 interface UserData {
   email: string;
@@ -99,8 +97,9 @@ const UserProfile = () => {
         if (!user) return;
 
         const booking = location.state.newBooking;
-        const newSession: Database['public']['Tables']['sessions']['Insert'] = {
+        const newSession = {
           user_id: user.id,
+          doctor_id: "basma_adel_123",
           date: format(new Date(booking.date), 'yyyy-MM-dd'),
           start_time: booking.startTime,
           end_time: booking.endTime,
