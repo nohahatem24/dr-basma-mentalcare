@@ -119,7 +119,11 @@ export const useUserSessions = (language: string) => {
       }
     };
 
-    return { handleNewBooking };
+    // Check location state for new booking
+    const locationState = window.history.state?.state;
+    if (locationState?.newBooking) {
+      handleNewBooking(locationState.newBooking);
+    }
   }, [navigate, toast, language]);
 
   const handleCancelSession = async () => {
