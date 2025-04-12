@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +12,7 @@ import AppointmentSummary from '@/components/booking/AppointmentSummary';
 import PaymentForm from '@/components/booking/PaymentForm';
 import BookingImageLight from '@/assets/images/BasmaAdelLight.jpg';
 import BookingImageDark from '@/assets/images/BasmaAdelDark.jpg';
+import { format, addMinutes, parse } from 'date-fns';
 
 interface TimeSlot {
   id: string;
@@ -92,6 +94,14 @@ const BookAppointment = () => {
     
     setIsProcessing(true);
     
+    // Calculate session end time (assuming 60 minutes duration)
+    const duration = 60;
+    const timeFormat = 'h:mm a';
+    const startTime = selectedSlot.time;
+    const parsedStartTime = parse(startTime, timeFormat, new Date());
+    const endTimeDate = addMinutes(parsedStartTime, duration);
+    const endTime = format(endTimeDate, timeFormat);
+    
     // Here we would normally save to Supabase and process payment
     // For now, we'll simulate the process
     
@@ -105,8 +115,24 @@ const BookAppointment = () => {
           : "تم تأكيد موعدك",
       });
       
-      // Redirect to profile page showing upcoming appointments
-      navigate('/dashboard');
+      // Create new booking session object to pass to profile page
+      const newBooking = {
+        date: selectedDate,
+        startTime: startTime,
+        endTime: endTime,
+        duration: duration,
+        appointmentType: 'video',
+        fee: 120,
+        currency: 'EGP',
+      };
+      
+      // Navigate to profile with the new booking
+      navigate('/profile', { 
+        state: { 
+          activeTab: 'upcoming',
+          newBooking: newBooking
+        }
+      });
     }, 2000);
   };
   

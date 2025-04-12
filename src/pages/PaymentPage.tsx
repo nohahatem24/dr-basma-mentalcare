@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, Check } from 'lucide-react';
 import PaymentForm from '@/components/booking/PaymentForm';
-import { format } from 'date-fns';
+import { format, addMinutes, parse } from 'date-fns';
 
 interface AppointmentDetails {
   date?: Date;
@@ -65,6 +66,32 @@ const PaymentPage = () => {
           ? "Your appointment has been confirmed" 
           : "تم تأكيد موعدك",
       });
+      
+      // Prepare the new booking object for profile page
+      const durationMinutes = parseInt(appointmentDetails.duration) || 60;
+      
+      // Create new booking session object to pass to profile page
+      const newBooking = {
+        date: appointmentDetails.date,
+        startTime: appointmentDetails.startTime,
+        endTime: appointmentDetails.endTime,
+        duration: durationMinutes,
+        appointmentType: appointmentDetails.appointmentType === 'standard' ? 'video' : 'in-person',
+        fee: appointmentDetails.fee,
+        currency: appointmentDetails.currency,
+        notes: appointmentDetails.notes
+      };
+      
+      // After a short delay to allow users to see the confirmation screen
+      setTimeout(() => {
+        // Navigate to profile with the new booking
+        navigate('/profile', { 
+          state: { 
+            activeTab: 'upcoming',
+            newBooking: newBooking
+          }
+        });
+      }, 3000);
     }, 2000);
   };
   

@@ -36,7 +36,51 @@ export const useUserSessions = (language: string) => {
           .order('date', { ascending: true });
 
         if (error) throw error;
-        setSessions(data as Session[]);
+        
+        // Process sessions and update their status based on date and time
+        const processedSessions = (data as Session[]).map(session => {
+          const sessionDate = new Date(session.date);
+          const sessionEndTime = session.end_time;
+          const [hours, minutes] = sessionEndTime.split(':').map(part => 
+            part.includes(' ') ? 
+              part.split(' ')[0] : part
+          );
+          
+          // Convert 12-hour format to 24-hour if needed
+          let hour = parseInt(hours);
+          if (sessionEndTime.toLowerCase().includes('pm') && hour < 12) {
+            hour += 12;
+          }
+          if (sessionEndTime.toLowerCase().includes('am') && hour === 12) {
+            hour = 0;
+          }
+          
+          // Set the session end time
+          sessionDate.setHours(hour, parseInt(minutes || '0'));
+          
+          // Mark session as completed if it's in the past and was 'upcoming'
+          if (session.status === 'upcoming' && sessionDate < new Date()) {
+            return { ...session, status: 'completed' };
+          }
+          
+          return session;
+        });
+        
+        // Update any sessions that have changed status in the database
+        const sessionsToUpdate = processedSessions.filter(
+          session => session.status !== (data as Session[]).find(s => s.id === session.id)?.status
+        );
+        
+        if (sessionsToUpdate.length > 0) {
+          await Promise.all(sessionsToUpdate.map(session => 
+            supabase
+              .from('sessions')
+              .update({ status: session.status })
+              .eq('id', session.id)
+          ));
+        }
+        
+        setSessions(processedSessions);
       } catch (error) {
         console.error('Error fetching sessions:', error);
         toast({
