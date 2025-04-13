@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -41,35 +40,58 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Sign out function
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, supabaseSession) => {
-        console.log("Auth state changed:", event);
-        setSession({
-          isAuthenticated: !!supabaseSession,
-          isDoctor: supabaseSession?.user?.user_metadata?.role === 'doctor',
-          isLoading: false,
-          user: supabaseSession?.user || null
-        });
-      }
-    );
+    let mounted = true;
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: supabaseSession } }) => {
-      console.log("Existing session:", supabaseSession);
+    // Function to update session state
+    const updateSession = (supabaseSession: any) => {
+      if (!mounted) return;
+      
       setSession({
         isAuthenticated: !!supabaseSession,
         isDoctor: supabaseSession?.user?.user_metadata?.role === 'doctor',
         isLoading: false,
         user: supabaseSession?.user || null
       });
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    // Check for existing session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        updateSession(initialSession);
+
+        // Set up auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (_event, supabaseSession) => {
+            updateSession(supabaseSession);
+          }
+        );
+
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setSession(prev => ({ ...prev, isLoading: false }));
+        }
+      }
+    };
+
+    const cleanup = initializeAuth();
+
+    return () => {
+      mounted = false;
+      cleanup.then(unsubscribe => unsubscribe?.());
+    };
   }, []);
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
@@ -63,8 +62,11 @@ const UserProfile = () => {
     if (location.state?.activeTab) {
       setActiveTab(location.state.activeTab);
       
-      // Refresh sessions to show the newly booked session
-      fetchSessions();
+      // If shouldRefresh flag is set, force a refresh of sessions
+      if (location.state.shouldRefresh) {
+        console.log('Forcing session refresh due to new booking');
+        fetchSessions();
+      }
       
       // Clear the state to avoid unnecessary refreshing
       window.history.replaceState({}, document.title);

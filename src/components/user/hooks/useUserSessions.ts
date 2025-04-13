@@ -27,7 +27,11 @@ export const useUserSessions = (language: string) => {
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('No authenticated user found');
+        return;
+      }
+      console.log('Fetching sessions for user:', user.id);
 
       const { data, error } = await supabase
         .from('sessions')
@@ -35,17 +39,23 @@ export const useUserSessions = (language: string) => {
         .eq('user_id', user.id)
         .order('date', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching sessions:', error);
+        throw error;
+      }
       
       if (!data || data.length === 0) {
-        console.log('No sessions found for user');
+        console.log('No sessions found for user:', user.id);
         setIsLoading(false);
         setSessions([]);
         return;
       }
       
+      console.log('Raw sessions data:', data);
+      
       // Process sessions and update their status based on date and time
       const processedSessions = data.map(session => {
+        console.log('Processing session:', session);
         const sessionDate = new Date(session.date);
         const sessionEndTime = session.end_time;
         
@@ -138,32 +148,71 @@ export const useUserSessions = (language: string) => {
   }, [language, toast, location.state]);
 
   const handleCancelSession = async () => {
-    if (!selectedSession || !cancellationReason.trim()) return;
+    if (!selectedSession || !cancellationReason.trim()) {
+      toast({
+        title: language === 'en' ? "Error" : "خطأ",
+        description: language === 'en' 
+          ? "Please provide a reason for cancellation" 
+          : "يرجى ذكر سبب الإلغاء",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
+      // First, verify the session still exists and is cancellable
+      const { data: currentSession, error: fetchError } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('id', selectedSession.id)
+        .single();
+        
+      if (fetchError || !currentSession) {
+        throw new Error(language === 'en'
+          ? 'Session not found'
+          : 'لم يتم العثور على الجلسة'
+        );
+      }
+      
+      if (currentSession.status !== 'upcoming') {
+        throw new Error(language === 'en'
+          ? 'Only upcoming sessions can be cancelled'
+          : 'يمكن إلغاء الجلسات القادمة فقط'
+        );
+      }
+
+      // Update the session status to cancelled
+      const { error: updateError } = await supabase
         .from('sessions')
         .update({ 
           status: 'cancelled',
-          notes: cancellationReason 
+          notes: cancellationReason
         })
         .eq('id', selectedSession.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
+      // Update local state
       setSessions(prevSessions => 
         prevSessions.map(s => 
           s.id === selectedSession.id 
-            ? { ...s, status: 'cancelled', notes: cancellationReason }
+            ? { 
+                ...s, 
+                status: 'cancelled', 
+                notes: cancellationReason
+              }
             : s
         )
       );
 
+      // Close dialog and clear state
       setCancelDialogOpen(false);
       setCancellationReason('');
+      setSelectedSession(null);
       
+      // Show success message
       toast({
         title: language === 'en' ? "Session Cancelled" : "تم إلغاء الجلسة",
         description: language === 'en' 
@@ -171,13 +220,16 @@ export const useUserSessions = (language: string) => {
           : "تم إلغاء جلستك بنجاح",
         variant: "default",
       });
-    } catch (error) {
+      
+      // Refresh sessions list
+      fetchSessions();
+    } catch (error: any) {
       console.error('Error cancelling session:', error);
       toast({
         title: language === 'en' ? 'Error' : 'خطأ',
-        description: language === 'en' 
+        description: error.message || (language === 'en' 
           ? 'Failed to cancel your session' 
-          : 'فشل في إلغاء جلستك',
+          : 'فشل في إلغاء جلستك'),
         variant: "destructive",
       });
     } finally {

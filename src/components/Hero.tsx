@@ -19,7 +19,7 @@ const Hero = () => {
     },
     {
       title: language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية',
-      subtitle: language === 'en' ? 'Evidence-based CBT techniques' : 'تقنيات العلاج المعرفي السلوكي المستندة إلى الأدلة',
+      subtitle: language === 'en' ? 'Evidence-based CBT, DBT & ACT techniques' : 'تقنيات العلاج المعرفي السلوكي والعلاج السلوكي الجدلي والعلاج بالقبول والالتزام المستندة إلى الأدلة',
       description: language === 'en'
         ? 'Practice proven exercises from Dr. Basma\'s therapeutic methods to improve your mental well-being.'
         : 'ممارسة التمارين المثبتة من أساليب الدكتورة بسمة العلاجية لتحسين صحتك النفسية.',
