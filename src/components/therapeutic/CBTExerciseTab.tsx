@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,10 +14,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Brain, CheckCircle, ThoughtBubble, ArrowRight, Save, Pencil, Plus } from 'lucide-react';
+import { Brain, CheckCircle, ThoughtBubble, ArrowRight, Save, Pencil, Plus, Trash2 } from 'lucide-react';
 
 interface CBTExerciseTabProps {
-  onComplete?: () => void;
+  onComplete?: (notes?: string) => void;
 }
 
 interface ThoughtRecord {
@@ -61,8 +62,8 @@ const exercises = [
       {
         title: { en: 'Labeling Thoughts', ar: 'تسمية الأفكار' },
         description: {
-          en: 'Prefix thoughts with "I'm having the thought that..."',
-          ar: 'أضف قبل الأفكار "أنا لدي فكرة أن..."'
+          en: "Prefix thoughts with \"I'm having the thought that...\"",
+          ar: "أضف قبل الأفكار \"أنا لدي فكرة أن...\""
         }
       },
       {
@@ -346,7 +347,7 @@ const CBTExerciseTab: React.FC<CBTExerciseTabProps> = ({ onComplete }) => {
                               }
                               placeholder={
                                 language === 'en'
-                                  ? 'What's a more balanced view?'
+                                  ? 'What\'s a more balanced view?'
                                   : 'ما هي النظرة الأكثر توازناً؟'
                               }
                             />
