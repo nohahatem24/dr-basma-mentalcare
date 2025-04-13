@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Edit, Trash } from 'lucide-react';
-import MoodEntryCard from './MoodEntryCard';
+import { MoodEntryCard } from './MoodEntryCard';
 
 export interface MoodEntry {
   id: string;
@@ -64,23 +64,11 @@ export const MoodHistory: React.FC<MoodHistoryProps> = ({
               <CardContent className="p-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <MoodEntryCard entry={entry} />
-                  </div>
-                  <div className="flex space-x-1 ml-4">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEditEntry(entry)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDeleteEntry(entry.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                    <MoodEntryCard 
+                      entry={entry} 
+                      onEdit={onEditEntry}
+                      onDelete={onDeleteEntry}
+                    />
                   </div>
                 </div>
               </CardContent>
