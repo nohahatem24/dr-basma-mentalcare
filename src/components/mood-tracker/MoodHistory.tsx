@@ -1,86 +1,95 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from 'lucide-react';
 import { useLanguage } from '@/components/Header';
-import { MoodEntryCard } from './MoodEntryCard';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Edit, Trash } from 'lucide-react';
+import MoodEntryCard from './MoodEntryCard';
 
-interface MoodHistoryProps {
-  moodEntries: {
-    id: string;
-    date: Date;
-    mood: number;
-    notes: string;
-    triggers: string[];
-  }[];
-  onEditEntry: (entry: any) => void;
-  onDeleteEntry: (id: string) => void;
+export interface MoodEntry {
+  id: string;
+  date: Date;
+  mood: number;
+  notes: string;
+  triggers: string[];
 }
 
-export const MoodHistory: React.FC<MoodHistoryProps> = ({
-  moodEntries,
-  onEditEntry,
+interface MoodHistoryProps {
+  moodEntries: MoodEntry[];
+  onEditEntry: (entry: MoodEntry) => void;
+  onDeleteEntry: (id: string) => Promise<void> | void;
+  isLoading?: boolean;
+}
+
+export const MoodHistory: React.FC<MoodHistoryProps> = ({ 
+  moodEntries, 
+  onEditEntry, 
   onDeleteEntry,
+  isLoading = false
 }) => {
   const { language } = useLanguage();
 
+  if (isLoading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">
+          {language === 'en' ? 'Loading mood entries...' : 'جاري تحميل مدخلات المزاج...'}
+        </p>
+      </div>
+    );
+  }
+
+  if (moodEntries.length === 0) {
+    return (
+      <div className="text-center py-8 bg-accent/10 rounded-lg">
+        <p>
+          {language === 'en' 
+            ? 'No mood entries recorded yet. Track your mood to see them here.'
+            : 'لم يتم تسجيل مدخلات المزاج بعد. سجل مزاجك لتراها هنا.'}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="font-medium">
-          {language === 'en' ? 'Mood History' : 'سجل المزاج'}
-        </h3>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Calendar className="h-4 w-4 mr-2" />
-              {language === 'en' ? 'Filter' : 'تصفية'}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-4">
-            <div className="space-y-2">
-              <h4 className="font-medium">
-                {language === 'en' ? 'View Entries For' : 'عرض الإدخالات لـ'}
-              </h4>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" className="w-full">
-                  {language === 'en' ? 'Today' : 'اليوم'}
-                </Button>
-                <Button variant="outline" size="sm" className="w-full">
-                  {language === 'en' ? 'Yesterday' : 'أمس'}
-                </Button>
-                <Button variant="outline" size="sm" className="w-full">
-                  {language === 'en' ? 'This Week' : 'هذا الأسبوع'}
-                </Button>
-                <Button variant="outline" size="sm" className="w-full">
-                  {language === 'en' ? 'This Month' : 'هذا الشهر'}
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {moodEntries.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">
-          {language === 'en'
-            ? 'No mood entries yet. Track your first mood!'
-            : 'لا توجد إدخالات مزاجية حتى الآن. تتبع مزاجك الأول!'}
-        </p>
-      ) : (
+      <h3 className="text-lg font-medium">
+        {language === 'en' ? 'Mood History' : 'سجل المزاج'}
+      </h3>
+      <ScrollArea className="h-[300px]">
         <div className="space-y-3">
           {moodEntries.map((entry) => (
-            <MoodEntryCard
-              key={entry.id}
-              entry={entry}
-              onEdit={onEditEntry}
-              onDelete={onDeleteEntry}
-            />
+            <Card key={entry.id}>
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <MoodEntryCard entry={entry} />
+                  </div>
+                  <div className="flex space-x-1 ml-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEditEntry(entry)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onDeleteEntry(entry.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
-      )}
+      </ScrollArea>
     </div>
   );
 };
+
+export default MoodHistory;

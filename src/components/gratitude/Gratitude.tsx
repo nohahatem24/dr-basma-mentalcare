@@ -1,255 +1,257 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Heart, Plus, Calendar, Trash, Edit } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
-import { Heart, Plus, Edit2, Trash2, Calendar } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 interface GratitudeEntry {
   id: string;
-  date: Date;
-  items: string[];
-  reflection: string;
+  content: string;
+  created_at: string;
 }
 
 const Gratitude = () => {
   const { language } = useLanguage();
+  const { toast } = useToast();
+  const { session } = useAuth();
+  
   const [entries, setEntries] = useState<GratitudeEntry[]>([]);
-  const [currentItems, setCurrentItems] = useState<string[]>(['', '', '']);
-  const [reflection, setReflection] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [activeTab, setActiveTab] = useState('write');
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [content, setContent] = useState('');
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  
   useEffect(() => {
-    const savedEntries = localStorage.getItem('gratitude_entries');
-    if (savedEntries) {
-      try {
-        const parsed = JSON.parse(savedEntries);
-        setEntries(parsed.map((entry: any) => ({
-          ...entry,
-          date: new Date(entry.date)
-        })));
-      } catch (error) {
-        console.error('Error loading gratitude entries:', error);
-      }
+    if (session?.user) {
+      fetchGratitudeEntries();
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('gratitude_entries', JSON.stringify(entries));
-  }, [entries]);
-
-  const updateItem = (index: number, value: string) => {
-    const newItems = [...currentItems];
-    newItems[index] = value;
-    setCurrentItems(newItems);
+  }, [session?.user]);
+  
+  const fetchGratitudeEntries = async () => {
+    if (!session?.user) return;
+    
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('gratitude_entries')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      
+      setEntries(data || []);
+    } catch (error) {
+      console.error('Error fetching gratitude entries:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' ? 'Failed to fetch gratitude entries.' : 'فشل في جلب مدخلات الامتنان.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const saveEntry = () => {
-    const filledItems = currentItems.filter(item => item.trim() !== '');
-    if (filledItems.length === 0) return;
-
-    const newEntry: GratitudeEntry = {
-      id: Date.now().toString(),
-      date: selectedDate,
-      items: filledItems,
-      reflection: reflection.trim()
-    };
-
-    setEntries(prev => [...prev, newEntry]);
-    setCurrentItems(['', '', '']);
-    setReflection('');
-    setActiveTab('history');
+  
+  const handleSubmit = async () => {
+    if (!session?.user) {
+      toast({
+        title: language === 'en' ? 'Authentication Required' : 'مطلوب المصادقة',
+        description: language === 'en' ? 'Please sign in to add gratitude entries.' : 'الرجاء تسجيل الدخول لإضافة مدخلات الامتنان.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    if (!content.trim()) {
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' ? 'Please enter what you are grateful for.' : 'الرجاء إدخال ما أنت ممتن له.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    try {
+      // If editing an existing entry
+      if (editingEntryId) {
+        const { error } = await supabase
+          .from('gratitude_entries')
+          .update({ content })
+          .eq('id', editingEntryId);
+          
+        if (error) throw error;
+        
+        toast({
+          title: language === 'en' ? 'Entry Updated' : 'تم تحديث المدخل',
+          description: language === 'en' ? 'Your gratitude entry has been updated.' : 'تم تحديث مدخل الامتنان الخاص بك.',
+        });
+      } else {
+        // Adding a new entry
+        const { data, error } = await supabase
+          .from('gratitude_entries')
+          .insert({
+            user_id: session.user.id,
+            content
+          })
+          .select();
+          
+        if (error) throw error;
+        
+        toast({
+          title: language === 'en' ? 'Entry Added' : 'تمت إضافة المدخل',
+          description: language === 'en' ? 'Your gratitude entry has been saved.' : 'تم حفظ مدخل الامتنان الخاص بك.',
+        });
+      }
+      
+      // Reset form and refresh entries
+      setContent('');
+      setEditingEntryId(null);
+      await fetchGratitudeEntries();
+    } catch (error) {
+      console.error('Error saving gratitude entry:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' ? 'Failed to save your gratitude entry.' : 'فشل في حفظ مدخل الامتنان الخاص بك.',
+        variant: 'destructive'
+      });
+    }
   };
-
-  const deleteEntry = (id: string) => {
-    setEntries(prev => prev.filter(entry => entry.id !== id));
+  
+  const handleEdit = (entry: GratitudeEntry) => {
+    setEditingEntryId(entry.id);
+    setContent(entry.content);
   };
-
-  const formatDate = (date: Date) => {
-    return format(date, language === 'en' ? 'MMMM d, yyyy' : 'yyyy/MM/dd');
+  
+  const handleDelete = async (id: string) => {
+    if (!confirm(language === 'en' ? 'Are you sure you want to delete this entry?' : 'هل أنت متأكد أنك تريد حذف هذا المدخل؟')) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('gratitude_entries')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      toast({
+        title: language === 'en' ? 'Entry Deleted' : 'تم حذف المدخل',
+        description: language === 'en' ? 'The gratitude entry has been deleted.' : 'تم حذف مدخل الامتنان.',
+      });
+      
+      await fetchGratitudeEntries();
+    } catch (error) {
+      console.error('Error deleting gratitude entry:', error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' ? 'Failed to delete the gratitude entry.' : 'فشل في حذف مدخل الامتنان.',
+        variant: 'destructive'
+      });
+    }
   };
-
+  
+  const handleCancel = () => {
+    setContent('');
+    setEditingEntryId(null);
+  };
+  
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="write">
-            {language === 'en' ? 'Daily Gratitude' : 'الامتنان اليومي'}
-          </TabsTrigger>
-          <TabsTrigger value="history">
-            {language === 'en' ? 'History' : 'السجل'}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="write">
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {language === 'en' ? 'Daily Gratitude Practice' : 'ممارسة الامتنان اليومية'}
-              </CardTitle>
-              <CardDescription>
-                {language === 'en' 
-                  ? 'Write three things you are grateful for today' 
-                  : 'اكتب ثلاثة أشياء تشعر بالامتنان لها اليوم'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label>
-                  {language === 'en' ? 'Date' : 'التاريخ'}
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {formatDate(selectedDate)}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <CalendarComponent
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-4">
-                {currentItems.map((item, index) => (
-                  <div key={index} className="space-y-2">
-                    <Label>
-                      {language === 'en' 
-                        ? `Grateful for #${index + 1}` 
-                        : `ممتن لـ #${index + 1}`}
-                    </Label>
-                    <Input
-                      value={item}
-                      onChange={(e) => updateItem(index, e.target.value)}
-                      placeholder={language === 'en' 
-                        ? 'I am grateful for...' 
-                        : 'أنا ممتن لـ...'}
-                    />
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Heart className="h-5 w-5 text-primary" />
+          {language === 'en' ? 'Gratitude Journal' : 'مذكرات الامتنان'}
+        </CardTitle>
+        <CardDescription>
+          {language === 'en' 
+            ? 'Record what you\'re grateful for to improve your mental well-being.' 
+            : 'سجل ما أنت ممتن له لتحسين صحتك النفسية.'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-3">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={
+              language === 'en'
+                ? 'What are you grateful for today?'
+                : 'ما الذي أنت ممتن له اليوم؟'
+            }
+            className="min-h-[100px]"
+          />
+          <div className="flex justify-end gap-2">
+            {editingEntryId && (
+              <Button variant="outline" onClick={handleCancel}>
+                {language === 'en' ? 'Cancel' : 'إلغاء'}
+              </Button>
+            )}
+            <Button onClick={handleSubmit}>
+              {editingEntryId
+                ? language === 'en' ? 'Update Entry' : 'تحديث المدخل'
+                : language === 'en' ? 'Save Entry' : 'حفظ المدخل'}
+            </Button>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <h3 className="font-medium">
+            {language === 'en' ? 'Your Gratitude Entries' : 'مدخلات الامتنان الخاصة بك'}
+          </h3>
+          
+          {isLoading ? (
+            <p className="text-center text-muted-foreground py-4">
+              {language === 'en' ? 'Loading entries...' : 'جاري تحميل المدخلات...'}
+            </p>
+          ) : entries.length === 0 ? (
+            <div className="bg-accent/10 rounded-lg p-6 text-center">
+              <p>{language === 'en' ? 'No gratitude entries yet.' : 'لا توجد مدخلات امتنان حتى الآن.'}</p>
+            </div>
+          ) : (
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-3">
+                {entries.map(entry => (
+                  <div key={entry.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center text-xs text-muted-foreground mb-2">
+                        <Calendar className="mr-1 h-3 w-3" />
+                        {format(new Date(entry.created_at), 'PPP')}
+                      </div>
+                      <div className="flex space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(entry)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(entry.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground">{entry.content}</p>
                   </div>
                 ))}
               </div>
-
-              <div className="space-y-2">
-                <Label>
-                  {language === 'en' ? 'Reflection (Optional)' : 'تأمل (اختياري)'}
-                </Label>
-                <Textarea
-                  value={reflection}
-                  onChange={(e) => setReflection(e.target.value)}
-                  placeholder={language === 'en' 
-                    ? 'How did these things impact your day?' 
-                    : 'كيف أثرت هذه الأشياء على يومك؟'}
-                  className="min-h-[100px]"
-                />
-              </div>
-
-              <Button 
-                onClick={saveEntry}
-                className="w-full"
-                disabled={!currentItems.some(item => item.trim() !== '')}
-              >
-                <Heart className="mr-2 h-4 w-4" />
-                {language === 'en' ? 'Save Gratitude Entry' : 'حفظ مدخلة الامتنان'}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>
-                  {language === 'en' ? 'Gratitude Journal' : 'سجل الامتنان'}
-                </CardTitle>
-                <Button variant="outline" onClick={() => setActiveTab('write')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {language === 'en' ? 'New Entry' : 'مدخلة جديدة'}
-                </Button>
-              </div>
-              <CardDescription>
-                {language === 'en' 
-                  ? 'Review your past gratitude entries' 
-                  : 'مراجعة مدخلات الامتنان السابقة'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[500px] pr-4">
-                <div className="space-y-4">
-                  {entries.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Heart className="h-12 w-12 mx-auto opacity-30 mb-4" />
-                      <p className="text-muted-foreground">
-                        {language === 'en' 
-                          ? 'No gratitude entries yet.' 
-                          : 'لا توجد مدخلات امتنان حتى الآن.'}
-                      </p>
-                      <Button 
-                        variant="link" 
-                        onClick={() => setActiveTab('write')}
-                      >
-                        {language === 'en' 
-                          ? 'Start your gratitude practice!' 
-                          : 'ابدأ ممارسة الامتنان!'}
-                      </Button>
-                    </div>
-                  ) : (
-                    entries
-                      .sort((a, b) => b.date.getTime() - a.date.getTime())
-                      .map(entry => (
-                        <Card key={entry.id} className="relative">
-                          <CardContent className="pt-6">
-                            <div className="absolute top-2 right-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => deleteEntry(entry.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <div className="mb-4 text-sm text-muted-foreground">
-                              {formatDate(entry.date)}
-                            </div>
-                            <ul className="space-y-2 mb-4">
-                              {entry.items.map((item, index) => (
-                                <li key={index} className="flex items-start gap-2">
-                                  <Heart className="h-4 w-4 mt-1 text-primary" />
-                                  <span>{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                            {entry.reflection && (
-                              <div className="bg-muted p-3 rounded-md text-sm">
-                                {entry.reflection}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+            </ScrollArea>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
-export default Gratitude; 
+export default Gratitude;

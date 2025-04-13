@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
@@ -146,8 +144,7 @@ const CBTExerciseTab: React.FC<CBTExerciseTabProps> = ({ onComplete }) => {
   };
 
   const updateProgress = () => {
-    // Calculate progress based on completed thought records and exercises
-    const totalSteps = 10; // Adjust based on your criteria
+    const totalSteps = 10;
     const completedSteps = thoughtRecords.length;
     const newProgress = Math.min(Math.round((completedSteps / totalSteps) * 100), 100);
     setProgress(newProgress);

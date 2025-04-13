@@ -1,15 +1,20 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/components/Header';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface MindfulnessExerciseTabProps {
-  onComplete: () => void;
+  onComplete: (notes?: string) => void;
 }
 
 const MindfulnessExerciseTab: React.FC<MindfulnessExerciseTabProps> = ({ onComplete }) => {
   const { language } = useLanguage();
+  const [activeExercise, setActiveExercise] = useState<string | null>(null);
+  const [notes, setNotes] = useState<string>('');
 
   const exercises = [
     {
@@ -80,6 +85,14 @@ const MindfulnessExerciseTab: React.FC<MindfulnessExerciseTabProps> = ({ onCompl
     }
   ];
 
+  const handleCompleteExercise = (exerciseId: string) => {
+    const exercise = exercises.find(ex => ex.id === exerciseId);
+    const noteText = notes ? notes : 
+      exercise ? `Completed ${exercise.title} mindfulness exercise` : 'Completed mindfulness exercise';
+    onComplete(noteText);
+    setNotes('');
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -96,7 +109,13 @@ const MindfulnessExerciseTab: React.FC<MindfulnessExerciseTabProps> = ({ onCompl
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion 
+            type="single" 
+            collapsible 
+            className="w-full"
+            value={activeExercise || undefined}
+            onValueChange={setActiveExercise}
+          >
             {exercises.map((exercise) => (
               <AccordionItem key={exercise.id} value={exercise.id}>
                 <AccordionTrigger>{exercise.title}</AccordionTrigger>
@@ -108,8 +127,22 @@ const MindfulnessExerciseTab: React.FC<MindfulnessExerciseTabProps> = ({ onCompl
                         <li key={index} className="text-sm">{step}</li>
                       ))}
                     </ol>
+                    
+                    <div className="space-y-3 mt-4">
+                      <Label htmlFor={`notes-${exercise.id}`}>
+                        {language === 'en' ? 'Your Notes (optional)' : 'ملاحظاتك (اختياري)'}
+                      </Label>
+                      <Textarea 
+                        id={`notes-${exercise.id}`}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder={language === 'en' ? 'Add any reflections or notes here...' : 'أضف أي تأملات أو ملاحظات هنا...'}
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                    
                     <Button 
-                      onClick={onComplete}
+                      onClick={() => handleCompleteExercise(exercise.id)}
                       className="w-full mt-4"
                     >
                       {language === 'en' ? 'Complete Exercise' : 'إكمال التمرين'}

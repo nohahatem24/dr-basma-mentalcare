@@ -28,7 +28,7 @@ const TherapeuticExercises = () => {
   const [exerciseCompleted, setExerciseCompleted] = useState(false);
 
   const handleCompleteExercise = async (exerciseType: string, notes?: string) => {
-    if (!session.user) {
+    if (!session?.user) {
       toast({
         title: language === 'en' ? 'Authentication Required' : 'مطلوب المصادقة',
         description: language === 'en' ? 'Please sign in to save your progress.' : 'الرجاء تسجيل الدخول لحفظ تقدمك.',
@@ -38,9 +38,19 @@ const TherapeuticExercises = () => {
     }
 
     try {
-      // Save exercise completion to local state for now
-      // In a real app, this would be saved to a database
-      console.log('Exercise completed:', { exerciseType, notes });
+      // Save exercise completion to database
+      const { error } = await supabase
+        .from('therapeutic_exercises_logs')
+        .insert({
+          user_id: session.user.id,
+          exercise_type: exerciseType,
+          notes: notes || '',
+        });
+
+      if (error) {
+        console.error("Error logging exercise:", error);
+        throw error;
+      }
       
       setExerciseCompleted(true);
       toast({
@@ -82,7 +92,7 @@ const TherapeuticExercises = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="cbt" className="w-full">
+          <Tabs defaultValue="mindfulness" className="w-full">
             <TabsList className="grid grid-cols-4 mb-4">
               <TabsTrigger value="cbt">
                 {language === 'en' ? 'CBT' : 'العلاج المعرفي السلوكي'}
