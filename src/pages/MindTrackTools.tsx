@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
@@ -6,16 +7,15 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth/AuthProvider';
-import MoodTracker from '@/components/MoodTracker';
+import MoodTracker from '@/components/mood-tracker/MoodTracker';
 import CPTTechniques from '@/components/CPTTechniques';
-import RelationshipTracker from '@/components/RelationshipTracker';
+import RelationshipTracker from '@/components/relationship-tracker/RelationshipTracker';
 import MentalHealthReport from '@/components/reports/MentalHealthReport';
 import GuidedBreathing from '@/components/breathing/GuidedBreathing';
 import Journal from '@/components/journal/Journal';
 import Gratitude from '@/components/gratitude/Gratitude';
 import Goals from '@/components/goals/Goals';
-import DBTExerciseTab from '@/components/therapeutic/DBTExerciseTab';
-import ACTExerciseTab from '@/components/therapeutic/ACTExerciseTab';
+import TherapeuticExercises from '@/components/TherapeuticExercises';
 
 const MindTrackTools = () => {
   const { language } = useLanguage();
@@ -24,16 +24,11 @@ const MindTrackTools = () => {
   const { session } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('mood');
 
-  const handleExerciseComplete = () => {
-    // يمكن إضافة منطق إضافي هنا عند اكتمال التمارين
-    console.log('Exercise completed');
-  };
-
   // Get tab from URL query parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
-    if (tab && ['mood', 'journal', 'gratitude', 'breathing', 'cpt', 'dbt', 'act', 'relationship', 'goals', 'report'].includes(tab)) {
+    if (tab && ['mood', 'journal', 'gratitude', 'breathing', 'cpt', 'therapeutic', 'relationship', 'goals', 'report'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [location.search]);
@@ -91,22 +86,13 @@ const MindTrackTools = () => {
       component: <CPTTechniques />
     },
     {
-      id: 'dbt',
-      title: language === 'en' ? 'DBT Skills' : 'مهارات DBT',
+      id: 'therapeutic',
+      title: language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية',
       icon: <Leaf className="h-6 w-6" />,
       description: language === 'en'
-        ? 'Practice Dialectical Behavior Therapy skills'
-        : 'تمرن على مهارات العلاج السلوكي الجدلي',
-      component: <DBTExerciseTab onComplete={handleExerciseComplete} />
-    },
-    {
-      id: 'act',
-      title: language === 'en' ? 'ACT Exercises' : 'تمارين ACT',
-      icon: <Sparkles className="h-6 w-6" />,
-      description: language === 'en'
-        ? 'Acceptance and Commitment Therapy exercises'
-        : 'تمارين العلاج بالقبول والالتزام',
-      component: <ACTExerciseTab onComplete={handleExerciseComplete} />
+        ? 'DBT, ACT and other therapy exercises'
+        : 'تمارين DBT و ACT والعلاجات الأخرى',
+      component: <TherapeuticExercises />
     },
     {
       id: 'relationship',
@@ -231,4 +217,4 @@ const MindTrackTools = () => {
   );
 };
 
-export default MindTrackTools; 
+export default MindTrackTools;

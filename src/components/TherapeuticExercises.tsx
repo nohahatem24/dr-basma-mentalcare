@@ -1,8 +1,11 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 
 // Import our component modules
 import TherapeuticExercisesCard from './therapeutic/TherapeuticExercisesCard';
@@ -14,14 +17,44 @@ import MindfulnessExerciseTab from './therapeutic/MindfulnessExerciseTab';
 const TherapeuticExercises = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
+  const { session } = useAuth();
   const [exerciseCompleted, setExerciseCompleted] = useState(false);
 
-  const handleCompleteExercise = () => {
-    setExerciseCompleted(true);
-    toast({
-      title: language === 'en' ? 'Exercise Completed' : 'تم إكمال التمرين',
-      description: language === 'en' ? 'Great job! Your progress has been saved.' : 'عمل رائع! تم حفظ تقدمك.',
-    });
+  const handleCompleteExercise = async (exerciseType: string, notes?: string) => {
+    if (!session.user) {
+      toast({
+        title: language === 'en' ? 'Authentication Required' : 'مطلوب المصادقة',
+        description: language === 'en' ? 'Please sign in to save your progress.' : 'الرجاء تسجيل الدخول لحفظ تقدمك.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      // Save exercise completion to database
+      const { error } = await supabase
+        .from('therapeutic_exercises')
+        .insert({
+          user_id: session.user.id,
+          exercise_type: exerciseType,
+          notes: notes || '',
+        });
+
+      if (error) throw error;
+
+      setExerciseCompleted(true);
+      toast({
+        title: language === 'en' ? 'Exercise Completed' : 'تم إكمال التمرين',
+        description: language === 'en' ? 'Great job! Your progress has been saved.' : 'عمل رائع! تم حفظ تقدمك.',
+      });
+    } catch (error) {
+      console.error("Error saving exercise completion:", error);
+      toast({
+        title: language === 'en' ? 'Error' : 'خطأ',
+        description: language === 'en' ? 'Failed to save your progress.' : 'فشل في حفظ تقدمك.',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
@@ -66,19 +99,19 @@ const TherapeuticExercises = () => {
             </TabsList>
 
             <TabsContent value="cbt" className="space-y-4">
-              <CBTExerciseTab onComplete={handleCompleteExercise} />
+              <CBTExerciseTab onComplete={(notes) => handleCompleteExercise('cbt', notes)} />
             </TabsContent>
 
             <TabsContent value="dbt" className="space-y-4">
-              <DBTExerciseTab onComplete={handleCompleteExercise} />
+              <DBTExerciseTab onComplete={(notes) => handleCompleteExercise('dbt', notes)} />
             </TabsContent>
 
             <TabsContent value="act" className="space-y-4">
-              <ACTExerciseTab onComplete={handleCompleteExercise} />
+              <ACTExerciseTab onComplete={(notes) => handleCompleteExercise('act', notes)} />
             </TabsContent>
 
             <TabsContent value="mindfulness" className="space-y-4">
-              <MindfulnessExerciseTab onComplete={handleCompleteExercise} />
+              <MindfulnessExerciseTab onComplete={(notes) => handleCompleteExercise('mindfulness', notes)} />
             </TabsContent>
           </Tabs>
         </CardContent>

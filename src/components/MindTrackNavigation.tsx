@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { useLanguage } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Brain, BookOpen, Heart, Target, Wind, Activity, BarChart3, FileText } from 'lucide-react';
+import { Brain, BookOpen, Heart, Target, Wind, Activity, BarChart3, FileText, Leaf } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface MindTrackNavProps {
@@ -46,6 +47,12 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
       label: language === 'en' ? 'CPT Techniques' : 'تقنيات المعالجة المعرفية',
       icon: <Activity className="mr-2 h-4 w-4" />,
       path: `${getBasePath()}?tab=cpt`
+    },
+    {
+      id: 'therapeutic',
+      label: language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية',
+      icon: <Leaf className="mr-2 h-4 w-4" />,
+      path: `${getBasePath()}?tab=therapeutic`
     },
     {
       id: 'relationship',

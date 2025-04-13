@@ -2,16 +2,17 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
-import MentalHealthReport from '@/components/MentalHealthReport';
-import RelationshipTracker from '@/components/RelationshipTracker';
-import MoodTracker from '@/components/MoodTracker';
+import MentalHealthReport from '@/components/reports/MentalHealthReport';
+import RelationshipTracker from '@/components/relationship-tracker/RelationshipTracker';
 import CPTTechniques from '@/components/CPTTechniques';
-import GuidedBreathing from '@/components/self-reporting/GuidedBreathing';
+import GuidedBreathing from '@/components/breathing/GuidedBreathing';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
-import JournalEntries from '@/components/dashboard/JournalEntries';
-import GratitudeJournal from '@/components/dashboard/GratitudeJournal';
-import GoalsTracker from '@/components/dashboard/GoalsTracker';
+import JournalEntries from '@/components/journal/Journal';
+import GratitudeJournal from '@/components/gratitude/Gratitude';
+import GoalsTracker from '@/components/goals/Goals';
 import AIInsights from '@/components/dashboard/AIInsights';
+import TherapeuticExercises from '@/components/TherapeuticExercises';
+import MoodTracker from '@/components/mood-tracker/MoodTracker';
 
 const Dashboard = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -36,6 +37,8 @@ const Dashboard = () => {
         return <GuidedBreathing />;
       case 'cpt':
         return <CPTTechniques />;
+      case 'therapeutic':
+        return <TherapeuticExercises />;
       case 'relationship':
         return <RelationshipTracker />;
       default:

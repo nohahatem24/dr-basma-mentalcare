@@ -1,5 +1,8 @@
+
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 // Type for session and user
 export interface SessionState {
@@ -12,6 +15,7 @@ export interface SessionState {
 interface AuthContextType {
   session: SessionState;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -31,6 +35,8 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [session, setSession] = useState<SessionState>({
     isAuthenticated: false,
     isDoctor: false,
@@ -38,12 +44,54 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     user: null
   });
 
+  // Function to refresh the session state
+  const refreshSession = async () => {
+    try {
+      const { data: { session: supabaseSession } } = await supabase.auth.getSession();
+      
+      if (supabaseSession) {
+        setSession({
+          isAuthenticated: true,
+          isDoctor: supabaseSession?.user?.user_metadata?.role === 'doctor',
+          isLoading: false,
+          user: supabaseSession?.user || null
+        });
+      } else {
+        setSession({
+          isAuthenticated: false,
+          isDoctor: false,
+          isLoading: false,
+          user: null
+        });
+      }
+    } catch (error) {
+      console.error('Error refreshing session:', error);
+      setSession(prev => ({ ...prev, isLoading: false }));
+    }
+  };
+
   // Sign out function
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      setSession({
+        isAuthenticated: false,
+        isDoctor: false,
+        isLoading: false,
+        user: null
+      });
+      navigate('/');
+      toast({
+        title: 'Signed Out',
+        description: 'You have been successfully signed out.',
+      });
     } catch (error) {
       console.error('Error signing out:', error);
+      toast({
+        title: 'Sign Out Error',
+        description: 'There was a problem signing you out.',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -95,7 +143,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, signOut }}>
+    <AuthContext.Provider value={{ session, signOut, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );
