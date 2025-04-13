@@ -14,7 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Brain, CheckCircle, ThoughtBubble, ArrowRight, Save, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Brain, CheckCircle, MessageSquare, ArrowRight, Save, Pencil, Plus, Trash2 } from 'lucide-react';
 
 interface CBTExerciseTabProps {
   onComplete?: (notes?: string) => void;
@@ -197,7 +197,7 @@ const CBTExerciseTab: React.FC<CBTExerciseTabProps> = ({ onComplete }) => {
                 <AccordionTrigger>
                   <div className="flex items-center gap-2">
                     {exercise.id === 'thought-record' ? (
-                      <ThoughtBubble className="h-5 w-5" />
+                      <MessageSquare className="h-5 w-5" />
                     ) : (
                       <Brain className="h-5 w-5" />
                     )}
