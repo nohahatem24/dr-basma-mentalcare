@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
 interface MindfulnessExerciseTabProps {
-  onComplete: (notes?: string) => void;
+  onComplete: (exerciseId: string, notes: string) => void;
 }
 
 const MindfulnessExerciseTab: React.FC<MindfulnessExerciseTabProps> = ({ onComplete }) => {
@@ -89,7 +88,7 @@ const MindfulnessExerciseTab: React.FC<MindfulnessExerciseTabProps> = ({ onCompl
     const exercise = exercises.find(ex => ex.id === exerciseId);
     const noteText = notes ? notes : 
       exercise ? `Completed ${exercise.title} mindfulness exercise` : 'Completed mindfulness exercise';
-    onComplete(noteText);
+    onComplete(exerciseId, noteText);
     setNotes('');
   };
 

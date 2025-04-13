@@ -17,7 +17,7 @@ import { Brain, CheckCircle, ArrowRight, Save, Pencil, Plus, Heart, Leaf } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface DBTExerciseTabProps {
-  onComplete?: () => void;
+  onComplete: (exerciseId: string, notes: string) => void;
 }
 
 const dbtSkills = [
@@ -161,7 +161,7 @@ const DBTExerciseTab: React.FC<DBTExerciseTabProps> = ({ onComplete }) => {
     setProgress(newProgress);
 
     if (newProgress === 100 && onComplete) {
-      onComplete();
+      onComplete(completed[completed.length - 1], notes[completed[completed.length - 1]] || '');
     }
   };
 

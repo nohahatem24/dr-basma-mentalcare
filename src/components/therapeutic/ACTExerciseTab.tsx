@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle2 } from 'lucide-react';
 
 interface ACTExerciseTabProps {
-  onComplete: () => void;
+  onComplete: (exerciseId: string, notes: string) => void;
 }
 
 interface ExerciseResponse {
@@ -73,7 +73,7 @@ const ACTExerciseTab: React.FC<ACTExerciseTabProps> = ({ onComplete }) => {
     }));
 
     // Call the parent completion handler
-    onComplete();
+    onComplete(exerciseId, responses[exerciseId].notes);
 
     // Check if all exercises are complete
     const allCompleted = Object.values(responses).every(r => r.completed);
