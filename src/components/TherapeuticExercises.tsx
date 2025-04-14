@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,7 +24,7 @@ const TherapeuticExercises = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
       setError(language === 'en' 
         ? 'Missing Supabase configuration. Please check your environment variables.' 
         : 'إعدادات Supabase مفقودة. يرجى التحقق من المتغيرات البيئية.');
@@ -35,7 +36,7 @@ const TherapeuticExercises = () => {
 
     try {
       const { error } = await supabase
-        .from('exercise_logs')
+        .from('therapeutic_exercises_logs')
         .insert({
           user_id: session.user.id,
           exercise_type: exerciseType,
