@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/Header';
@@ -22,14 +22,6 @@ const TherapeuticExercises = () => {
   const { session } = useAuth();
   const [activeTab, setActiveTab] = useState('dbt');
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-      setError(language === 'en' 
-        ? 'Missing Supabase configuration. Please check your environment variables.' 
-        : 'إعدادات Supabase مفقودة. يرجى التحقق من المتغيرات البيئية.');
-    }
-  }, [language]);
 
   const handleExerciseComplete = async (exerciseType: 'dbt' | 'act', exerciseId: string, notes: string) => {
     if (!session?.user?.id) return;
