@@ -17,10 +17,23 @@ export type JournalEntry = Database['public']['Tables']['journal_entries']['Row'
 export type GratitudeEntry = Database['public']['Tables']['gratitude_entries']['Row'];
 
 // Define goal type
-export type Goal = Database['public']['Tables']['goals']['Row'];
+export type Goal = Database['public']['Tables']['goals']['Row'] & {
+  status: 'active' | 'completed' | 'abandoned'
+};
 
 // Define CBT exercise type
 export type CBTExercise = Database['public']['Tables']['cbt_exercises']['Row'];
+
+// Define therapeutic exercise type
+export type TherapeuticExerciseLog = {
+  id: string;
+  user_id: string;
+  exercise_type: string;
+  exercise_id: string;
+  notes?: string;
+  completed_at: string;
+  created_at: string;
+};
 
 // Define user settings type
 export type UserSettings = Database['public']['Tables']['user_settings']['Row'];
