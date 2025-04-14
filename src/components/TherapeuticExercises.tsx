@@ -1,17 +1,18 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/components/Header';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import DBTExerciseTab from './therapeutic/DBTExerciseTab';
 import ACTExerciseTab from './therapeutic/ACTExerciseTab';
+import CBTExerciseTab from './therapeutic/CBTExerciseTab';
+import PositivePsychologyTab from './therapeutic/PositivePsychologyTab';
 
 interface ExerciseLog {
   id: string;
   user_id: string;
-  exercise_type: 'dbt' | 'act';
+  exercise_type: 'dbt' | 'act' | 'cbt' | 'positive';
   exercise_id: string;
   completed_at: string;
   notes: string;
@@ -20,10 +21,10 @@ interface ExerciseLog {
 const TherapeuticExercises = () => {
   const { language } = useLanguage();
   const { session } = useAuth();
-  const [activeTab, setActiveTab] = useState('dbt');
+  const [activeTab, setActiveTab] = useState('cbt');
   const [error, setError] = useState<string | null>(null);
 
-  const handleExerciseComplete = async (exerciseType: 'dbt' | 'act', exerciseId: string, notes: string) => {
+  const handleExerciseComplete = async (exerciseType: 'dbt' | 'act' | 'cbt' | 'positive', exerciseId: string, notes: string) => {
     if (!session?.user?.id) return;
 
     try {
@@ -67,17 +68,33 @@ const TherapeuticExercises = () => {
         <CardTitle>
           {language === 'en' ? 'Therapeutic Exercises' : 'التمارين العلاجية'}
         </CardTitle>
+        <CardDescription>
+          {language === 'en' 
+            ? 'Evidence-based therapeutic approaches for mental well-being'
+            : 'أساليب علاجية مبنية على الأدلة للصحة النفسية'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="cbt">
+              {language === 'en' ? 'CBT' : 'العلاج المعرفي السلوكي'}
+            </TabsTrigger>
             <TabsTrigger value="dbt">
-              {language === 'en' ? 'DBT Exercises' : 'تمارين DBT'}
+              {language === 'en' ? 'DBT' : 'العلاج السلوكي الجدلي'}
             </TabsTrigger>
             <TabsTrigger value="act">
-              {language === 'en' ? 'ACT Exercises' : 'تمارين ACT'}
+              {language === 'en' ? 'ACT' : 'العلاج بالقبول والالتزام'}
+            </TabsTrigger>
+            <TabsTrigger value="positive">
+              {language === 'en' ? 'Positive Psychology' : 'علم النفس الإيجابي'}
             </TabsTrigger>
           </TabsList>
+          <TabsContent value="cbt">
+            <CBTExerciseTab onComplete={(exerciseId, notes) => {
+              handleExerciseComplete('cbt', exerciseId, notes);
+            }} />
+          </TabsContent>
           <TabsContent value="dbt">
             <DBTExerciseTab onComplete={(exerciseId, notes) => {
               handleExerciseComplete('dbt', exerciseId, notes);
@@ -86,6 +103,11 @@ const TherapeuticExercises = () => {
           <TabsContent value="act">
             <ACTExerciseTab onComplete={(exerciseId, notes) => {
               handleExerciseComplete('act', exerciseId, notes);
+            }} />
+          </TabsContent>
+          <TabsContent value="positive">
+            <PositivePsychologyTab onComplete={(exerciseId, notes) => {
+              handleExerciseComplete('positive', exerciseId, notes);
             }} />
           </TabsContent>
         </Tabs>
