@@ -297,6 +297,36 @@ export type Database = {
         }
         Relationships: []
       }
+      therapeutic_exercises_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          exercise_id: string
+          exercise_type: string
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          exercise_id: string
+          exercise_type: string
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          exercise_id?: string
+          exercise_type?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           created_at: string | null

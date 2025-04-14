@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Calendar, Download, Printer, Send, BarChart2, LineChart, PieChart, Activity, Brain, Heart, Users } from 'lucide-react';
+import { Calendar, Download, Printer, Send, BarChart2, LineChart, PieChart, Activity, Brain, Heart, Users, Target } from 'lucide-react';
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -36,6 +35,10 @@ interface TherapeuticExercise {
   id: string;
   created_at: string;
   exercise_type: string;
+  user_id: string;
+  exercise_id: string;
+  notes?: string;
+  completed_at: string;
 }
 
 interface GoalData {
@@ -69,7 +72,6 @@ const MentalHealthReport = () => {
     ]
   });
 
-  // Fetch data when component mounts
   useEffect(() => {
     if (!session.user) return;
     
@@ -77,7 +79,6 @@ const MentalHealthReport = () => {
       setIsLoading(true);
       
       try {
-        // Fetch mood data
         const { data: moodData, error: moodError } = await supabase
           .from('mood_entries')
           .select('*')
@@ -87,17 +88,15 @@ const MentalHealthReport = () => {
         if (moodError) throw moodError;
         setMoodData(moodData || []);
         
-        // Fetch therapeutic exercises data
         const { data: exerciseData, error: exerciseError } = await supabase
-          .from('therapeutic_exercises')
+          .from('therapeutic_exercises_logs')
           .select('*')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false });
           
         if (exerciseError) throw exerciseError;
-        setExerciseData(exerciseData || []);
+        setExerciseData(exerciseData as TherapeuticExercise[] || []);
         
-        // Fetch goals data
         const { data: goalData, error: goalError } = await supabase
           .from('goals')
           .select('*')
@@ -171,11 +170,9 @@ const MentalHealthReport = () => {
     return format(date, language === 'en' ? 'MMMM d, yyyy' : 'yyyy/MM/dd');
   };
 
-  // Prepare chart data
   const getMoodChartData = () => {
     if (!moodData.length) return null;
     
-    // Get last 14 days of mood data
     const last14Days = moodData
       .filter(entry => new Date(entry.created_at) >= subDays(new Date(), 14))
       .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
@@ -198,7 +195,6 @@ const MentalHealthReport = () => {
   const getExerciseChartData = () => {
     if (!exerciseData.length) return null;
     
-    // Count exercises by type
     const exerciseCounts: Record<string, number> = {};
     exerciseData.forEach(exercise => {
       exerciseCounts[exercise.exercise_type] = (exerciseCounts[exercise.exercise_type] || 0) + 1;
@@ -247,7 +243,6 @@ const MentalHealthReport = () => {
   };
 
   const generateReport = () => {
-    // Implementation for report generation would go here
     console.log('Generating report with config:', config);
     setActiveTab('report');
   };
@@ -286,7 +281,6 @@ const MentalHealthReport = () => {
                 </div>
               ) : (
                 <>
-                  {/* Mood Chart */}
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center">
@@ -323,7 +317,6 @@ const MentalHealthReport = () => {
                     </CardContent>
                   </Card>
                   
-                  {/* Exercises Chart */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card>
                       <CardHeader>
@@ -346,7 +339,6 @@ const MentalHealthReport = () => {
                       </CardContent>
                     </Card>
                     
-                    {/* Goals Chart */}
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center">
@@ -514,7 +506,6 @@ const MentalHealthReport = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-8">
-                  {/* Sample report content - would be populated based on config */}
                   {isLoading ? (
                     <div className="flex justify-center p-8">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
