@@ -13,6 +13,19 @@ interface MoodGraphProps {
 export const MoodGraph: React.FC<MoodGraphProps> = ({ moodEntries }) => {
   const { language } = useLanguage();
 
+  // Return empty state if no entries
+  if (!moodEntries || moodEntries.length === 0) {
+    return (
+      <div className="bg-accent/10 p-4 rounded-lg flex items-center justify-center h-48">
+        <p className="text-muted-foreground">
+          {language === 'en' 
+            ? 'No mood data to display yet. Add your first mood entry!' 
+            : 'لا توجد بيانات مزاجية للعرض بعد. أضف أول إدخال للمزاج!'}
+        </p>
+      </div>
+    );
+  }
+
   // Sort entries by date (oldest to newest)
   const sortedEntries = [...moodEntries].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -47,12 +60,31 @@ export const MoodGraph: React.FC<MoodGraphProps> = ({ moodEntries }) => {
           text: language === 'en' ? 'Mood Scale (-10 to 10)' : 'مقياس المزاج (-١٠ إلى ١٠)',
         },
       },
+      x: {
+        ticks: {
+          autoSkip: true,
+          maxRotation: language === 'ar' ? 45 : 0, // Rotate Arabic labels for better visibility
+          align: language === 'ar' ? 'start' : 'center',
+        }
+      }
+    },
+    plugins: {
+      tooltip: {
+        rtl: language === 'ar', // Right to left for Arabic
+        textDirection: language === 'ar' ? 'rtl' : 'ltr',
+      },
+      legend: {
+        rtl: language === 'ar', // Right to left for Arabic
+        textDirection: language === 'ar' ? 'rtl' : 'ltr',
+      },
     },
   };
 
   return (
-    <div className="bg-accent/10 p-4 rounded-lg">
+    <div className="bg-accent/10 p-4 rounded-lg" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <Line data={moodGraphData} options={moodGraphOptions} />
     </div>
   );
 };
+
+export default MoodGraph;

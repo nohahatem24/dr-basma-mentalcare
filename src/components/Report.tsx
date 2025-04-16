@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,20 +25,15 @@ interface PrintableReportProps {
   language: 'en' | 'ar';
 }
 
-// Separate printable component for cleaner printing
 const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language }) => {
-  // Process data for charts
   const processedEntries = [...moodEntries].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
   
-  // Weekly average data for line chart
   const weeklyAverages = processWeeklyAverages(processedEntries);
   
-  // Trigger frequency for bar chart
   const triggerFrequency = processTriggerFrequency(processedEntries);
   
-  // Calculate overall stats
   const stats = calculateMoodStats(processedEntries);
 
   return (
@@ -243,18 +237,15 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language
   );
 };
 
-// Helper functions
 const processWeeklyAverages = (entries: MoodEntry[]): MoodTrend[] => {
   if (entries.length === 0) return [];
   
-  // Group entries by week
   const weeklyData: { [key: string]: number[] } = {};
   
   entries.forEach(entry => {
     const date = new Date(entry.date);
-    // Create week identifier (YYYY-WW)
     const weekStart = new Date(date);
-    weekStart.setDate(date.getDate() - date.getDay()); // Set to Sunday
+    weekStart.setDate(date.getDate() - date.getDay());
     const weekKey = `${weekStart.toISOString().substring(0, 10)}`;
     
     if (!weeklyData[weekKey]) {
@@ -264,7 +255,6 @@ const processWeeklyAverages = (entries: MoodEntry[]): MoodTrend[] => {
     weeklyData[weekKey].push(entry.mood);
   });
   
-  // Calculate averages
   return Object.entries(weeklyData).map(([date, moods]) => ({
     date,
     mood: moods.reduce((sum, val) => sum + val, 0) / moods.length
@@ -286,7 +276,7 @@ const processTriggerFrequency = (entries: MoodEntry[]): { trigger: string; frequ
   return Object.entries(triggerCount)
     .map(([trigger, frequency]) => ({ trigger, frequency }))
     .sort((a, b) => b.frequency - a.frequency)
-    .slice(0, 5); // Top 5 triggers
+    .slice(0, 5);
 };
 
 const calculateMoodStats = (entries: MoodEntry[]) => {
@@ -307,7 +297,6 @@ const calculateMoodStats = (entries: MoodEntry[]) => {
   const lowest = Math.min(...moodValues);
   const fluctuation = highest - lowest;
   
-  // Calculate trend (positive number = improving, negative = declining)
   let trend = 0;
   if (entries.length > 1) {
     const firstWeek = entries.slice(0, Math.max(Math.floor(entries.length / 4), 1));
@@ -319,7 +308,6 @@ const calculateMoodStats = (entries: MoodEntry[]) => {
     trend = lastAvg - firstAvg;
   }
   
-  // Date range
   const sortedDates = [...entries].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
@@ -347,7 +335,6 @@ const generateEnglishAnalysis = (stats: any, entriesCount: number) => {
   
   let analysis = '';
   
-  // Average mood analysis
   if (stats.average > 5) {
     analysis += 'Your average mood has been positive. ';
   } else if (stats.average > 0) {
@@ -358,7 +345,6 @@ const generateEnglishAnalysis = (stats: any, entriesCount: number) => {
     analysis += 'Your average mood has been negative. ';
   }
   
-  // Trend analysis
   if (Math.abs(stats.trend) < 1) {
     analysis += 'Your mood has been relatively stable. ';
   } else if (stats.trend > 1) {
@@ -367,7 +353,6 @@ const generateEnglishAnalysis = (stats: any, entriesCount: number) => {
     analysis += 'Your mood shows a declining trend. ';
   }
   
-  // Fluctuation analysis
   if (stats.fluctuation > 15) {
     analysis += 'You\'ve experienced significant mood fluctuations. ';
   } else if (stats.fluctuation > 10) {
@@ -386,7 +371,6 @@ const generateArabicAnalysis = (stats: any, entriesCount: number) => {
   
   let analysis = '';
   
-  // Average mood analysis
   if (stats.average > 5) {
     analysis += 'كان متوسط مزاجك إيجابيًا. ';
   } else if (stats.average > 0) {
@@ -397,7 +381,6 @@ const generateArabicAnalysis = (stats: any, entriesCount: number) => {
     analysis += 'كان متوسط مزاجك سلبيًا. ';
   }
   
-  // Trend analysis
   if (Math.abs(stats.trend) < 1) {
     analysis += 'كان مزاجك مستقرًا نسبيًا. ';
   } else if (stats.trend > 1) {
@@ -406,7 +389,6 @@ const generateArabicAnalysis = (stats: any, entriesCount: number) => {
     analysis += 'يُظهر مزاجك اتجاهًا نحو التراجع. ';
   }
   
-  // Fluctuation analysis
   if (stats.fluctuation > 15) {
     analysis += 'لقد واجهت تقلبات كبيرة في المزاج. ';
   } else if (stats.fluctuation > 10) {
@@ -468,11 +450,9 @@ const Report = () => {
   const location = useLocation();
   const moodEntries: MoodEntry[] = location.state?.moodEntries || [];
 
-  // Fixed the useReactToPrint hook usage
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
-    // Use correct syntax for getting content from ref
-    documentToPrint: reportRef.current,
+    content: () => reportRef.current,
   });
 
   return (
@@ -482,8 +462,7 @@ const Report = () => {
           <CardTitle className={language === 'ar' ? 'text-right' : ''}>
             {language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية'}
           </CardTitle>
-          {/* Fixed the button click handler */}
-          <Button variant="outline" onClick={() => handlePrint()} className="no-print">
+          <Button variant="outline" onClick={handlePrint} className="no-print">
             <Printer className="mr-2 h-4 w-4" />
             {language === 'en' ? 'Print Report' : 'طباعة التقرير'}
           </Button>
