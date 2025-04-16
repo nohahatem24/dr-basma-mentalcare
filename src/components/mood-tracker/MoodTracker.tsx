@@ -96,6 +96,18 @@ const MoodTracker = () => {
     fetchMoodEntries();
   }, [session.user, language, toast]);
 
+  // Convert mood from -10:10 scale to 1:5 scale for database
+  const mapMoodToDBScale = (mood: number): number => {
+    // Map mood from -10:10 to 1:5
+    return Math.round(((mood + 10) / 20) * 4) + 1;
+  };
+
+  // Convert mood from 1:5 scale (database) back to -10:10 scale (UI)
+  const mapMoodFromDBScale = (mood: number): number => {
+    // Map mood from 1:5 back to -10:10
+    return Math.round(((mood - 1) / 4) * 20) - 10;
+  };
+
   const handleAddMoodEntry = async (formData: { mood: number; notes: string; triggers: string[] }) => {
     if (!session.user) {
       toast({
@@ -107,12 +119,15 @@ const MoodTracker = () => {
     }
     
     try {
+      // Map the mood to database scale (1 to 5)
+      const dbMoodScore = mapMoodToDBScale(formData.mood);
+      
       // If editing an existing entry
       if (editingId) {
         const { error } = await supabase
           .from('mood_entries')
           .update({
-            mood_score: formData.mood,
+            mood_score: dbMoodScore, // Save mapped mood score
             notes: formData.notes,
             triggers: formData.triggers,
             updated_at: new Date().toISOString()
@@ -139,7 +154,7 @@ const MoodTracker = () => {
           .from('mood_entries')
           .insert({
             user_id: session.user.id,
-            mood_score: formData.mood,
+            mood_score: dbMoodScore, // Save mapped mood score
             notes: formData.notes,
             triggers: formData.triggers,
             mood_label: getMoodLabel(formData.mood)
@@ -153,7 +168,7 @@ const MoodTracker = () => {
           const newEntry: MoodEntry = {
             id: data[0].id,
             date: new Date(),
-            mood: formData.mood,
+            mood: formData.mood, // Store the original mood value in the UI
             notes: formData.notes,
             triggers: formData.triggers
           };

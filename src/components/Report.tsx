@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,7 +90,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language
               <span className="font-medium">{moodEntries.length}</span>
             </div>
             <div className="flex justify-between">
-              <span>{language === 'en' ? 'Date Range' : 'النطاق الزمني'}</span>
+              <span>{language === 'en' ? 'Date Range' : 'النطاق الز��ني'}</span>
               <span className="font-medium">
                 {stats.dateRange.start} - {stats.dateRange.end}
               </span>
@@ -454,18 +453,8 @@ const Report = () => {
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
     onPrintError: (error) => console.error('Printing failed', error),
-    copyStyles: true,  // Add this to ensure styles are copied
-    print: (printIframe) => {
-      const document = printIframe.contentDocument;
-      if (document) {
-        const printContents = reportRef.current;
-        if (printContents) {
-          const body = document.body;
-          body.innerHTML = printContents.innerHTML;
-          window.print();
-        }
-      }
-    }
+    copyStyles: true,  
+    content: () => reportRef.current
   });
 
   return (
@@ -477,10 +466,7 @@ const Report = () => {
           </CardTitle>
           <Button 
             variant="outline" 
-            onClick={(e) => {
-              e.preventDefault();
-              handlePrint();
-            }}
+            onClick={() => handlePrint()}
             className="no-print"
           >
             <Printer className="mr-2 h-4 w-4" />
