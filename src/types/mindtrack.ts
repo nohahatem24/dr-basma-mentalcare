@@ -1,3 +1,4 @@
+
 import type { Database } from '@/integrations/supabase/types';
 
 // Re-export the database types
@@ -6,19 +7,11 @@ export type { Database };
 // Define profile type based on the database schema
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 
-// Define mood entry type
-export type MoodEntry = Database['public']['Tables']['mood_entries']['Row'];
-
 // Define journal entry type
 export type JournalEntry = Database['public']['Tables']['journal_entries']['Row'];
 
 // Define gratitude entry type
 export type GratitudeEntry = Database['public']['Tables']['gratitude_entries']['Row'];
-
-// Define goal type
-export type Goal = Database['public']['Tables']['goals']['Row'] & {
-  status: 'active' | 'completed' | 'abandoned'
-};
 
 // Define CBT exercise type
 export type CBTExercise = Database['public']['Tables']['cbt_exercises']['Row'];
@@ -49,6 +42,28 @@ export type Wallet = Database['public']['Tables']['wallet']['Row'];
 // Define wallet transaction type
 export type WalletTransaction = Database['public']['Tables']['wallet_transactions']['Row'];
 
+// Define mood entry type - consolidated definition
+export type MoodEntry = Database['public']['Tables']['mood_entries']['Row'] & {
+  id: string;
+  date: Date;
+  mood: number;
+  notes: string;
+  triggers: string[];
+};
+
+// Define goal type - consolidated definition
+export type Goal = Database['public']['Tables']['goals']['Row'] & {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  target_date: string | null;
+  status: 'active' | 'completed' | 'abandoned';
+  progress: number;
+  created_at: string;
+  updated_at: string;
+};
+
 // Insert types (for creating new records)
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
 export type MoodEntryInsert = Database['public']['Tables']['mood_entries']['Insert'];
@@ -75,28 +90,8 @@ export type SessionUpdate = Database['public']['Tables']['sessions']['Update'];
 export type WalletUpdate = Database['public']['Tables']['wallet']['Update'];
 export type WalletTransactionUpdate = Database['public']['Tables']['wallet_transactions']['Update'];
 
-export interface Goal {
-  id: string;
-  user_id: string;
-  title: string;
-  description: string | null;
-  target_date: string | null;
-  status: 'active' | 'completed' | 'abandoned';
-  progress: number;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface GoalFormData {
   title: string;
   description: string;
   targetDate?: Date;
-}
-
-export interface MoodEntry {
-  id: string;
-  date: Date;
-  mood: number;
-  notes: string;
-  triggers: string[];
 }

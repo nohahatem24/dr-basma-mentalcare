@@ -19,8 +19,8 @@ const TherapeuticExercises = () => {
   const { session } = useAuth();
   const [activeTab, setActiveTab] = useState('mindfulness');
 
-  // Handler for completing exercises, fixed to accept two parameters
-  const handleExerciseComplete = (exerciseId: string, notes: string) => {
+  // Handler for completing exercises, modified to match the expected signature in tabs
+  const handleExerciseComplete = (exerciseId: string, notes?: string) => {
     if (!session?.user) {
       toast({
         title: language === 'en' ? 'Sign in required' : 'تسجيل الدخول مطلوب',
@@ -42,8 +42,8 @@ const TherapeuticExercises = () => {
         completed_at: new Date().toISOString(),
       };
       
-      // Save to Supabase
-      supabase.from('therapeutic_exercises_log').insert(exerciseLog).then(({ error }) => {
+      // Save to Supabase - fixed table name to therapeutic_exercises_logs (plural)
+      supabase.from('therapeutic_exercises_logs').insert(exerciseLog).then(({ error }) => {
         if (error) {
           console.error('Error logging exercise:', error);
           toast({

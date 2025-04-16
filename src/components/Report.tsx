@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

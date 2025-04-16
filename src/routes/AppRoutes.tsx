@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
@@ -22,7 +23,6 @@ import AccountSettings from "@/components/user/AccountSettings";
 const AppRoutes = () => {
   const location = useLocation();
   const { language } = useLanguage();
-  const [relationshipData, setRelationshipData] = useState([]);
 
   return (
     <Routes>
@@ -48,11 +48,7 @@ const AppRoutes = () => {
       
       <Route path="/report" element={
         <ProtectedRoute>
-          <Report
-            moodEntries={(location.state as any)?.moodEntries || []}
-            relationshipData={relationshipData}
-            language={language}
-          />
+          <Report />
         </ProtectedRoute>
       } />
       
