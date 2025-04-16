@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -453,7 +454,18 @@ const Report = () => {
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
     onPrintError: (error) => console.error('Printing failed', error),
-    content: () => reportRef.current,
+    copyStyles: true,  // Add this to ensure styles are copied
+    print: (printIframe) => {
+      const document = printIframe.contentDocument;
+      if (document) {
+        const printContents = reportRef.current;
+        if (printContents) {
+          const body = document.body;
+          body.innerHTML = printContents.innerHTML;
+          window.print();
+        }
+      }
+    }
   });
 
   return (
