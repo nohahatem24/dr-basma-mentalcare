@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/Header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Play, Pause, RotateCw, Wind } from 'lucide-react';
+import AnimatedBreathingCircle from './AnimatedBreathingCircle';
 
 interface BreathingExercise {
   id: string;
@@ -30,6 +32,7 @@ const GuidedBreathing = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold1' | 'exhale' | 'hold2'>('inhale');
   const [timer, setTimer] = useState(0);
+  const [totalSeconds, setTotalSeconds] = useState(4); // For the progress animation
   const [currentCycle, setCurrentCycle] = useState(1);
   const [customInhale, setCustomInhale] = useState(4);
   const [customHold1, setCustomHold1] = useState(4);
@@ -91,10 +94,20 @@ const GuidedBreathing = () => {
     }
   ];
 
+  // Initialize with box breathing
+  useEffect(() => {
+    if (!selectedExercise && breathingExercises.length > 0) {
+      setSelectedExercise(breathingExercises[0]);
+      setTimer(breathingExercises[0].inhale);
+      setTotalSeconds(breathingExercises[0].inhale);
+    }
+  }, []);
+
   // Reset timer when changing exercises
   useEffect(() => {
     if (selectedExercise) {
       setTimer(selectedExercise.inhale);
+      setTotalSeconds(selectedExercise.inhale);
       setCurrentPhase('inhale');
       setCurrentCycle(1);
     }
@@ -117,18 +130,22 @@ const GuidedBreathing = () => {
               case 'inhale':
                 nextPhase = 'hold1';
                 nextTimer = selectedExercise.hold1;
+                setTotalSeconds(selectedExercise.hold1);
                 break;
               case 'hold1':
                 nextPhase = 'exhale';
                 nextTimer = selectedExercise.exhale;
+                setTotalSeconds(selectedExercise.exhale);
                 break;
               case 'exhale':
                 if (selectedExercise.hold2 > 0) {
                   nextPhase = 'hold2';
                   nextTimer = selectedExercise.hold2;
+                  setTotalSeconds(selectedExercise.hold2);
                 } else {
                   nextPhase = 'inhale';
                   nextTimer = selectedExercise.inhale;
+                  setTotalSeconds(selectedExercise.inhale);
                   if (currentCycle >= selectedExercise.cycles) {
                     setIsRunning(false);
                     return 0;
@@ -139,6 +156,7 @@ const GuidedBreathing = () => {
               case 'hold2':
                 nextPhase = 'inhale';
                 nextTimer = selectedExercise.inhale;
+                setTotalSeconds(selectedExercise.inhale);
                 if (currentCycle >= selectedExercise.cycles) {
                   setIsRunning(false);
                   return 0;
@@ -188,23 +206,9 @@ const GuidedBreathing = () => {
     setIsRunning(false);
     if (selectedExercise) {
       setTimer(selectedExercise.inhale);
+      setTotalSeconds(selectedExercise.inhale);
       setCurrentPhase('inhale');
       setCurrentCycle(1);
-    }
-  };
-
-  const getPhaseText = () => {
-    switch (currentPhase) {
-      case 'inhale':
-        return language === 'en' ? 'Inhale' : 'استنشاق';
-      case 'hold1':
-        return language === 'en' ? 'Hold' : 'امسك';
-      case 'exhale':
-        return language === 'en' ? 'Exhale' : 'زفير';
-      case 'hold2':
-        return language === 'en' ? 'Hold' : 'امسك';
-      default:
-        return '';
     }
   };
 
@@ -329,9 +333,14 @@ const GuidedBreathing = () => {
       {selectedExercise && (
         <Card className="p-6">
           <div className="flex flex-col items-center justify-center">
-            <div className="text-6xl font-bold mb-6">{timer}</div>
-            <div className="text-2xl font-medium mb-8">{getPhaseText()}</div>
-            <div className="flex justify-center space-x-4 mb-6">
+            {/* Animated Breathing Circle */}
+            <AnimatedBreathingCircle 
+              currentPhase={currentPhase}
+              secondsLeft={timer}
+              totalSeconds={totalSeconds}
+            />
+            
+            <div className="flex justify-center space-x-4 my-6">
               {!isRunning ? (
                 <Button onClick={handleStart} size="lg">
                   <Play className="h-5 w-5 mr-2" />
@@ -373,4 +382,4 @@ const GuidedBreathing = () => {
   );
 };
 
-export default GuidedBreathing; 
+export default GuidedBreathing;

@@ -1,238 +1,221 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '@/components/Header';
-import { useAuth } from '@/components/auth/AuthProvider';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { CheckCircle, Target, PlusCircle, Calendar, Edit, Trash2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import GoalsForm from './GoalsForm';
-
-interface Goal {
-  id: string;
-  title: string;
-  description?: string;
-  target_date?: string;
-  progress: number;
-  status: 'active' | 'completed' | 'abandoned';
-}
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/components/Header';
+import { Target, Plus, CheckCircle, Calendar } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { Goal } from '@/types/mindtrack';
+import GoalForm from './GoalsForm';
 
 const Goals = () => {
   const { language } = useLanguage();
-  const { session } = useAuth();
   const { toast } = useToast();
-  
+  const { session } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  
-  const fetchGoals = async () => {
-    if (!session.user) return;
-    
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase
+  const [isAddingGoal, setIsAddingGoal] = useState(false);
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      if (!session?.user) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('goals')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Convert database data to Goal type
+        if (data) {
+          const typedGoals: Goal[] = data.map(goal => ({
+            ...goal,
+            status: goal.status as 'active' | 'completed' | 'abandoned'
+          }));
+          
+          setGoals(typedGoals);
+        }
+      } catch (error) {
+        console.error('Error fetching goals:', error);
+        toast({
+          title: language === 'en' ? 'Error' : 'خطأ',
+          description: language === 'en' ? 'Failed to load your goals' : 'فشل في تحميل أهدافك',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGoals();
+  }, [session?.user, language, toast]);
+
+  const handleAddGoalSuccess = () => {
+    setIsAddingGoal(false);
+    // Refresh goals list
+    if (session?.user) {
+      supabase
         .from('goals')
         .select('*')
         .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false });
-        
-      if (error) throw error;
-      
-      setGoals(data || []);
-    } catch (error) {
-      console.error('Error fetching goals:', error);
-      toast({
-        title: language === 'en' ? 'Error' : 'خطأ',
-        description: language === 'en' ? 'Failed to load your goals' : 'فشل في تحميل أهدافك',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  useEffect(() => {
-    fetchGoals();
-  }, [session.user]);
-  
-  const updateGoalProgress = async (goalId: string, newProgress: number) => {
-    if (!session.user) return;
-    
-    try {
-      const { error } = await supabase
-        .from('goals')
-        .update({ progress: newProgress })
-        .eq('id', goalId);
-        
-      if (error) throw error;
-      
-      // Update local state
-      setGoals(goals.map(goal => 
-        goal.id === goalId ? { ...goal, progress: newProgress } : goal
-      ));
-      
-      // If progress is 100%, update status to completed
-      if (newProgress === 100) {
-        await supabase
-          .from('goals')
-          .update({ status: 'completed' })
-          .eq('id', goalId);
+        .order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching updated goals:', error);
+            return;
+          }
           
-        setGoals(goals.map(goal => 
-          goal.id === goalId ? { ...goal, status: 'completed' } : goal
-        ));
-      }
-      
-      toast({
-        title: language === 'en' ? 'Progress Updated' : 'تم تحديث التقدم',
-        description: language === 'en' ? 'Goal progress has been updated' : 'تم تحديث تقدم الهدف',
-      });
-    } catch (error) {
-      console.error('Error updating goal progress:', error);
-      toast({
-        title: language === 'en' ? 'Error' : 'خطأ',
-        description: language === 'en' ? 'Failed to update progress' : 'فشل في تحديث التقدم',
-        variant: 'destructive',
-      });
+          if (data) {
+            const typedGoals: Goal[] = data.map(goal => ({
+              ...goal,
+              status: goal.status as 'active' | 'completed' | 'abandoned'
+            }));
+            
+            setGoals(typedGoals);
+          }
+        });
     }
   };
-  
-  const deleteGoal = async (goalId: string) => {
-    if (!session.user) return;
-    
-    if (!confirm(language === 'en' ? 'Are you sure you want to delete this goal?' : 'هل أنت متأكد أنك تريد حذف هذا الهدف؟')) {
-      return;
-    }
-    
+
+  const handleUpdateGoalStatus = async (goalId: string, newStatus: 'active' | 'completed' | 'abandoned') => {
     try {
       const { error } = await supabase
         .from('goals')
-        .delete()
+        .update({ 
+          status: newStatus,
+          progress: newStatus === 'completed' ? 100 : (newStatus === 'abandoned' ? 0 : 50)
+        })
         .eq('id', goalId);
         
       if (error) throw error;
       
       // Update local state
-      setGoals(goals.filter(goal => goal.id !== goalId));
+      setGoals(
+        goals.map(goal => 
+          goal.id === goalId 
+            ? { 
+                ...goal, 
+                status: newStatus,
+                progress: newStatus === 'completed' ? 100 : (newStatus === 'abandoned' ? 0 : goal.progress)
+              } 
+            : goal
+        )
+      );
       
       toast({
-        title: language === 'en' ? 'Goal Deleted' : 'تم حذف الهدف',
-        description: language === 'en' ? 'Your goal has been deleted' : 'تم حذف هدفك',
+        title: language === 'en' ? 'Goal Updated' : 'تم تحديث الهدف',
+        description: language === 'en' ? 'Your goal status was updated' : 'تم تحديث حالة هدفك',
       });
     } catch (error) {
-      console.error('Error deleting goal:', error);
+      console.error('Error updating goal:', error);
       toast({
         title: language === 'en' ? 'Error' : 'خطأ',
-        description: language === 'en' ? 'Failed to delete the goal' : 'فشل في حذف الهدف',
+        description: language === 'en' ? 'Failed to update goal status' : 'فشل في تحديث حالة الهدف',
         variant: 'destructive',
       });
     }
   };
-  
-  const formatDate = (dateString?: string) => {
+
+  const formatDate = (dateString: string | null) => {
     if (!dateString) return '';
     
-    return new Intl.DateTimeFormat(
-      language === 'en' ? 'en-US' : 'ar-SA',
-      { year: 'numeric', month: 'short', day: 'numeric' }
-    ).format(new Date(dateString));
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'ar-EG', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
   };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
-            {language === 'en' ? 'Goals Tracker' : 'متتبع الأهداف'}
-          </CardTitle>
-          <Button 
-            size="sm" 
-            onClick={() => setShowForm(true)}
-            className="gap-1"
-          >
-            <PlusCircle className="h-4 w-4" />
-            {language === 'en' ? 'Add Goal' : 'إضافة هدف'}
-          </Button>
-        </div>
+        <CardTitle className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-primary" />
+          {language === 'en' ? 'Goals Tracker' : 'متتبع الأهداف'}
+        </CardTitle>
         <CardDescription>
           {language === 'en'
-            ? 'Set and track your personal growth goals'
-            : 'حدد وتتبع أهداف نموك الشخصي'}
+            ? 'Set and track your therapy and personal growth goals'
+            : 'ضع وتتبع أهداف العلاج والنمو الشخصي الخاصة بك'}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        {showForm ? (
-          <GoalsForm 
-            onSuccess={() => {
-              setShowForm(false);
-              fetchGoals();
-            }}
-            onCancel={() => setShowForm(false)}
+      
+      <CardContent className="space-y-6">
+        {isAddingGoal ? (
+          <GoalForm 
+            onSuccess={handleAddGoalSuccess} 
+            onCancel={() => setIsAddingGoal(false)}
           />
         ) : (
-          <>
-            {isLoading ? (
-              <div className="flex justify-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            ) : goals.length === 0 ? (
-              <div className="text-center py-12 px-4">
-                <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                  <Target className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">
-                  {language === 'en' ? 'No Goals Yet' : 'لا توجد أهداف بعد'}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {language === 'en'
-                    ? 'Set goals to track your personal development journey'
-                    : 'حدد أهدافًا لتتبع رحلة تطورك الشخصي'}
-                </p>
-                <Button onClick={() => setShowForm(true)}>
-                  {language === 'en' ? 'Create Your First Goal' : 'أنشئ هدفك الأول'}
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {goals.map((goal) => (
-                  <div 
-                    key={goal.id} 
-                    className={`border rounded-lg p-4 ${
-                      goal.status === 'completed' ? 'bg-green-50 border-green-200' : 'bg-card'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          {goal.status === 'completed' && (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          )}
-                          <h3 className="font-medium text-lg">{goal.title}</h3>
-                        </div>
-                        {goal.description && (
-                          <p className="text-muted-foreground text-sm mt-1">{goal.description}</p>
-                        )}
-                      </div>
-                      <div className="flex gap-1">
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          onClick={() => deleteGoal(goal.id)}
-                          className="h-8 w-8"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
+          <Button 
+            onClick={() => setIsAddingGoal(true)}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <Plus size={16} />
+            {language === 'en' ? 'Add New Goal' : 'إضافة هدف جديد'}
+          </Button>
+        )}
+        
+        {isLoading ? (
+          <div className="py-8 text-center text-muted-foreground">
+            {language === 'en' ? 'Loading goals...' : 'جاري تحميل الأهداف...'}
+          </div>
+        ) : goals.length === 0 ? (
+          <div className="py-8 text-center text-muted-foreground">
+            {language === 'en' 
+              ? 'No goals added yet. Add your first goal to start tracking your progress!' 
+              : 'لم تتم إضافة أهداف حتى الآن. أضف هدفك الأول لبدء تتبع تقدمك!'}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {goals.map(goal => (
+              <Card key={goal.id} className={`border-l-4 ${
+                goal.status === 'completed' 
+                  ? 'border-l-green-500' 
+                  : goal.status === 'abandoned' 
+                    ? 'border-l-gray-400' 
+                    : 'border-l-blue-500'
+              }`}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-medium text-lg">{goal.title}</h3>
+                      <div className={`px-2 py-1 rounded-full text-xs 
+                        ${goal.status === 'completed' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                          : goal.status === 'abandoned' 
+                            ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200' 
+                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                        }`}
+                      >
+                        {language === 'en' 
+                          ? goal.status.charAt(0).toUpperCase() + goal.status.slice(1) 
+                          : goal.status === 'active' 
+                            ? 'نشط' 
+                            : goal.status === 'completed' 
+                              ? 'مكتمل' 
+                              : 'متروك'
+                        }
                       </div>
                     </div>
                     
+                    {goal.description && (
+                      <p className="text-sm text-muted-foreground">{goal.description}</p>
+                    )}
+                    
                     {goal.target_date && (
-                      <div className="flex items-center text-xs text-muted-foreground mb-2">
-                        <Calendar className="h-3 w-3 mr-1" />
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar size={12} />
                         <span>
                           {language === 'en' ? 'Target: ' : 'الهدف: '}
                           {formatDate(goal.target_date)}
@@ -240,40 +223,60 @@ const Goals = () => {
                       </div>
                     )}
                     
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span>
-                          {language === 'en' ? 'Progress' : 'التقدم'}
-                        </span>
-                        <span>
-                          {goal.progress}%
-                        </span>
-                      </div>
-                      <Progress value={goal.progress} className="h-2" />
+                    {/* Progress bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                      <div 
+                        className={`h-2 rounded-full ${
+                          goal.status === 'completed' 
+                            ? 'bg-green-500' 
+                            : goal.status === 'abandoned' 
+                              ? 'bg-gray-400' 
+                              : 'bg-blue-500'
+                        }`}
+                        style={{ width: `${goal.progress}%` }}
+                      ></div>
                     </div>
                     
+                    {/* Status change buttons */}
                     {goal.status !== 'completed' && (
-                      <div className="grid grid-cols-5 gap-1 mt-4">
-                        {[0, 25, 50, 75, 100].map(value => (
+                      <div className="flex justify-end gap-2 mt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs"
+                          onClick={() => handleUpdateGoalStatus(goal.id, 'completed')}
+                        >
+                          <CheckCircle size={14} className="mr-1" />
+                          {language === 'en' ? 'Mark as Completed' : 'وضع علامة كمكتمل'}
+                        </Button>
+                        
+                        {goal.status !== 'abandoned' && (
                           <Button
-                            key={value}
                             size="sm"
-                            variant={goal.progress === value ? "default" : "outline"}
-                            onClick={() => updateGoalProgress(goal.id, value)}
-                            className="h-8"
+                            variant="outline"
+                            className="text-xs text-gray-500 border-gray-300"
+                            onClick={() => handleUpdateGoalStatus(goal.id, 'abandoned')}
                           >
-                            {value}%
+                            {language === 'en' ? 'Abandon' : 'مهجور'}
                           </Button>
-                        ))}
+                        )}
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
-          </>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </CardContent>
+      
+      <CardFooter>
+        <div className="w-full text-xs text-muted-foreground text-center">
+          {language === 'en'
+            ? 'Tip: Setting SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound) increases your chance of success.'
+            : 'نصيحة: تحديد أهداف SMART (محددة، قابلة للقياس، قابلة للتحقيق، ذات صلة، محددة بوقت) يزيد من فرصة نجاحك.'}
+        </div>
+      </CardFooter>
     </Card>
   );
 };

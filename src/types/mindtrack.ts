@@ -1,4 +1,3 @@
-
 import type { Database } from '@/integrations/supabase/types';
 
 // Re-export the database types
@@ -75,3 +74,29 @@ export type MessageUpdate = Database['public']['Tables']['messages']['Update'];
 export type SessionUpdate = Database['public']['Tables']['sessions']['Update'];
 export type WalletUpdate = Database['public']['Tables']['wallet']['Update'];
 export type WalletTransactionUpdate = Database['public']['Tables']['wallet_transactions']['Update'];
+
+export interface Goal {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  target_date: string | null;
+  status: 'active' | 'completed' | 'abandoned';
+  progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoalFormData {
+  title: string;
+  description: string;
+  targetDate?: Date;
+}
+
+export interface MoodEntry {
+  id: string;
+  date: Date;
+  mood: number;
+  notes: string;
+  triggers: string[];
+}

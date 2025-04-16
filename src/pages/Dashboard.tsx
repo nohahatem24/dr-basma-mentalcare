@@ -47,14 +47,14 @@ const Dashboard = () => {
   };
 
   return (
-    <div className={`container py-8 ${language === 'ar' ? 'arabic text-right' : ''}`}>
+    <div className={`container py-8 ${language === 'ar' ? 'arabic text-right' : ''}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <h1 className="text-3xl font-bold header-gradient mb-4 md:mb-0">
           {language === 'en' ? 'MindTrack Dashboard' : 'لوحة تحكم مايند تراك'}
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className={`grid grid-cols-1 lg:grid-cols-4 gap-6 ${language === 'ar' ? 'lg:grid-flow-row-reverse' : ''}`}>
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <DashboardSidebar 

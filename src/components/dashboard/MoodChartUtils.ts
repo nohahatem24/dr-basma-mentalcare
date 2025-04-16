@@ -17,8 +17,15 @@ export const useMoodChartData = (moodEntries: MoodEntry[] = []): MoodDataPoint[]
     return [];
   }
   
+  // Ensure all entries have valid dates
+  const validEntries = moodEntries.filter(entry => entry.date && !isNaN(new Date(entry.date).getTime()));
+  
+  if (validEntries.length === 0) {
+    return [];
+  }
+  
   // Sort entries by date (newest first)
-  const sortedEntries = [...moodEntries].sort((a, b) => 
+  const sortedEntries = [...validEntries].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   

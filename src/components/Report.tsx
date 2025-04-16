@@ -1,222 +1,496 @@
 
-import React from 'react';
-import { Line, Bar } from 'react-chartjs-2';
-import { Button } from '@/components/ui/button';
+import React, { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Printer, Download, LineChart, Brain, Heart, Target, Users } from 'lucide-react';
-import { useMoodChartData } from '@/components/dashboard/MoodChartUtils';
-import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/components/Header';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { useLocation } from 'react-router-dom';
+import { Printer } from 'lucide-react';
 
-interface ReportProps {
-  moodEntries: {
-    date: Date;
-    mood: number;
-  }[];
-  relationshipData: {
-    label: string;
-    value: number;
-  }[];
+interface MoodEntry {
+  id: string;
+  date: Date;
+  mood: number;
+  notes: string;
+  triggers: string[];
+}
+
+interface MoodTrend {
+  date: string;
+  mood: number;
+}
+
+interface PrintableReportProps {
+  moodEntries: MoodEntry[];
   language: 'en' | 'ar';
 }
 
-const Report: React.FC<ReportProps> = ({ moodEntries, relationshipData, language }) => {
-  // Prepare mood graph data for the Chart.js visualization
-  const moodGraphData = {
-    labels: moodEntries.map((entry) =>
-      new Intl.DateTimeFormat(language === 'en' ? 'en-US' : 'ar-EG', {
-        month: 'short',
-        day: 'numeric',
-      }).format(entry.date)
-    ),
-    datasets: [
-      {
-        label: language === 'en' ? 'Mood Over Time' : 'المزاج مع مرور الوقت',
-        data: moodEntries.map((entry) => entry.mood),
-        borderColor: 'rgba(75,192,192,1)',
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        fill: true,
-      },
-    ],
-  };
-
-  const moodGraphOptions = {
-    scales: {
-      y: {
-        min: -10,
-        max: 10,
-        title: {
-          display: true,
-          text: language === 'en' ? 'Mood Scale (-10 to 10)' : 'مقياس المزاج (-١٠ إلى ١٠)',
-        },
-      },
-    },
-    responsive: true,
-    maintainAspectRatio: true,
-  };
-
-  const relationshipGraphData = {
-    labels: relationshipData.map((item) => item.label),
-    datasets: [
-      {
-        label: language === 'en' ? 'Relationship Quality' : 'جودة العلاقة',
-        data: relationshipData.map((item) => item.value),
-        backgroundColor: 'rgba(153,102,255,0.6)',
-      },
-    ],
-  };
-
-  const formatDate = (date: Date) => {
-    return format(date, language === 'en' ? 'PPP' : 'yyyy/MM/dd');
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
+// Separate printable component for cleaner printing
+const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language }) => {
+  // Process data for charts
+  const processedEntries = [...moodEntries].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  // Weekly average data for line chart
+  const weeklyAverages = processWeeklyAverages(processedEntries);
+  
+  // Trigger frequency for bar chart
+  const triggerFrequency = processTriggerFrequency(processedEntries);
+  
+  // Calculate overall stats
+  const stats = calculateMoodStats(processedEntries);
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto report-container">
-      {/* Report Header */}
-      <div className="text-center mb-8 print:mb-4">
+    <div className="p-8 max-w-4xl mx-auto bg-white dark:bg-gray-950">
+      <style>{`
+        @media print {
+          body {
+            background-color: white !important;
+            color: black !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .print-section {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+        }
+      `}</style>
+      
+      <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">
           {language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية'}
         </h1>
         <p className="text-muted-foreground">
           {language === 'en' 
-            ? `Generated on ${formatDate(new Date())}` 
-            : `تم إنشاؤه في ${formatDate(new Date())}`}
+            ? `Generated on ${new Date().toLocaleDateString()}` 
+            : `تم إنشاؤه في ${new Date().toLocaleDateString('ar-EG')}`}
         </p>
       </div>
-
-      {/* Mood Graph Section */}
-      <Card className="print:shadow-none print:border-none">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LineChart className="h-5 w-5" />
-            {language === 'en' ? 'Mood Trends' : 'اتجاهات المزاج'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="h-[300px] w-full">
-            <Line data={moodGraphData} options={moodGraphOptions} />
-          </div>
-          <div className="bg-muted p-4 rounded-md print:bg-transparent">
-            <h3 className="font-medium mb-2">
-              {language === 'en' ? 'Analysis:' : 'التحليل:'}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {language === 'en' 
-                ? 'Your mood patterns show fluctuations that may correlate with specific events or triggers. Consider noting activities on days with higher mood scores to identify positive influences.'
-                : 'تظهر أنماط مزاجك تقلبات قد ترتبط بأحداث أو محفزات محددة. فكر في تدوين الأنشطة في الأيام ذات درجات المزاج الأعلى لتحديد التأثيرات الإيجابية.'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Relationship Tracker Section */}
-      <Card className="print:shadow-none print:border-none">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            {language === 'en' ? 'Relationship Tracker' : 'متتبع العلاقات'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="h-[250px]">
-            <Bar 
-              data={relationshipGraphData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    max: 10
-                  }
-                }
-              }}
-            />
-          </div>
-          <div className="bg-muted p-4 rounded-md print:bg-transparent">
-            <h3 className="font-medium mb-2">
-              {language === 'en' ? 'Insights:' : 'الرؤى:'}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {language === 'en' 
-                ? 'Your relationships show varying levels of quality and interaction frequency. Consider dedicating more time to relationships that positively impact your mental wellbeing.'
-                : 'تُظهر علاقاتك مستويات متفاوتة من الجودة وتكرار التفاعل. فكر في تخصيص المزيد من الوقت للعلاقات التي تؤثر بشكل إيجابي على صحتك النفسية.'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Goals Summary */}
-      <Card className="print:shadow-none print:border-none">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
-            {language === 'en' ? 'Goals Summary' : 'ملخص الأهداف'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 print-section">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">
+            {language === 'en' ? 'Mood Summary' : 'ملخص المزاج'}
+          </h2>
           <div className="space-y-4">
-            <div className="bg-muted p-4 rounded-md print:bg-transparent">
-              <h3 className="font-medium mb-2">
-                {language === 'en' ? 'Recommendations:' : 'التوصيات:'}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {language === 'en' 
-                  ? 'Setting SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound) can help improve your mental wellbeing. Consider setting goals related to physical activity, mindfulness practice, and social connections.'
-                  : 'يمكن أن يساعد تحديد أهداف SMART (محددة، قابلة للقياس، قابلة للتحقيق، ذات صلة، محددة زمنياً) في تحسين صحتك النفسية. فكر في تحديد أهداف تتعلق بالنشاط البدني وممارسة اليقظة الذهنية والروابط الاجتماعية.'}
-              </p>
+            <div className="flex justify-between">
+              <span>{language === 'en' ? 'Average Mood' : 'متوسط المزاج'}</span>
+              <span className="font-medium">{stats.average.toFixed(1)} / 10</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{language === 'en' ? 'Highest Mood' : 'أعلى مزاج'}</span>
+              <span className="font-medium">{stats.highest} / 10</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{language === 'en' ? 'Lowest Mood' : 'أدنى مزاج'}</span>
+              <span className="font-medium">{stats.lowest} / 10</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{language === 'en' ? 'Entries' : 'المدخلات'}</span>
+              <span className="font-medium">{moodEntries.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{language === 'en' ? 'Date Range' : 'النطاق الزمني'}</span>
+              <span className="font-medium">
+                {stats.dateRange.start} - {stats.dateRange.end}
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Final Summary */}
-      <Card className="print:shadow-none print:border-none">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            {language === 'en' ? 'Overall Assessment' : 'التقييم العام'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm">
-            {language === 'en' 
-              ? 'This report provides an overview of your mental health patterns. Remember that mental health fluctuations are normal, and identifying patterns can help you develop strategies to manage your wellbeing. Consider discussing these insights with your therapist for personalized guidance.'
-              : 'يوفر هذا التقرير نظرة عامة على أنماط صحتك النفسية. تذكر أن تقلبات الصحة النفسية أمر طبيعي، ويمكن أن يساعدك تحديد الأنماط في تطوير استراتيجيات لإدارة صحتك. فكر في مناقشة هذه الرؤى مع معالجك للحصول على إرشادات مخصصة.'}
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Print/Download Buttons - hidden when printing */}
-      <div className="flex justify-end gap-2 print:hidden">
-        <Button onClick={handlePrint} className="gap-2">
-          <Printer className="h-4 w-4" />
-          {language === 'en' ? 'Print Report' : 'طباعة التقرير'}
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          {language === 'en' ? 'Download PDF' : 'تنزيل PDF'}
-        </Button>
+        </div>
+        
+        <div>
+          <h2 className="text-xl font-semibold mb-4">
+            {language === 'en' ? 'Mood Analysis' : 'تحليل المزاج'}
+          </h2>
+          <div className="space-y-2">
+            <p>
+              {language === 'en'
+                ? generateEnglishAnalysis(stats, moodEntries.length)
+                : generateArabicAnalysis(stats, moodEntries.length)}
+            </p>
+            <p className="text-sm text-muted-foreground italic">
+              {language === 'en'
+                ? 'Note: This is an automated analysis based on your mood entries. It is not a professional diagnosis.'
+                : 'ملاحظة: هذا تحليل آلي بناءً على إدخالات مزاجك. إنه ليس تشخيصًا مهنيًا.'}
+            </p>
+          </div>
+        </div>
       </div>
+      
+      <div className="mb-8 print-section">
+        <h2 className="text-xl font-semibold mb-4">
+          {language === 'en' ? 'Mood Trends' : 'اتجاهات المزاج'}
+        </h2>
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={weeklyAverages}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis domain={[-10, 10]} />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="mood"
+                stroke="#8884d8"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="text-center text-sm text-muted-foreground mt-2">
+          {language === 'en' ? 'Weekly mood averages over time' : 'متوسطات المزاج الأسبوعية عبر الزمن'}
+        </p>
+      </div>
+      
+      {triggerFrequency.length > 0 && (
+        <div className="mb-8 print-section">
+          <h2 className="text-xl font-semibold mb-4">
+            {language === 'en' ? 'Common Triggers' : 'المحفزات الشائعة'}
+          </h2>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={triggerFrequency}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="trigger" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="frequency" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-2">
+            {language === 'en' 
+              ? 'Frequency of reported triggers in your entries' 
+              : 'تكرار المحفزات المبلغ عنها في إدخالاتك'}
+          </p>
+        </div>
+      )}
+      
+      <div className="mb-8 print-section">
+        <h2 className="text-xl font-semibold mb-4">
+          {language === 'en' ? 'Recommendations' : 'التوصيات'}
+        </h2>
+        <div className="space-y-3">
+          <p>
+            {language === 'en' 
+              ? generateEnglishRecommendations(stats) 
+              : generateArabicRecommendations(stats)}
+          </p>
+        </div>
+      </div>
+      
+      {moodEntries.length > 0 && (
+        <div className="print-section">
+          <h2 className="text-xl font-semibold mb-4">
+            {language === 'en' ? 'Recent Entries' : 'المدخلات الأخيرة'}
+          </h2>
+          <div className="space-y-4">
+            {moodEntries.slice(0, 3).map((entry, index) => (
+              <div key={index} className="border rounded p-4">
+                <div className="flex justify-between">
+                  <span className="font-medium">
+                    {new Date(entry.date).toLocaleDateString(
+                      language === 'en' ? 'en-US' : 'ar-EG',
+                      { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }
+                    )}
+                  </span>
+                  <span className={`font-semibold ${
+                    entry.mood > 5 ? 'text-green-600' : 
+                    entry.mood > 0 ? 'text-blue-600' : 
+                    entry.mood > -5 ? 'text-orange-600' : 'text-red-600'
+                  }`}>
+                    {entry.mood > 0 ? '+' : ''}{entry.mood}
+                  </span>
+                </div>
+                {entry.notes && (
+                  <p className="text-sm mt-2">{entry.notes}</p>
+                )}
+                {entry.triggers && entry.triggers.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {entry.triggers.map((trigger, i) => (
+                      <span key={i} className="bg-gray-200 dark:bg-gray-800 text-xs px-2 py-1 rounded">
+                        {trigger}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      <div className="mt-8 text-center text-xs text-muted-foreground print-section">
+        {language === 'en'
+          ? 'This report is generated based on your tracked mood data. For professional mental health support, please consult a qualified therapist or counselor.'
+          : 'تم إنشاء هذا التقرير بناءً على بيانات المزاج التي تم تتبعها. للحصول على دعم الصحة النفسية المهني، يرجى استشارة معالج أو مستشار مؤهل.'}
+      </div>
+    </div>
+  );
+};
 
-      {/* Print Styles */}
-      <style jsx global>{`
-        @media print {
-          body {
-            background: white;
-            font-size: 12pt;
-          }
-          .report-container {
-            padding: 0;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
-        }
-      `}</style>
+// Helper functions
+const processWeeklyAverages = (entries: MoodEntry[]): MoodTrend[] => {
+  if (entries.length === 0) return [];
+  
+  // Group entries by week
+  const weeklyData: { [key: string]: number[] } = {};
+  
+  entries.forEach(entry => {
+    const date = new Date(entry.date);
+    // Create week identifier (YYYY-WW)
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay()); // Set to Sunday
+    const weekKey = `${weekStart.toISOString().substring(0, 10)}`;
+    
+    if (!weeklyData[weekKey]) {
+      weeklyData[weekKey] = [];
+    }
+    
+    weeklyData[weekKey].push(entry.mood);
+  });
+  
+  // Calculate averages
+  return Object.entries(weeklyData).map(([date, moods]) => ({
+    date,
+    mood: moods.reduce((sum, val) => sum + val, 0) / moods.length
+  })).sort((a, b) => a.date.localeCompare(b.date));
+};
+
+const processTriggerFrequency = (entries: MoodEntry[]): { trigger: string; frequency: number }[] => {
+  const triggerCount: { [key: string]: number } = {};
+  
+  entries.forEach(entry => {
+    (entry.triggers || []).forEach(trigger => {
+      if (!triggerCount[trigger]) {
+        triggerCount[trigger] = 0;
+      }
+      triggerCount[trigger]++;
+    });
+  });
+  
+  return Object.entries(triggerCount)
+    .map(([trigger, frequency]) => ({ trigger, frequency }))
+    .sort((a, b) => b.frequency - a.frequency)
+    .slice(0, 5); // Top 5 triggers
+};
+
+const calculateMoodStats = (entries: MoodEntry[]) => {
+  if (entries.length === 0) {
+    return {
+      average: 0,
+      highest: 0,
+      lowest: 0,
+      fluctuation: 0,
+      trend: 0,
+      dateRange: { start: 'N/A', end: 'N/A' }
+    };
+  }
+  
+  const moodValues = entries.map(entry => entry.mood);
+  const average = moodValues.reduce((sum, val) => sum + val, 0) / moodValues.length;
+  const highest = Math.max(...moodValues);
+  const lowest = Math.min(...moodValues);
+  const fluctuation = highest - lowest;
+  
+  // Calculate trend (positive number = improving, negative = declining)
+  let trend = 0;
+  if (entries.length > 1) {
+    const firstWeek = entries.slice(0, Math.max(Math.floor(entries.length / 4), 1));
+    const lastWeek = entries.slice(-Math.max(Math.floor(entries.length / 4), 1));
+    
+    const firstAvg = firstWeek.reduce((sum, entry) => sum + entry.mood, 0) / firstWeek.length;
+    const lastAvg = lastWeek.reduce((sum, entry) => sum + entry.mood, 0) / lastWeek.length;
+    
+    trend = lastAvg - firstAvg;
+  }
+  
+  // Date range
+  const sortedDates = [...entries].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  const startDate = new Date(sortedDates[0].date);
+  const endDate = new Date(sortedDates[sortedDates.length - 1].date);
+  
+  return {
+    average,
+    highest,
+    lowest,
+    fluctuation,
+    trend,
+    dateRange: {
+      start: startDate.toLocaleDateString(),
+      end: endDate.toLocaleDateString()
+    }
+  };
+};
+
+const generateEnglishAnalysis = (stats: any, entriesCount: number) => {
+  if (entriesCount < 3) {
+    return 'Not enough data to provide an analysis yet. Please continue tracking your mood for more insights.';
+  }
+  
+  let analysis = '';
+  
+  // Average mood analysis
+  if (stats.average > 5) {
+    analysis += 'Your average mood has been positive. ';
+  } else if (stats.average > 0) {
+    analysis += 'Your average mood has been mildly positive. ';
+  } else if (stats.average > -5) {
+    analysis += 'Your average mood has been mildly negative. ';
+  } else {
+    analysis += 'Your average mood has been negative. ';
+  }
+  
+  // Trend analysis
+  if (Math.abs(stats.trend) < 1) {
+    analysis += 'Your mood has been relatively stable. ';
+  } else if (stats.trend > 1) {
+    analysis += 'Your mood shows an improving trend. ';
+  } else {
+    analysis += 'Your mood shows a declining trend. ';
+  }
+  
+  // Fluctuation analysis
+  if (stats.fluctuation > 15) {
+    analysis += 'You\'ve experienced significant mood fluctuations. ';
+  } else if (stats.fluctuation > 10) {
+    analysis += 'You\'ve experienced moderate mood fluctuations. ';
+  } else {
+    analysis += 'Your mood has been relatively consistent. ';
+  }
+  
+  return analysis;
+};
+
+const generateArabicAnalysis = (stats: any, entriesCount: number) => {
+  if (entriesCount < 3) {
+    return 'لا توجد بيانات كافية لتقديم تحليل حتى الآن. يرجى الاستمرار في تتبع مزاجك للحصول على المزيد من الرؤى.';
+  }
+  
+  let analysis = '';
+  
+  // Average mood analysis
+  if (stats.average > 5) {
+    analysis += 'كان متوسط مزاجك إيجابيًا. ';
+  } else if (stats.average > 0) {
+    analysis += 'كان متوسط مزاجك إيجابيًا بشكل معتدل. ';
+  } else if (stats.average > -5) {
+    analysis += 'كان متوسط مزاجك سلبيًا بشكل معتدل. ';
+  } else {
+    analysis += 'كان متوسط مزاجك سلبيًا. ';
+  }
+  
+  // Trend analysis
+  if (Math.abs(stats.trend) < 1) {
+    analysis += 'كان مزاجك مستقرًا نسبيًا. ';
+  } else if (stats.trend > 1) {
+    analysis += 'يُظهر مزاجك اتجاهًا نحو التحسن. ';
+  } else {
+    analysis += 'يُظهر مزاجك اتجاهًا نحو التراجع. ';
+  }
+  
+  // Fluctuation analysis
+  if (stats.fluctuation > 15) {
+    analysis += 'لقد واجهت تقلبات كبيرة في المزاج. ';
+  } else if (stats.fluctuation > 10) {
+    analysis += 'لقد واجهت تقلبات معتدلة في المزاج. ';
+  } else {
+    analysis += 'كان مزاجك متسقًا نسبيًا. ';
+  }
+  
+  return analysis;
+};
+
+const generateEnglishRecommendations = (stats: any) => {
+  let recommendations = '';
+  
+  if (stats.average < 0) {
+    recommendations += 'Consider seeking professional support if your low mood persists. Regular mindfulness practice and physical activity can help improve your mood. ';
+  }
+  
+  if (stats.fluctuation > 10) {
+    recommendations += 'Your mood shows significant fluctuations. Establishing regular routines for sleep, meals, and activities can help stabilize mood. ';
+  }
+  
+  if (stats.trend < -2) {
+    recommendations += 'Your mood shows a declining trend. It may be helpful to identify recent stressors and develop coping strategies. ';
+  }
+  
+  if (recommendations === '') {
+    recommendations = 'Continue with your current activities and self-care routines. Regular mood tracking helps you maintain awareness of your mental wellbeing.';
+  }
+  
+  return recommendations;
+};
+
+const generateArabicRecommendations = (stats: any) => {
+  let recommendations = '';
+  
+  if (stats.average < 0) {
+    recommendations += 'فكر في طلب الدعم المهني إذا استمر مزاجك المنخفض. يمكن أن تساعد ممارسة اليقظة الذهنية والنشاط البدني المنتظم في تحسين مزاجك. ';
+  }
+  
+  if (stats.fluctuation > 10) {
+    recommendations += 'يُظهر مزاجك تقلبات كبيرة. يمكن أن يساعد وضع روتين منتظم للنوم والوجبات والأنشطة في استقرار المزاج. ';
+  }
+  
+  if (stats.trend < -2) {
+    recommendations += 'يُظهر مزاجك اتجاهًا نحو التراجع. قد يكون من المفيد تحديد الضغوطات الأخيرة وتطوير استراتيجيات للتأقلم. ';
+  }
+  
+  if (recommendations === '') {
+    recommendations = 'استمر في أنشطتك الحالية وروتين العناية الذاتية. يساعدك تتبع المزاج المنتظم على الحفاظ على الوعي برفاهيتك العقلية.';
+  }
+  
+  return recommendations;
+};
+
+const Report = () => {
+  const { language } = useLanguage();
+  const reportRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const moodEntries: MoodEntry[] = location.state?.moodEntries || [];
+
+  const handlePrint = useReactToPrint({
+    content: () => reportRef.current,
+    documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
+    pageStyle: 'width: 100%; height: auto;',
+  });
+
+  return (
+    <div className="container py-8">
+      <Card className="w-full shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className={language === 'ar' ? 'text-right' : ''}>
+            {language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية'}
+          </CardTitle>
+          <Button variant="outline" onClick={handlePrint} className="no-print">
+            <Printer className="mr-2 h-4 w-4" />
+            {language === 'en' ? 'Print Report' : 'طباعة التقرير'}
+          </Button>
+        </CardHeader>
+        
+        <CardContent className="pb-8">
+          <div ref={reportRef}>
+            <PrintableReport moodEntries={moodEntries} language={language} />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
