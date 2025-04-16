@@ -90,7 +90,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language
               <span className="font-medium">{moodEntries.length}</span>
             </div>
             <div className="flex justify-between">
-              <span>{language === 'en' ? 'Date Range' : 'النطاق الز��ني'}</span>
+              <span>{language === 'en' ? 'Date Range' : 'النطاق الز����ني'}</span>
               <span className="font-medium">
                 {stats.dateRange.start} - {stats.dateRange.end}
               </span>
@@ -386,7 +386,7 @@ const generateArabicAnalysis = (stats: any, entriesCount: number) => {
   } else if (stats.trend > 1) {
     analysis += 'يُظهر مزاجك اتجاهًا نحو التحسن. ';
   } else {
-    analysis += 'يُظهر مزاجك اتجاهًا نحو التراجع. ';
+    analysis += 'يُظهر مزاجك اتجاهًا نحو التراج��. ';
   }
   
   if (stats.fluctuation > 15) {
@@ -453,8 +453,7 @@ const Report = () => {
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
     onPrintError: (error) => console.error('Printing failed', error),
-    copyStyles: true,  
-    content: () => reportRef.current
+    content: () => reportRef.current,
   });
 
   return (
