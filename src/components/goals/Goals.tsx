@@ -35,11 +35,14 @@ const Goals = () => {
 
         if (error) throw error;
 
-        // Convert database data to Goal type
+        // Convert database data to Goal type with proper type validation
         if (data) {
           const typedGoals: Goal[] = data.map(goal => ({
             ...goal,
-            status: goal.status as 'active' | 'completed' | 'abandoned'
+            // Ensure status is one of the allowed values
+            status: (goal.status === 'active' || goal.status === 'completed' || goal.status === 'abandoned') 
+              ? goal.status as 'active' | 'completed' | 'abandoned'
+              : 'active' // Default to active if invalid status
           }));
           
           setGoals(typedGoals);
@@ -77,7 +80,10 @@ const Goals = () => {
           if (data) {
             const typedGoals: Goal[] = data.map(goal => ({
               ...goal,
-              status: goal.status as 'active' | 'completed' | 'abandoned'
+              // Ensure status is one of the allowed values
+              status: (goal.status === 'active' || goal.status === 'completed' || goal.status === 'abandoned') 
+                ? goal.status as 'active' | 'completed' | 'abandoned'
+                : 'active' // Default to active if invalid status
             }));
             
             setGoals(typedGoals);

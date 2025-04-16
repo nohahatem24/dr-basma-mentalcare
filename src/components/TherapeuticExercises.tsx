@@ -19,7 +19,8 @@ const TherapeuticExercises = () => {
   const { session } = useAuth();
   const [activeTab, setActiveTab] = useState('mindfulness');
 
-  // Handler for completing exercises, modified to match the expected signature in tabs
+  // Handler for completing exercises, updated to match expected signature in tabs
+  // and added adapter pattern to handle different parameter orders
   const handleExerciseComplete = (exerciseId: string, notes?: string) => {
     if (!session?.user) {
       toast({
@@ -68,6 +69,18 @@ const TherapeuticExercises = () => {
     }
   };
 
+  // Wrapper function for MindfulnessExerciseTab to adapt function signature
+  // This allows the component to call onComplete with either order of parameters
+  const handleMindfulnessComplete = (notesOrExerciseId: string, exerciseIdOrUndefined?: string) => {
+    if (exerciseIdOrUndefined) {
+      // Called as (exerciseId, notes)
+      handleExerciseComplete(notesOrExerciseId, exerciseIdOrUndefined);
+    } else {
+      // Called as (notes) - in this case we use a default exercise ID
+      handleExerciseComplete('mindfulness-exercise', notesOrExerciseId);
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className={language === 'ar' ? 'text-right' : ''}>
@@ -97,7 +110,7 @@ const TherapeuticExercises = () => {
           </TabsList>
           
           <TabsContent value="mindfulness" className="mt-0">
-            <MindfulnessExerciseTab onComplete={handleExerciseComplete} />
+            <MindfulnessExerciseTab onComplete={handleMindfulnessComplete} />
           </TabsContent>
           
           <TabsContent value="cbt" className="mt-0">

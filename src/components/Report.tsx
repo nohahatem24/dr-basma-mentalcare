@@ -43,21 +43,23 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language
 
   return (
     <div className="p-8 max-w-4xl mx-auto bg-white dark:bg-gray-950">
-      <style>{`
-        @media print {
-          body {
-            background-color: white !important;
-            color: black !important;
+      <style>
+        {`
+          @media print {
+            body {
+              background-color: white !important;
+              color: black !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .print-section {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
           }
-          .no-print {
-            display: none !important;
-          }
-          .print-section {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-        }
-      `}</style>
+        `}
+      </style>
       
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">
@@ -466,9 +468,8 @@ const Report = () => {
   const moodEntries: MoodEntry[] = location.state?.moodEntries || [];
 
   const handlePrint = useReactToPrint({
-    content: () => reportRef.current,
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
-    pageStyle: 'width: 100%; height: auto;',
+    content: () => reportRef.current,
   });
 
   return (
