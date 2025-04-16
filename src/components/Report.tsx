@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -450,9 +451,11 @@ const Report = () => {
   const location = useLocation();
   const moodEntries: MoodEntry[] = location.state?.moodEntries || [];
 
+  // Fix the useReactToPrint hook implementation
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
     onPrintError: (error) => console.error('Printing failed', error),
+    // Using the ref correctly as a content provider function
     content: () => reportRef.current,
   });
 
@@ -465,6 +468,7 @@ const Report = () => {
           </CardTitle>
           <Button 
             variant="outline" 
+            // Fix the onClick handler to use handlePrint directly
             onClick={handlePrint} 
             className="no-print"
           >
