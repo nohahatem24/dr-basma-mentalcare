@@ -32,7 +32,7 @@ export const useMoodChartData = (moodEntries: MoodEntry[] = []): MoodDataPoint[]
       weekday: 'short',
     });
     
-    // Normalize the mood value from -10:10 to 1:5 scale
+    // Normalize the mood value from -10:10 to 1:5 scale for the chart
     const normalizedMood = Math.round(((entry.mood + 10) / 20) * 4) + 1;
     
     return {

@@ -9,7 +9,7 @@ import GuidedBreathing from '@/components/breathing/GuidedBreathing';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import JournalEntries from '@/components/journal/Journal';
 import GratitudeJournal from '@/components/gratitude/Gratitude';
-import GoalsTracker from '@/components/goals/Goals';
+import Goals from '@/components/goals/Goals';
 import AIInsights from '@/components/dashboard/AIInsights';
 import TherapeuticExercises from '@/components/TherapeuticExercises';
 import MoodTracker from '@/components/mood-tracker/MoodTracker';
@@ -30,7 +30,7 @@ const Dashboard = () => {
       case 'gratitude':
         return <GratitudeJournal />;
       case 'goals':
-        return <GoalsTracker />;
+        return <Goals />;
       case 'report':
         return <MentalHealthReport />;
       case 'breathing':
