@@ -64,7 +64,8 @@ export const MoodGraph: React.FC<MoodGraphProps> = ({ moodEntries }) => {
         ticks: {
           autoSkip: true,
           maxRotation: language === 'ar' ? 45 : 0, // Rotate Arabic labels for better visibility
-          align: language === 'ar' ? 'start' : 'center',
+          // Fix: Use literal "center" or "start" instead of string variable to match Chart.js types
+          align: language === 'ar' ? 'start' as const : 'center' as const,
         }
       }
     },

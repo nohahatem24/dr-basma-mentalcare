@@ -452,7 +452,7 @@ const Report = () => {
 
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
-    content: () => reportRef.current,
+    documentElement: () => reportRef.current,
   });
 
   return (
@@ -462,7 +462,11 @@ const Report = () => {
           <CardTitle className={language === 'ar' ? 'text-right' : ''}>
             {language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية'}
           </CardTitle>
-          <Button variant="outline" onClick={handlePrint} className="no-print">
+          <Button 
+            variant="outline" 
+            onClick={() => handlePrint()} 
+            className="no-print"
+          >
             <Printer className="mr-2 h-4 w-4" />
             {language === 'en' ? 'Print Report' : 'طباعة التقرير'}
           </Button>
