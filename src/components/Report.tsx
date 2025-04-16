@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,7 +90,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ moodEntries, language
               <span className="font-medium">{moodEntries.length}</span>
             </div>
             <div className="flex justify-between">
-              <span>{language === 'en' ? 'Date Range' : 'النطاق الز������ني'}</span>
+              <span>{language === 'en' ? 'Date Range' : 'النطاق الزمني'}</span>
               <span className="font-medium">
                 {stats.dateRange.start} - {stats.dateRange.end}
               </span>
@@ -451,12 +450,9 @@ const Report = () => {
   const location = useLocation();
   const moodEntries: MoodEntry[] = location.state?.moodEntries || [];
 
-  // Fixing the useReactToPrint hook implementation
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
     onPrintError: (error) => console.error('Printing failed', error),
-    // The correct way to use the content prop
-    content: () => reportRef.current,
   });
 
   return (
@@ -468,8 +464,7 @@ const Report = () => {
           </CardTitle>
           <Button 
             variant="outline" 
-            // Fixing the onClick handler - handlePrint is already a function
-            onClick={() => handlePrint()}
+            onClick={handlePrint}
             className="no-print"
           >
             <Printer className="mr-2 h-4 w-4" />
