@@ -452,6 +452,7 @@ const Report = () => {
 
   const handlePrint = useReactToPrint({
     documentTitle: language === 'en' ? 'Mental Health Report' : 'تقرير الصحة النفسية',
+    onPrintError: (error) => console.error('Printing failed', error),
     content: () => reportRef.current,
   });
 
@@ -464,7 +465,10 @@ const Report = () => {
           </CardTitle>
           <Button 
             variant="outline" 
-            onClick={handlePrint} 
+            onClick={(e) => {
+              e.preventDefault();
+              handlePrint();
+            }}
             className="no-print"
           >
             <Printer className="mr-2 h-4 w-4" />
