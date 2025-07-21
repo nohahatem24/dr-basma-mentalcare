@@ -1,69 +1,126 @@
-# Welcome to your Lovable project
+Dr. Basma Mental Care
 
-## Project info
+**Dr. Basma Mental Care** is a web platform dedicated to providing mental health support through online session booking, user profiles, digital payments, and administrative tools for mental health professionals. This application was developed as a modern, responsive, and scalable mental health care platform using **React**, **Vite**, **Firebase**, and **Tailwind CSS**.
 
-**URL**: https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37
+---
 
-## How can I edit this code?
+## 🌟 Features
 
-There are several ways of editing your application.
+### 🧑‍⚕️ For Patients:
+- Register and log in securely
+- View available mental health services
+- Book sessions with professionals
+- Manage bookings and sessions
+- Make online payments
 
-**Use Lovable**
+### 👩‍⚕️ For Doctors:
+- Create and update personal profile and specialties
+- Approve or reject session bookings
+- View and manage patient schedules
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37) and start prompting.
+### 🛠️ Admin Panel:
+- Manage doctor accounts
+- Track sessions
+- Monitor payment and wallet status
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🧰 Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend**: React + Vite + Tailwind CSS
+- **Authentication & Database**: Firebase Authentication + Firestore
+- **Routing**: React Router
+- **Deployment**: GitHub Pages / Firebase Hosting
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Prerequisites
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- Node.js ≥ 16
+- NPM or Yarn
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Installation
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/nohahatem24/dr-basma-mentalcare.git
+   cd dr-basma-mentalcare
+````
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Run the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser at [http://localhost:5173](http://localhost:5173)
+
+---
+
+## 🗃️ Project Structure
+
+```bash
+├── public
+├── src
+│   ├── components     # Shared UI components
+│   ├── pages          # Main page views (Home, Login, Register, etc.)
+│   ├── context        # Auth and global context
+│   ├── firebase       # Firebase configuration
+│   └── styles         # Tailwind & custom styles
+├── vite.config.ts     # Vite configuration
+├── tailwind.config.js # Tailwind configuration
+└── package.json
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## ⚠️ Known Issues
 
-**Use GitHub Codespaces**
+* Booking and payment validation needs enhancement.
+* Data (user input like age, reason, preferred session time) isn't currently saved.
+* Session confirmation may proceed even if payment fails or user input is incomplete.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### ✅ Planned Fixes:
 
-## What technologies are used for this project?
+* Add validation for all booking form fields
+* Ensure wallet deduction only happens after valid input & successful payment
+* Improve session booking logic and payment feedback
 
-This project is built with .
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Contributing
 
-## How can I deploy this project?
+Contributions are welcome! If you'd like to suggest a fix or feature:
 
-Simply open [Lovable](https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37) and click on Share -> Publish.
+1. Fork the repo
+2. Create a new branch (`git checkout -b feature-name`)
+3. Commit changes (`git commit -m 'Add new feature'`)
+4. Push to your branch (`git push origin feature-name`)
+5. Open a Pull Request
 
-## I want to use a custom domain - is that possible?
+---
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+## 📬 Contact
+
+**Developer:** Noha Hatem
+**GitHub:** [@nohahatem24](https://github.com/nohahatem24)
+
+For suggestions or collaboration opportunities, feel free to reach out via GitHub.
+
+```
+
