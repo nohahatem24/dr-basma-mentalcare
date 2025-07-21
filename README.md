@@ -3,6 +3,9 @@ Dr. Basma Mental Care
 **Dr. Basma Mental Care** is a web platform dedicated to providing mental health support through online session booking, user profiles, digital payments, and administrative tools for mental health professionals. This application was developed as a modern, responsive, and scalable mental health care platform using **React**, **Vite**, **Firebase**, and **Tailwind CSS**.
 
 ---
+## Dr. Basma Mental Care Project Link
+
+**URL**: https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37
 
 ## 🌟 Features
 
