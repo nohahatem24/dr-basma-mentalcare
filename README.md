@@ -35,7 +35,7 @@ Dr. Basma Mental Care
 ## 🧰 Tech Stack
 
 - **Frontend**: React + Vite + Tailwind CSS
-- **Authentication & Database**: Firebase Authentication + Firestore
+- **Authentication & Database**: Supbase Authentication 
 - **Routing**: React Router
 - **Deployment**: GitHub Pages / Firebase Hosting
 
