@@ -12,9 +12,13 @@ Dr. Basma Mental Care
 ### 🧑‍⚕️ For Patients:
 - Register and log in securely
 - View available mental health services
-- Book sessions with professionals
+- Book sessions with Dr Basma Adel
+- MindTrack tool for mood tracking, journaling, and emotional well-being insights
+- Guided breathing and self-care exercises 
 - Manage bookings and sessions
 - Make online payments
+- Flexible session durations and pricing options
+- Patient reviews and feedback system',
 
 ### 👩‍⚕️ For Doctors:
 - Create and update personal profile and specialties
@@ -31,7 +35,7 @@ Dr. Basma Mental Care
 ## 🧰 Tech Stack
 
 - **Frontend**: React + Vite + Tailwind CSS
-- **Authentication & Database**: Firebase Authentication + Firestore
+- **Authentication & Database**: Supbase Authentication 
 - **Routing**: React Router
 - **Deployment**: GitHub Pages / Firebase Hosting
 
