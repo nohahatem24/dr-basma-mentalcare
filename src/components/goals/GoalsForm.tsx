@@ -53,7 +53,7 @@ const GoalsForm: React.FC<GoalsFormProps> = ({ onSuccess, onCancel }) => {
       setIsSubmitting(true);
       
       const { error } = await supabase.from('goals').insert({
-        user_id: session.user.id,
+        //user_id: session.user.id,
         title,
         description: description.trim() || null,
         target_date: targetDate ? targetDate.toISOString() : null,

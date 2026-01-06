@@ -20,10 +20,10 @@ const Goals = () => {
 
   useEffect(() => {
     const fetchGoals = async () => {
-      if (!session?.user) {
+      /*if (!session?.user) {
         setIsLoading(false);
         return;
-      }
+      }*/
 
       try {
         setIsLoading(true);

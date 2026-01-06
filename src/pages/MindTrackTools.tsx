@@ -21,7 +21,7 @@ const MindTrackTools = () => {
   const { language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const { session } = useAuth();
+  //const { session } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('mood');
 
   // Get tab from URL query parameters
@@ -124,7 +124,7 @@ const MindTrackTools = () => {
   ];
 
   // Check if user is authenticated
-  if (!session.isAuthenticated) {
+  /*if (!session.isAuthenticated) {
     return (
       <div className="container max-w-6xl py-8">
         <Card className="p-8 text-center">
@@ -146,7 +146,7 @@ const MindTrackTools = () => {
         </Card>
       </div>
     );
-  }
+  }*/
 
   return (
     <div className="container max-w-6xl py-8">

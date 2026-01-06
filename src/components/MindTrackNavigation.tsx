@@ -14,7 +14,7 @@ const MindTrackNavigation: React.FC<MindTrackNavProps> = ({ activePage }) => {
   const location = useLocation();
 
   const getBasePath = () => {
-    return '/dashboard'; // Now everything is under dashboard
+    return '/mindtrack'; // Now everything is under dashboard
   };
 
   const navItems = [

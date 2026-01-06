@@ -100,14 +100,14 @@ const Journal = () => {
   };
   
   const handleSaveEntry = async () => {
-    if (!session?.user) {
+    /*if (!session?.user) {
       toast({
         title: language === 'en' ? 'Authentication Required' : 'مطلوب المصادقة',
         description: language === 'en' ? 'Please sign in to save journal entries.' : 'الرجاء تسجيل الدخول لحفظ مدخلات المذكرات.',
         variant: 'destructive'
       });
       return;
-    }
+    }*/
     
     if (!title.trim() || !content.trim()) {
       toast({
@@ -142,7 +142,7 @@ const Journal = () => {
         const { data, error } = await supabase
           .from('journal_entries')
           .insert({
-            user_id: session.user.id,
+            //user_id: session.user.id,
             title,
             content,
             tags,

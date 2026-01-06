@@ -5,7 +5,7 @@ Dr. Basma Mental Care
 ---
 ## Dr. Basma Mental Care Project Link
 
-**URL**: https://lovable.dev/projects/92a1247e-da3a-45be-a0e8-3a3098f0bf37
+**URL**: https://dr-basma-mentalcare.vercel.app/
 
 ## 🌟 Features
 

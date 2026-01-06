@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ 
   children,
-  requireAuth = true,
+  requireAuth = false, //////////////////
   requireDoctor = false 
 }: ProtectedRouteProps) => {
   const location = useLocation();

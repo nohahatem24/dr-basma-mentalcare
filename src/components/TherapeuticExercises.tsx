@@ -22,7 +22,7 @@ const TherapeuticExercises = () => {
   // Handler for completing exercises, updated to match expected signature in tabs
   // and added adapter pattern to handle different parameter orders
   const handleExerciseComplete = (exerciseId: string, notes?: string) => {
-    if (!session?.user) {
+    /*if (!session?.user) {
       toast({
         title: language === 'en' ? 'Sign in required' : 'تسجيل الدخول مطلوب',
         description: language === 'en' 
@@ -31,12 +31,12 @@ const TherapeuticExercises = () => {
         variant: 'destructive',
       });
       return;
-    }
+    }*/
     
     try {
       // Log completion in database
       const exerciseLog = {
-        user_id: session.user.id,
+        //user_id: session.user.id,
         exercise_id: exerciseId,
         exercise_type: activeTab,
         notes: notes || '',

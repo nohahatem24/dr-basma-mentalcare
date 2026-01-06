@@ -60,14 +60,14 @@ const Gratitude = () => {
   };
   
   const handleSubmit = async () => {
-    if (!session?.user) {
+    /*if (!session?.user) {
       toast({
         title: language === 'en' ? 'Authentication Required' : 'مطلوب المصادقة',
         description: language === 'en' ? 'Please sign in to add gratitude entries.' : 'الرجاء تسجيل الدخول لإضافة مدخلات الامتنان.',
         variant: 'destructive'
       });
       return;
-    }
+    }*/
     
     if (!content.trim()) {
       toast({
@@ -97,7 +97,7 @@ const Gratitude = () => {
         const { data, error } = await supabase
           .from('gratitude_entries')
           .insert({
-            user_id: session.user.id,
+            //user_id: session.user.id,
             content
           })
           .select();

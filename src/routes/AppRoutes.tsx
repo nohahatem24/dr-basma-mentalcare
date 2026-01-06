@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/components/Header';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import MindTrackTools from "@/pages/MindTrackTools.tsx";
 
 // Pages
 import Index from "@/pages/Index";
@@ -31,27 +32,37 @@ const AppRoutes = () => {
       <Route path="/services" element={<Services />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/auth" element={<Auth />} />
-      
+
+
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
         </ProtectedRoute>
       } />
-      
+
+      <Route
+        path="/mindtrack"
+        element={
+          <ProtectedRoute requireAuth={false}>
+            <MindTrackTools />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="/book-appointment" element={<DoctorProfile />} />
-      
+
       <Route path="/video-session" element={
         <ProtectedRoute>
           <VideoSession />
         </ProtectedRoute>
       } />
-      
+
       <Route path="/report" element={
         <ProtectedRoute>
           <Report />
         </ProtectedRoute>
       } />
-      
+
       <Route path="/profile" element={
         <ProtectedRoute>
           <div className="container py-8">
@@ -65,7 +76,7 @@ const AppRoutes = () => {
           <AccountSettings />
         </ProtectedRoute>
       } />
-      
+
       <Route path="/doctor-admin" element={
         <ProtectedRoute requireDoctor={true}>
           <div className="container py-8">
@@ -73,13 +84,13 @@ const AppRoutes = () => {
           </div>
         </ProtectedRoute>
       } />
-      
+
       <Route path="/payment" element={
         <ProtectedRoute>
           <PaymentPage />
         </ProtectedRoute>
       } />
-      
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

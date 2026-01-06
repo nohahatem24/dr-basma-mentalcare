@@ -48,7 +48,7 @@ const MoodTracker = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { session } = useAuth();
-  
+
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
@@ -58,7 +58,7 @@ const MoodTracker = () => {
   useEffect(() => {
     const fetchMoodEntries = async () => {
       if (!session.user) return;
-      
+
       try {
         setIsLoading(true);
         const { data, error } = await supabase
@@ -66,9 +66,9 @@ const MoodTracker = () => {
           .select('*')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false });
-          
+
         if (error) throw error;
-        
+
         if (data) {
           // Convert database entries to MoodEntry format
           const formattedEntries: MoodEntry[] = data.map(entry => ({
@@ -78,7 +78,7 @@ const MoodTracker = () => {
             notes: entry.notes || '',
             triggers: entry.triggers || []
           }));
-          
+
           setMoodEntries(formattedEntries);
         }
       } catch (error) {
@@ -92,7 +92,7 @@ const MoodTracker = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchMoodEntries();
   }, [session.user, language, toast]);
 
@@ -109,34 +109,52 @@ const MoodTracker = () => {
   };
 
   const handleAddMoodEntry = async (formData: { mood: number; notes: string; triggers: string[] }) => {
-    if (!session.user) {
-      toast({
-        title: language === 'en' ? 'Authentication Required' : 'مطلوب المصادقة',
-        description: language === 'en' ? 'Please sign in to track your mood.' : 'الرجاء تسجيل الدخول لتتبع مزاجك.',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
     try {
       // Map the mood to database scale (1 to 5)
       const dbMoodScore = mapMoodToDBScale(formData.mood);
-      
-      // If editing an existing entry
+
+      if (!session?.user) {
+        // Guest Mode: Save locally
+        const guestMoods = JSON.parse(localStorage.getItem('guest_moods') || '[]');
+        const newGuestEntry: MoodEntry = {
+          id: Date.now().toString(),
+          date: new Date(),
+          mood: formData.mood,
+          notes: formData.notes,
+          triggers: formData.triggers
+        };
+
+        guestMoods.unshift(newGuestEntry);
+        localStorage.setItem('guest_moods', JSON.stringify(guestMoods));
+
+        // Update local state
+        setMoodEntries([newGuestEntry, ...moodEntries]);
+
+        toast({
+          title: language === 'en' ? 'Mood Saved (Guest)' : 'تم حفظ المزاج (ضيف)',
+          description: language === 'en'
+            ? 'Your mood was saved locally. Sign in to back it up.'
+            : 'تم حفظ مزاجك محليًا. سجّل الدخول لنسخه احتياطيًا.'
+        });
+
+        resetForm();
+        return;
+      }
+
+      // Logged-in user: Save to Supabase
       if (editingId) {
         const { error } = await supabase
           .from('mood_entries')
           .update({
-            mood_score: dbMoodScore, // Save mapped mood score
+            mood_score: dbMoodScore,
             notes: formData.notes,
             triggers: formData.triggers,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingId);
-          
+
         if (error) throw error;
-        
-        // Update local state
+
         const updatedEntries = moodEntries.map(entry =>
           entry.id === editingId
             ? { ...entry, mood: formData.mood, notes: formData.notes, triggers: formData.triggers }
@@ -146,29 +164,27 @@ const MoodTracker = () => {
         setMoodEntries(updatedEntries);
         toast({
           title: language === 'en' ? 'Mood Entry Updated' : 'تم تحديث إدخال المزاج',
-          description: language === 'en' ? 'Your mood entry has been updated.' : 'تم تحديث إدخال المزاج الخاص بك.',
+          description: language === 'en' ? 'Your mood entry has been updated.' : 'تم تحديث إدخال المزاج الخاص بك.'
         });
       } else {
-        // Adding a new entry
         const { data, error } = await supabase
           .from('mood_entries')
           .insert({
-            user_id: session.user.id,
-            mood_score: dbMoodScore, // Save mapped mood score
+            //user_id: session.user.id,
+            mood_score: dbMoodScore,
             notes: formData.notes,
             triggers: formData.triggers,
             mood_label: getMoodLabel(formData.mood)
           })
           .select();
-          
+
         if (error) throw error;
-        
+
         if (data && data[0]) {
-          // Add new entry to local state
           const newEntry: MoodEntry = {
             id: data[0].id,
             date: new Date(),
-            mood: formData.mood, // Store the original mood value in the UI
+            mood: formData.mood,
             notes: formData.notes,
             triggers: formData.triggers
           };
@@ -176,12 +192,11 @@ const MoodTracker = () => {
           setMoodEntries([newEntry, ...moodEntries]);
           toast({
             title: language === 'en' ? 'Mood Tracked' : 'تم تتبع المزاج',
-            description: language === 'en' ? 'Your mood has been recorded.' : 'تم تسجيل مزاجك.',
+            description: language === 'en' ? 'Your mood has been recorded.' : 'تم تسجيل مزاجك.'
           });
         }
       }
 
-      // Reset form
       resetForm();
     } catch (error) {
       console.error('Error saving mood entry:', error);
@@ -209,15 +224,15 @@ const MoodTracker = () => {
 
   const handleDeleteEntry = async (id: string) => {
     if (!session.user) return;
-    
+
     try {
       const { error } = await supabase
         .from('mood_entries')
         .delete()
         .eq('id', id);
-        
+
       if (error) throw error;
-      
+
       // Update local state
       setMoodEntries(moodEntries.filter(entry => entry.id !== id));
       toast({
